@@ -808,5 +808,276 @@ public class RectangleDemo
 
 
 
+![image-20220809211203606](img/java设计模式学习笔记/image-20220809211203606.png)
 
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_里氏代换原则
+ * Package(包名): mao.after
+ * Interface(接口名): Quadrilateral
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 21:13
+ * Version(版本): 1.0
+ * Description(描述)： 四边形接口
+ */
+
+public interface Quadrilateral
+{
+    /**
+     * Gets length.
+     *
+     * @return the length
+     */
+    double getLength();
+
+    /**
+     * Gets width.
+     *
+     * @return the width
+     */
+    double getWidth();
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_里氏代换原则
+ * Package(包名): mao.after
+ * Class(类名): Rectangle
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 21:15
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Rectangle implements Quadrilateral
+{
+
+    private double length;
+    private double width;
+
+    /**
+     * Instantiates a new Rectangle.
+     */
+    public Rectangle()
+    {
+
+    }
+
+    /**
+     * Instantiates a new Rectangle.
+     *
+     * @param length the length
+     * @param width  the width
+     */
+    public Rectangle(double length, double width)
+    {
+        this.length = length;
+        this.width = width;
+    }
+
+    @Override
+    public double getLength()
+    {
+        return length;
+    }
+
+    /**
+     * Sets length.
+     *
+     * @param length the length
+     */
+    public void setLength(double length)
+    {
+        this.length = length;
+    }
+
+    @Override
+    public double getWidth()
+    {
+        return width;
+    }
+
+    /**
+     * Sets width.
+     *
+     * @param width the width
+     */
+    public void setWidth(double width)
+    {
+        this.width = width;
+    }
+}
+```
+
+
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_里氏代换原则
+ * Package(包名): mao.after
+ * Class(类名): Square
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 21:16
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+public class Square implements Quadrilateral
+{
+    private double side;
+
+    /**
+     * Instantiates a new Square.
+     */
+    public Square()
+    {
+
+    }
+
+    /**
+     * Instantiates a new Square.
+     *
+     * @param side the side
+     */
+    public Square(double side)
+    {
+        this.side = side;
+    }
+
+    /**
+     * Sets side.
+     *
+     * @param side the side
+     */
+    public void setSide(double side)
+    {
+        this.side = side;
+    }
+
+    @Override
+    public double getLength()
+    {
+        return side;
+    }
+
+    @Override
+    public double getWidth()
+    {
+        return side;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+
+/**
+ * Project name(项目名称)：java设计模式_里氏代换原则
+ * Package(包名): mao.after
+ * Class(类名): RectangleDemo
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 21:18
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class RectangleDemo
+{
+    /**
+     * 拓宽，直到宽度比长度还大，正方形会死循环
+     *
+     * @param rectangle Rectangle对象
+     */
+    public static void resize(Rectangle rectangle)
+    {
+        while (rectangle.getWidth() <= rectangle.getLength())
+        {
+            rectangle.setWidth(rectangle.getWidth() + 1);
+        }
+    }
+
+    /**
+     * 打印长和宽
+     *
+     * @param quadrilateral Quadrilateral实现类对象
+     */
+    public static void printf(Quadrilateral quadrilateral)
+    {
+        System.out.println("长度：" + quadrilateral.getLength());
+        System.out.println("宽度：" + quadrilateral.getWidth());
+    }
+
+
+    public static void main(String[] args)
+    {
+        Rectangle rectangle = new Rectangle(9, 3);
+        printf(rectangle);
+        resize(rectangle);
+        printf(rectangle);
+
+        //----
+
+        Square square = new Square();
+        square.setSide(13);
+        printf(square);
+        //因为无法使用resize(square)，解决了此问题
+        //resize(square);
+    }
+}
+```
+
+
+
+
+
+![image-20220809212435400](img/java设计模式学习笔记/image-20220809212435400.png)
+
+
+
+
+
+
+
+
+
+
+
+## 依赖倒转原则
 
