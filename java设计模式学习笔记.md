@@ -253,3 +253,560 @@ UML 从目标系统的不同角度出发，定义了用例图、类图、对象�
 
 ## 开闭原则
 
+### 概念
+
+**对扩展开放，对修改关闭**。在程序需要进行拓展的时候，不能去修改原有的代码，实现一个热插拔的效果。简言之，是为了使程序的扩展性好，易于维护和升级。
+
+想要达到这样的效果，我们需要使用接口和抽象类。
+
+因为抽象灵活性好，适应性广，只要抽象的合理，可以基本保持软件架构的稳定。而软件中易变的细节可以从抽象派生来的实现类来进行扩展，当软件需要发生变化时，只需要根据需求重新派生一个实现类来扩展就可以了。
+
+
+
+
+
+### 示例
+
+示例：搜狗输入法的皮肤设计
+
+
+
+搜狗输入法的皮肤是输入法背景图片、窗口颜色和声音等元素的组合。用户可以根据自己的喜爱更换自己的输入法的皮肤，也可以从网上下载新的皮肤。这些皮肤有共同的特点，可以为其定义一个抽象类（AbstractSkin），而每个具体的皮肤是其子类。用户窗体可以根据需要选择或者增加新的主题，而不需要修改原代码，所以它是满足开闭原则的。
+
+
+
+![image-20220809204551300](img/java设计模式学习笔记/image-20220809204551300.png)
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_开闭原则
+ * Package(包名): mao
+ * Class(类名): AbstractSkin
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 20:27
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public abstract class AbstractSkin
+{
+    public abstract void display();
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_开闭原则
+ * Package(包名): mao
+ * Class(类名): SouGouInput
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 20:28
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+public class SouGouInput
+{
+    private AbstractSkin skin;
+
+    /**
+     * Instantiates a new Sou gou input.
+     *
+     * @param skin the skin
+     */
+    public SouGouInput(AbstractSkin skin)
+    {
+        this.skin = skin;
+    }
+
+    /**
+     * Gets skin.
+     *
+     * @return the skin
+     */
+    public AbstractSkin getSkin()
+    {
+        return skin;
+    }
+
+    /**
+     * Sets skin.
+     *
+     * @param skin the skin
+     */
+    public void setSkin(AbstractSkin skin)
+    {
+        this.skin = skin;
+    }
+
+    /**
+     * Display.
+     */
+    public void display()
+    {
+        skin.display();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_开闭原则
+ * Package(包名): mao
+ * Class(类名): DefaultSkin
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 20:35
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class DefaultSkin extends AbstractSkin
+{
+
+    @Override
+    public void display()
+    {
+        System.out.println("默认皮肤");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_开闭原则
+ * Package(包名): mao
+ * Class(类名): Skin1
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 20:36
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Skin1 extends AbstractSkin
+{
+
+    @Override
+    public void display()
+    {
+        System.out.println("皮肤1");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_开闭原则
+ * Package(包名): mao
+ * Class(类名): Skin2
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 20:37
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Skin2 extends AbstractSkin
+{
+
+    @Override
+    public void display()
+    {
+        System.out.println("皮肤2");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_开闭原则
+ * Package(包名): mao
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 20:37
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        SouGouInput souGouInput = new SouGouInput(new DefaultSkin());
+        souGouInput.display();
+        souGouInput = new SouGouInput(new Skin1());
+        souGouInput.display();
+        souGouInput = new SouGouInput(new Skin2());
+        souGouInput.display();
+    }
+}
+```
+
+
+
+
+
+添加皮肤
+
+
+
+```java
+package mao.add;
+
+import mao.AbstractSkin;
+
+/**
+ * Project name(项目名称)：java设计模式_开闭原则
+ * Package(包名): mao.add
+ * Class(类名): Skin3
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 20:42
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Skin3 extends AbstractSkin
+{
+
+    @Override
+    public void display()
+    {
+        System.out.println("添加皮肤3，没有对原来代码进行修改");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.add;
+
+import mao.SouGouInput;
+
+/**
+ * Project name(项目名称)：java设计模式_开闭原则
+ * Package(包名): mao.add
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 20:42
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        SouGouInput souGouInput = new SouGouInput(new Skin3());
+        souGouInput.display();
+    }
+}
+```
+
+
+
+
+
+
+
+## 里氏代换原则
+
+### 概念
+
+里氏代换原则是面向对象设计的基本原则之一。
+
+里氏代换原则：任何基类可以出现的地方，子类一定可以出现。通俗理解：子类可以扩展父类的功能，但不能改变父类原有的功能。换句话说，子类继承父类时，除添加新的方法完成新增功能外，尽量不要重写父类的方法。
+
+如果通过重写父类的方法来完成新的功能，这样写起来虽然简单，但是整个继承体系的可复用性会比较差，特别是运用多态比较频繁时，程序运行出错的概率会非常大。
+
+
+
+
+
+### 示例
+
+示例：正方形不是长方形
+
+在数学领域里，正方形毫无疑问是长方形，它是一个长宽相等的长方形。所以，我们开发的一个与几何图形相关的软件系统，就可以顺理成章的让正方形继承自长方形。
+
+
+
+![image-20220809205433018](img/java设计模式学习笔记/image-20220809205433018.png)
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_里氏代换原则
+ * Package(包名): mao.before
+ * Class(类名): Rectangle
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 20:57
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+public class Rectangle
+{
+    private double length;
+    private double width;
+
+    /**
+     * Instantiates a new Rectangle.
+     *
+     * @param length the length
+     * @param width  the width
+     */
+    public Rectangle(double length, double width)
+    {
+        this.length = length;
+        this.width = width;
+    }
+
+    /**
+     * Instantiates a new Rectangle.
+     */
+    public Rectangle()
+    {
+
+    }
+
+    /**
+     * Gets length.
+     *
+     * @return the length
+     */
+    public double getLength()
+    {
+        return length;
+    }
+
+    /**
+     * Sets length.
+     *
+     * @param length the length
+     */
+    public void setLength(double length)
+    {
+        this.length = length;
+    }
+
+    /**
+     * Gets width.
+     *
+     * @return the width
+     */
+    public double getWidth()
+    {
+        return width;
+    }
+
+    /**
+     * Sets width.
+     *
+     * @param width the width
+     */
+    public void setWidth(double width)
+    {
+        this.width = width;
+    }
+
+
+}
+```
+
+
+
+
+
+由于正方形的长和宽相同，所以在方法setLength和setWidth中，对长度和宽度都需要赋相同值。
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_里氏代换原则
+ * Package(包名): mao.before
+ * Class(类名): Square
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 20:57
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Square extends Rectangle
+{
+    @Override
+    public void setWidth(double width)
+    {
+        super.setLength(width);
+        super.setWidth(width);
+    }
+
+    @Override
+    public void setLength(double length)
+    {
+        super.setLength(length);
+        super.setWidth(length);
+    }
+}
+```
+
+
+
+
+
+类RectangleDemo是我们的软件系统中的一个组件，它有一个resize方法依赖基类Rectangle，resize方法是RectandleDemo类中的一个方法，用来实现宽度逐渐增长的效果。
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_里氏代换原则
+ * Package(包名): mao.before
+ * Class(类名): RectangleDemo
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 21:00
+ * Version(版本): 1.0
+ * Description(描述)： 类RectangleDemo是我们的软件系统中的一个组件，它有一个resize方法依赖基类Rectangle，resize方法是RectangleDemo类中的一个方法，用来实现宽度逐渐增长的效果。
+ */
+
+public class RectangleDemo
+{
+    /**
+     * 拓宽，直到宽度比长度还大，正方形会死循环
+     *
+     * @param rectangle Rectangle对象
+     */
+    public static void resize(Rectangle rectangle)
+    {
+        while (rectangle.getWidth() <= rectangle.getLength())
+        {
+            rectangle.setWidth(rectangle.getWidth() + 1);
+        }
+    }
+
+    /**
+     * 打印长和宽
+     *
+     * @param rectangle Rectangle对象
+     */
+    public static void printf(Rectangle rectangle)
+    {
+        System.out.println("长度：" + rectangle.getLength());
+        System.out.println("宽度：" + rectangle.getWidth());
+    }
+
+    public static void main(String[] args)
+    {
+        Rectangle rectangle = new Rectangle(12, 8);
+        printf(rectangle);
+        resize(rectangle);
+        printf(rectangle);
+
+        //-------
+        rectangle = new Square();
+        rectangle.setLength(9);
+        printf(rectangle);
+        resize(rectangle);
+        printf(rectangle);
+    }
+}
+```
+
+
+
+
+
+我们运行一下这段代码就会发现，假如我们把一个普通长方形作为参数传入resize方法，就会看到长方形宽度逐渐增长的效果，当宽度大于长度,代码就会停止，这种行为的结果符合我们的预期；假如我们再把一个正方形作为参数传入resize方法后，就会看到正方形的宽度和长度都在不断增长，代码会一直运行下去，直至系统产生溢出错误。所以，普通的长方形是适合这段代码的，正方形不适合。
+我们得出结论：在resize方法中，Rectangle类型的参数是不能被Square类型的参数所代替，如果进行了替换就得不到预期结果。因此，Square类和Rectangle类之间的继承关系违反了里氏代换原则，它们之间的继承关系不成立，正方形不是长方形。
+
+
+
+
+
+**改进：**
+
+抽象出来一个四边形接口(Quadrilateral)，让Rectangle类和Square类实现Quadrilateral接口
+
+
+
+
+
