@@ -1856,3 +1856,303 @@ public class Test2
 
 ## 接口隔离原则
 
+### 概念
+
+客户端不应该被迫依赖于它不使用的方法；一个类对另一个类的依赖应该建立在最小的接口上
+
+
+
+### 示例
+
+接口有三个方法
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_接口隔离原则
+ * Package(包名): mao.before
+ * Interface(接口名): Interface_s
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/10
+ * Time(创建时间)： 21:33
+ * Version(版本): 1.0
+ * Description(描述)： 接口
+ */
+
+public interface Interface_s
+{
+    void a();
+
+    void b();
+
+    void c();
+}
+```
+
+
+
+实现类Impl1需要重写三个方法，没问题
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_接口隔离原则
+ * Package(包名): mao.before
+ * Class(类名): Impl1
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/10
+ * Time(创建时间)： 21:34
+ * Version(版本): 1.0
+ * Description(描述)： Impl1类，需要实现Interface_s接口的三个方法
+ */
+
+public class Impl1 implements Interface_s
+{
+
+    @Override
+    public void a()
+    {
+        System.out.println("Impl1重写方法a");
+    }
+
+    @Override
+    public void b()
+    {
+        System.out.println("Impl1重写方法b");
+    }
+
+    @Override
+    public void c()
+    {
+        System.out.println("Impl1重写方法c");
+    }
+}
+```
+
+
+
+
+
+现在实现类Impl2只需要重写两个方法，第三个方法不需要重写，有问题，实现的接口必须重写全部方法
+
+
+
+![image-20220810214021061](img/java设计模式学习笔记/image-20220810214021061.png)
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_接口隔离原则
+ * Package(包名): mao.before
+ * Class(类名): Impl2
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/10
+ * Time(创建时间)： 21:36
+ * Version(版本): 1.0
+ * Description(描述)： Impl2类，需求：只需要实现a和b方法，c方法不需要实现，做不到
+ */
+
+public class Impl2 implements Interface_s
+{
+
+    @Override
+    public void a()
+    {
+        System.out.println("Impl2重写方法a");
+    }
+
+    @Override
+    public void b()
+    {
+        System.out.println("Impl2重写方法b");
+    }
+
+    @Override
+    public void c()
+    {
+        
+    }
+}
+```
+
+
+
+
+
+**改进：**
+
+一个类对另一个类的依赖应该建立在最小的接口上
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_接口隔离原则
+ * Package(包名): mao.after
+ * Interface(接口名): Interface_a
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/10
+ * Time(创建时间)： 21:42
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface Interface_a
+{
+    void a();
+}
+```
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_接口隔离原则
+ * Package(包名): mao.after
+ * Interface(接口名): Interface_b
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/10
+ * Time(创建时间)： 21:43
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface Interface_b
+{
+    void b();
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_接口隔离原则
+ * Package(包名): mao.after
+ * Interface(接口名): Interface_c
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/10
+ * Time(创建时间)： 21:43
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface Interface_c
+{
+    void c();
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_接口隔离原则
+ * Package(包名): mao.after
+ * Class(类名): Impl1
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/10
+ * Time(创建时间)： 21:43
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Impl1 implements Interface_a, Interface_b, Interface_c
+{
+
+    @Override
+    public void a()
+    {
+        System.out.println("Impl1重写方法a");
+    }
+
+    @Override
+    public void b()
+    {
+        System.out.println("Impl1重写方法b");
+    }
+
+    @Override
+    public void c()
+    {
+        System.out.println("Impl1重写方法c");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_接口隔离原则
+ * Package(包名): mao.after
+ * Class(类名): Impl2
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/10
+ * Time(创建时间)： 21:45
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Impl2 implements Interface_a, Interface_b
+{
+
+    @Override
+    public void a()
+    {
+        System.out.println("Impl2重写方法a");
+    }
+
+    @Override
+    public void b()
+    {
+        System.out.println("Impl2重写方法b");
+    }
+}
+```
+
+
+
+
+
+![image-20220810214944402](img/java设计模式学习笔记/image-20220810214944402.png)
+
+
+
