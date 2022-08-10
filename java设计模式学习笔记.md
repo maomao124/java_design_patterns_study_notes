@@ -1081,3 +1081,778 @@ public class RectangleDemo
 
 ## 依赖倒转原则
 
+### 概念
+
+高层模块不应该依赖低层模块，两者都应该依赖其抽象；抽象不应该依赖细节，细节应该依赖抽象。简单的说就是要求对抽象进行编程，不要对实现进行编程，这样就降低了客户与实现模块间的耦合。
+
+
+
+
+
+### 示例
+
+示例：组装电脑
+
+
+
+现要组装一台电脑，需要配件cpu，硬盘，内存条。只有这些配置都有了，计算机才能正常的运行。选择cpu有很多选择，如Intel，AMD等，硬盘可以选择希捷，西数等，内存条可以选择金士顿，海盗船等。
+
+
+
+![image-20220809214041160](img/java设计模式学习笔记/image-20220809214041160.png)
+
+
+
+
+
+代码如下
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_依赖倒转原则
+ * Package(包名): mao.before
+ * Class(类名): IntelCpu
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 21:45
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class IntelCpu
+{
+    public void run()
+    {
+        System.out.println("使用Intel处理器");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_依赖倒转原则
+ * Package(包名): mao.before
+ * Class(类名): KingstonMemory
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 21:45
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class KingstonMemory
+{
+    public void save()
+    {
+        System.out.println("使用金士顿作为内存条");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_依赖倒转原则
+ * Package(包名): mao.before
+ * Class(类名): XiJieHardDisk
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 21:44
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class XiJieHardDisk
+{
+    public void save(String data)
+    {
+        System.out.println("使用希捷硬盘存储数据" + data);
+    }
+
+    public String get()
+    {
+        System.out.println("使用希捷希捷硬盘取数据");
+        return "数据";
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_依赖倒转原则
+ * Package(包名): mao.before
+ * Class(类名): Computer
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 21:46
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+public class Computer
+{
+    private IntelCpu intelCpu;
+    private KingstonMemory kingstonMemory;
+    private XiJieHardDisk xiJieHardDisk;
+
+    /**
+     * Instantiates a new Computer.
+     */
+    public Computer()
+    {
+
+    }
+
+    /**
+     * Instantiates a new Computer.
+     *
+     * @param intelCpu       the intel cpu
+     * @param kingstonMemory the kingston memory
+     * @param xiJieHardDisk  the xi jie hard disk
+     */
+    public Computer(IntelCpu intelCpu, KingstonMemory kingstonMemory, XiJieHardDisk xiJieHardDisk)
+    {
+        this.intelCpu = intelCpu;
+        this.kingstonMemory = kingstonMemory;
+        this.xiJieHardDisk = xiJieHardDisk;
+    }
+
+    /**
+     * Gets intel cpu.
+     *
+     * @return the intel cpu
+     */
+    public IntelCpu getIntelCpu()
+    {
+        return intelCpu;
+    }
+
+    /**
+     * Sets intel cpu.
+     *
+     * @param intelCpu the intel cpu
+     */
+    public void setIntelCpu(IntelCpu intelCpu)
+    {
+        this.intelCpu = intelCpu;
+    }
+
+    /**
+     * Gets kingston memory.
+     *
+     * @return the kingston memory
+     */
+    public KingstonMemory getKingstonMemory()
+    {
+        return kingstonMemory;
+    }
+
+    /**
+     * Sets kingston memory.
+     *
+     * @param kingstonMemory the kingston memory
+     */
+    public void setKingstonMemory(KingstonMemory kingstonMemory)
+    {
+        this.kingstonMemory = kingstonMemory;
+    }
+
+    /**
+     * Gets xi jie hard disk.
+     *
+     * @return the xi jie hard disk
+     */
+    public XiJieHardDisk getXiJieHardDisk()
+    {
+        return xiJieHardDisk;
+    }
+
+    /**
+     * Sets xi jie hard disk.
+     *
+     * @param xiJieHardDisk the xi jie hard disk
+     */
+    public void setXiJieHardDisk(XiJieHardDisk xiJieHardDisk)
+    {
+        this.xiJieHardDisk = xiJieHardDisk;
+    }
+
+    /**
+     * Run.
+     */
+    public void run()
+    {
+        System.out.println("计算机工作");
+        intelCpu.run();
+        kingstonMemory.save();
+        String data = xiJieHardDisk.get();
+        System.out.println("从硬盘中获取的数据为：" + data);
+    }
+}
+
+```
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_依赖倒转原则
+ * Package(包名): mao.before
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 21:49
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        IntelCpu intelCpu = new IntelCpu();
+        XiJieHardDisk xiJieHardDisk = new XiJieHardDisk();
+        KingstonMemory kingstonMemory = new KingstonMemory();
+
+        Computer computer = new Computer();
+        computer.setIntelCpu(intelCpu);
+        computer.setKingstonMemory(kingstonMemory);
+        computer.setXiJieHardDisk(xiJieHardDisk);
+
+        computer.run();
+    }
+}
+```
+
+
+
+
+
+上面代码可以看到已经组装了一台电脑，但是似乎组装的电脑的cpu只能是Intel的，内存条只能是金士顿的，硬盘只能是希捷的，这对用户肯定是不友好的，用户有了机箱肯定是想按照自己的喜好，选择自己喜欢的配件。
+
+如果想要装AMD的CPU，那必须更改源码，也不满足开闭原则
+
+
+
+
+
+**改进：**
+
+
+
+Computer类，让Computer类依赖抽象（各个配件的接口），而不是依赖于各个组件具体的实现类
+
+
+
+![image-20220809215507059](img/java设计模式学习笔记/image-20220809215507059.png)
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_依赖倒转原则
+ * Package(包名): mao.after
+ * Interface(接口名): Cpu
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 21:56
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface Cpu
+{
+    /**
+     * Run.
+     */
+    void run();
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_依赖倒转原则
+ * Package(包名): mao.after
+ * Interface(接口名): HardDisk
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 21:57
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface HardDisk
+{
+    /**
+     * Save.
+     *
+     * @param data the data
+     */
+    void save(String data);
+
+    /**
+     * Get string.
+     *
+     * @return the string
+     */
+    String get();
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_依赖倒转原则
+ * Package(包名): mao.after
+ * Interface(接口名): Memory
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 21:57
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface Memory
+{
+    /**
+     * Save.
+     */
+    void save();
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_依赖倒转原则
+ * Package(包名): mao.after
+ * Class(类名): IntelCpu
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 22:01
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class IntelCpu implements Cpu
+{
+
+    @Override
+    public void run()
+    {
+        System.out.println("使用Intel处理器");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_依赖倒转原则
+ * Package(包名): mao.after
+ * Class(类名): KingstonMemory
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 22:01
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class KingstonMemory implements Memory
+{
+
+    @Override
+    public void save()
+    {
+        System.out.println("使用金士顿作为内存条");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_依赖倒转原则
+ * Package(包名): mao.after
+ * Class(类名): XiJieHardDisk
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 22:02
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class XiJieHardDisk implements HardDisk
+{
+
+    @Override
+    public void save(String data)
+    {
+        System.out.println("使用希捷硬盘存储数据" + data);
+    }
+
+    @Override
+    public String get()
+    {
+        System.out.println("使用希捷希捷硬盘取数据");
+        return "数据";
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_依赖倒转原则
+ * Package(包名): mao.after
+ * Class(类名): Computer
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 22:02
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+public class Computer
+{
+    private Cpu cpu;
+    private HardDisk hardDisk;
+    private Memory memory;
+
+    /**
+     * Instantiates a new Computer.
+     */
+    public Computer()
+    {
+
+    }
+
+    /**
+     * Instantiates a new Computer.
+     *
+     * @param cpu      the cpu
+     * @param hardDisk the hard disk
+     * @param memory   the memory
+     */
+    public Computer(Cpu cpu, HardDisk hardDisk, Memory memory)
+    {
+        this.cpu = cpu;
+        this.hardDisk = hardDisk;
+        this.memory = memory;
+    }
+
+    /**
+     * Gets cpu.
+     *
+     * @return the cpu
+     */
+    public Cpu getCpu()
+    {
+        return cpu;
+    }
+
+    /**
+     * Sets cpu.
+     *
+     * @param cpu the cpu
+     */
+    public void setCpu(Cpu cpu)
+    {
+        this.cpu = cpu;
+    }
+
+    /**
+     * Gets hard disk.
+     *
+     * @return the hard disk
+     */
+    public HardDisk getHardDisk()
+    {
+        return hardDisk;
+    }
+
+    /**
+     * Sets hard disk.
+     *
+     * @param hardDisk the hard disk
+     */
+    public void setHardDisk(HardDisk hardDisk)
+    {
+        this.hardDisk = hardDisk;
+    }
+
+    /**
+     * Gets memory.
+     *
+     * @return the memory
+     */
+    public Memory getMemory()
+    {
+        return memory;
+    }
+
+    /**
+     * Sets memory.
+     *
+     * @param memory the memory
+     */
+    public void setMemory(Memory memory)
+    {
+        this.memory = memory;
+    }
+
+    /**
+     * Run.
+     */
+    public void run()
+    {
+        System.out.println("计算机工作");
+        cpu.run();
+        memory.save();
+        String data = hardDisk.get();
+        System.out.println("从硬盘中获取的数据为：" + data);
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+
+/**
+ * Project name(项目名称)：java设计模式_依赖倒转原则
+ * Package(包名): mao.after
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 22:04
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        Cpu cpu = new IntelCpu();
+        HardDisk hardDisk = new XiJieHardDisk();
+        Memory memory = new KingstonMemory();
+
+        Computer computer = new Computer();
+        computer.setCpu(cpu);
+        computer.setHardDisk(hardDisk);
+        computer.setMemory(memory);
+
+        computer.run();
+    }
+}
+```
+
+
+
+面向对象的开发很好的解决了这个问题，一般情况下抽象的变化概率很小，让用户程序依赖于抽象，实现的细节也依赖于抽象。即使实现细节不断变动，只要抽象不变，客户程序就不需要变化。这大大降低了客户程序与实现细节的耦合度。
+
+
+
+当需要使用AMD更改配件时，比如使用AMD处理器，实现CPU接口
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_依赖倒转原则
+ * Package(包名): mao.after
+ * Class(类名): AMDCpu
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 22:09
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class AMDCpu implements Cpu
+{
+
+    @Override
+    public void run()
+    {
+        System.out.println("使用AMD处理器");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_依赖倒转原则
+ * Package(包名): mao.after
+ * Class(类名): CorsairMemory
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 22:12
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class CorsairMemory implements Memory
+{
+
+    @Override
+    public void save()
+    {
+        System.out.println("使用海盗船作为内存条");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_依赖倒转原则
+ * Package(包名): mao.after
+ * Class(类名): Test2
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/9
+ * Time(创建时间)： 22:14
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test2
+{
+    public static void main(String[] args)
+    {
+        Cpu cpu = new AMDCpu();
+        HardDisk hardDisk = new XiJieHardDisk();
+        Memory memory = new CorsairMemory();
+
+        Computer computer = new Computer();
+        computer.setCpu(cpu);
+        computer.setHardDisk(hardDisk);
+        computer.setMemory(memory);
+
+        computer.run();
+    }
+}
+```
+
+
+
+
+
+
+
+
+
+## 接口隔离原则
+
