@@ -2156,3 +2156,368 @@ public class Impl2 implements Interface_a, Interface_b
 
 
 
+
+
+
+
+
+
+## 迪米特法则
+
+### 概念
+
+迪米特法则又叫最少知识原则。
+
+只和你的直接朋友交谈，不跟“陌生人”说话（Talk only to your immediate friends and not to strangers）。
+
+其含义是：如果两个软件实体无须直接通信，那么就不应当发生直接的相互调用，可以通过第三方转发该调用。其目的是降低类之间的耦合度，提高模块的相对独立性。
+
+迪米特法则中的“朋友”是指：当前对象本身、当前对象的成员对象、当前对象所创建的对象、当前对象的方法参数等，这些对象同当前对象存在关联、聚合或组合关系，可以直接访问这些对象的方法。
+
+
+
+
+
+### 示例
+
+明星与经纪人的关系实例
+
+明星由于全身心投入艺术，所以许多日常事务由经纪人负责处理，如和粉丝的见面会，和媒体公司的业务洽淡等。这里的经纪人是明星的朋友，而粉丝和媒体公司是陌生人，所以适合使用迪米特法则。
+
+
+
+![image-20220810220443377](img/java设计模式学习笔记/image-20220810220443377.png)
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_迪米特法则
+ * Package(包名): mao
+ * Class(类名): Star
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/10
+ * Time(创建时间)： 21:59
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Star
+{
+    private String name;
+
+    /**
+     * Instantiates a new Star.
+     */
+    public Star()
+    {
+    }
+
+    /**
+     * Instantiates a new Star.
+     *
+     * @param name the name
+     */
+    public Star(String name)
+    {
+        this.name = name;
+    }
+
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
+     * Sets name.
+     *
+     * @param name the name
+     */
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_迪米特法则
+ * Package(包名): mao
+ * Class(类名): Fans
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/10
+ * Time(创建时间)： 22:00
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+public class Fans
+{
+    private String name;
+
+    /**
+     * Instantiates a new Fans.
+     */
+    public Fans()
+    {
+
+    }
+
+    /**
+     * Instantiates a new Fans.
+     *
+     * @param name the name
+     */
+    public Fans(String name)
+    {
+        this.name = name;
+    }
+
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
+     * Sets name.
+     *
+     * @param name the name
+     */
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_迪米特法则
+ * Package(包名): mao
+ * Class(类名): Company
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/10
+ * Time(创建时间)： 22:01
+ * Version(版本): 1.0
+ * Description(描述)： 媒体公司类
+ */
+
+
+public class Company
+{
+    private String name;
+
+    /**
+     * Instantiates a new Company.
+     */
+    public Company()
+    {
+
+    }
+
+    /**
+     * Instantiates a new Company.
+     *
+     * @param name the name
+     */
+    public Company(String name)
+    {
+        this.name = name;
+    }
+
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
+     * Sets name.
+     *
+     * @param name the name
+     */
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+}
+```
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_迪米特法则
+ * Package(包名): mao
+ * Class(类名): Agent
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/10
+ * Time(创建时间)： 22:02
+ * Version(版本): 1.0
+ * Description(描述)： 经纪人类
+ */
+
+
+public class Agent
+{
+    private Star star;
+    private Fans fans;
+    private Company company;
+
+    /**
+     * Instantiates a new Agent.
+     */
+    public Agent()
+    {
+
+    }
+
+    /**
+     * Instantiates a new Agent.
+     *
+     * @param star    the star
+     * @param fans    the fans
+     * @param company the company
+     */
+    public Agent(Star star, Fans fans, Company company)
+    {
+        this.star = star;
+        this.fans = fans;
+        this.company = company;
+    }
+
+    /**
+     * Sets star.
+     *
+     * @param star the star
+     */
+    public void setStar(Star star)
+    {
+        this.star = star;
+    }
+
+    /**
+     * Sets fans.
+     *
+     * @param fans the fans
+     */
+    public void setFans(Fans fans)
+    {
+        this.fans = fans;
+    }
+
+    /**
+     * Sets company.
+     *
+     * @param company the company
+     */
+    public void setCompany(Company company)
+    {
+        this.company = company;
+    }
+
+    /**
+     * Meeting.
+     */
+    public void meeting()
+    {
+        System.out.println(fans.getName() + "与明星" + star.getName() + "见面了");
+    }
+
+    /**
+     * Business.
+     */
+    public void business()
+    {
+        System.out.println(company.getName() + "与明星" + star.getName() + "洽淡业务");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_迪米特法则
+ * Package(包名): mao
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/10
+ * Time(创建时间)： 22:04
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        Agent agent = new Agent();
+        agent.setCompany(new Company("某公司"));
+        agent.setFans(new Fans("粉丝李四"));
+        agent.setStar(new Star("赵六"));
+
+        agent.business();
+        agent.meeting();
+    }
+}
+```
+
+
+
+
+
+![image-20220810220838564](img/java设计模式学习笔记/image-20220810220838564.png)
+
+
+
+
+
