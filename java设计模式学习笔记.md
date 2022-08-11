@@ -2521,3 +2521,583 @@ public class Test
 
 
 
+
+
+## 合成复用原则
+
+### 概念
+
+合成复用原则是指：尽量先使用组合或者聚合等关联关系来实现，其次才考虑使用继承关系来实现。
+
+
+
+通常类的复用分为继承复用和合成复用两种。
+
+
+
+继承复用虽然有简单和易实现的优点，但它也存在以下缺点：
+
+1. 继承复用破坏了类的封装性。因为继承会将父类的实现细节暴露给子类，父类对子类是透明的，所以这种复用又称为“白箱”复用。
+2. 子类与父类的耦合度高。父类的实现的任何改变都会导致子类的实现发生变化，这不利于类的扩展与维护。
+3. 它限制了复用的灵活性。从父类继承而来的实现是静态的，在编译时已经定义，所以在运行时不可能发生变化。
+
+
+
+
+采用组合或聚合复用时，可以将已有对象纳入新对象中，使之成为新对象的一部分，新对象可以调用已有对象的功能，它有以下优点：
+
+1. 它维持了类的封装性。因为成分对象的内部细节是新对象看不见的，所以这种复用又称为“黑箱”复用。
+2. 对象间的耦合度低。可以在类的成员位置声明抽象。
+3. 复用的灵活性高。这种复用可以在运行时动态进行，新对象可以动态地引用与成分对象类型相同的对象。
+
+
+
+
+
+
+
+### 示例
+
+汽车分类管理程序
+
+汽车按“动力源”划分可分为汽油汽车、电动汽车等；按“颜色”划分可分为白色汽车、黑色汽车和红色汽车等。如果同时考虑这两种分类，其组合就很多。类图如下： 
+
+
+
+![image-20220811201744918](img/java设计模式学习笔记/image-20220811201744918.png)
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_合成复用原则
+ * Package(包名): mao.before
+ * Class(类名): Car
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 20:20
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Car
+{
+    public void move()
+    {
+        System.out.println("汽车移动");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_合成复用原则
+ * Package(包名): mao.before
+ * Class(类名): ElectricCar
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 20:23
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class ElectricCar extends Car
+{
+    @Override
+    public void move()
+    {
+        System.out.println("电动汽车移动");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_合成复用原则
+ * Package(包名): mao.before
+ * Class(类名): PetrolCar
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 20:21
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class PetrolCar extends Car
+{
+    @Override
+    public void move()
+    {
+        System.out.println("汽油汽车移动");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_合成复用原则
+ * Package(包名): mao.before
+ * Class(类名): RedElectricCar
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 20:26
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class RedElectricCar extends ElectricCar
+{
+    @Override
+    public void move()
+    {
+        System.out.println("红色电动汽车移动");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_合成复用原则
+ * Package(包名): mao.before
+ * Class(类名): RedPetrolCar
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 20:23
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class RedPetrolCar extends PetrolCar
+{
+    @Override
+    public void move()
+    {
+        System.out.println("红色汽油汽车移动");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_合成复用原则
+ * Package(包名): mao.before
+ * Class(类名): WhiteElectricCar
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 20:26
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class WhiteElectricCar extends ElectricCar
+{
+    @Override
+    public void move()
+    {
+        System.out.println("红色电动汽车移动");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_合成复用原则
+ * Package(包名): mao.before
+ * Class(类名): WhitePetrolCar
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 20:25
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class WhitePetrolCar extends PetrolCar
+{
+    @Override
+    public void move()
+    {
+        System.out.println("白色汽油汽车移动");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_合成复用原则
+ * Package(包名): mao.before
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 20:27
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        Car car=new RedElectricCar();
+        car.move();
+    }
+}
+```
+
+
+
+
+
+**改进：**
+
+我们可以看到使用继承复用产生了很多子类，如果现在又有新的动力源或者新的颜色的话，就需要再定义新的类
+
+将继承复用改为聚合复用
+
+
+
+![image-20220811203111895](img/java设计模式学习笔记/image-20220811203111895.png)
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_合成复用原则
+ * Package(包名): mao.after
+ * Class(类名): Car
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 20:31
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+public class Car
+{
+    /**
+     * The Color.
+     */
+    protected Color color;
+
+    /**
+     * Instantiates a new Car.
+     *
+     * @param color the color
+     */
+    public Car(Color color)
+    {
+        this.color = color;
+    }
+
+    /**
+     * Gets color.
+     *
+     * @return the color
+     */
+    public Color getColor()
+    {
+        return color;
+    }
+
+    /**
+     * Sets color.
+     *
+     * @param color the color
+     */
+    public void setColor(Color color)
+    {
+        this.color = color;
+    }
+
+    /**
+     * Move.
+     */
+    public void move()
+    {
+        System.out.println(color.getColor() + "汽车移动");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_合成复用原则
+ * Package(包名): mao.after
+ * Interface(接口名): Color
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 20:32
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface Color
+{
+    String getColor();
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_合成复用原则
+ * Package(包名): mao.after
+ * Class(类名): ElectricCar
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 20:33
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class ElectricCar extends Car
+{
+
+    public ElectricCar(Color color)
+    {
+        super(color);
+    }
+
+    @Override
+    public void move()
+    {
+        System.out.println(color.getColor() + "电动汽车移动");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_合成复用原则
+ * Package(包名): mao.after
+ * Class(类名): PetrolCar
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 20:37
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class PetrolCar extends Car
+{
+
+    public PetrolCar(Color color)
+    {
+        super(color);
+    }
+
+    @Override
+    public void move()
+    {
+        System.out.println(color.getColor() + "汽油汽车移动");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_合成复用原则
+ * Package(包名): mao.after
+ * Class(类名): Red
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 20:38
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Red implements Color
+{
+
+    @Override
+    public String getColor()
+    {
+        return "红色";
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_合成复用原则
+ * Package(包名): mao.after
+ * Class(类名): White
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 20:39
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class White implements Color
+{
+
+    @Override
+    public String getColor()
+    {
+        return "白色";
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_合成复用原则
+ * Package(包名): mao.after
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 20:39
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        Car car = new ElectricCar(new White());
+        car.move();
+        car = new ElectricCar(new Red());
+        car.move();
+        car = new PetrolCar(new Red());
+        car.move();
+        car = new PetrolCar(new White());
+        car.move();
+    }
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 创建者模式
+
