@@ -3636,5 +3636,649 @@ mao.m3.Singleton@6de48836
 
 #### 懒汉式-方式2
 
+加同步锁
 
 
+
+```java
+package mao.m4;
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m4
+ * Class(类名): Singleton
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 22:10
+ * Version(版本): 1.0
+ * Description(描述)： 懒汉式-方式2（线程安全）
+ */
+
+public class Singleton
+{
+    public String str = "hello world";
+
+    public String show()
+    {
+        return "show";
+    }
+
+    /**
+     * 私有化构造方法
+     */
+    private Singleton()
+    {
+        System.out.println("实例私有化构造方法");
+    }
+
+    private static Singleton instance;
+
+    /**
+     * 对外提供方法获取该对象
+     * 线程安全
+     *
+     * @return Singleton对象
+     */
+    public synchronized static Singleton getInstance()
+    {
+        if (instance == null)
+        {
+            System.out.println("创建对象实例");
+            instance = new Singleton();
+        }
+        return instance;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.m4;
+
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m4
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 22:11
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args) throws ClassNotFoundException, InterruptedException
+    {
+        Class.forName("mao.m4.Singleton");
+        Thread.sleep(1000);
+        System.out.println(Singleton.getInstance().str);
+        System.out.println(Singleton.getInstance().show());
+        //打印的内存地址都一样，单例
+        System.out.println(Singleton.getInstance());
+        System.out.println(Singleton.getInstance());
+        System.out.println(Singleton.getInstance());
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.m4;
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m4
+ * Class(类名): Test2
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 22:12
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test2
+{
+    public static void main(String[] args)
+    {
+        Thread[] threads = new Thread[100];
+        for (int i = 0; i < 100; i++)
+        {
+            //可简写为：new Thread(Singleton::getInstance);
+            threads[i] = new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    System.out.println(Singleton.getInstance());
+                }
+            });
+        }
+        for (int i = 0; i < 100; i++)
+        {
+            threads[i].start();
+        }
+    }
+}
+```
+
+
+
+Tets2运行结果：
+
+```sh
+创建对象实例
+实例私有化构造方法
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+mao.m4.Singleton@6abb6ab
+```
+
+
+
+该方式也实现了懒加载效果，同时又解决了线程安全问题。但是在getInstance()方法上添加了synchronized关键字，导致该方法的执行效果特别低。
+
+
+
+
+
+
+
+#### 懒汉式-方式3
+
+使用双重检查锁
+
+对于 `getInstance()` 方法来说，绝大部分的操作都是读操作，读操作是线程安全的，所以我们没必让每个线程必须持有锁才能调用该方法，我们需要调整加锁的时机。由此也产生了一种新的实现模式：双重检查锁模式
+
+
+
+
+
+```java
+package mao.m5;
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m5
+ * Class(类名): Singleton
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 22:28
+ * Version(版本): 1.0
+ * Description(描述)： 懒汉式-方式3（双重检查锁）
+ */
+
+public class Singleton
+{
+    public String str = "hello world";
+
+    public String show()
+    {
+        return "show";
+    }
+
+    /**
+     * 私有化构造方法
+     */
+    private Singleton()
+    {
+        System.out.println("实例私有化构造方法");
+    }
+
+    private static Singleton instance;
+
+    /**
+     * 对外提供方法获取该对象
+     * 线程安全
+     *
+     * @return Singleton对象
+     */
+    public static Singleton getInstance()
+    {
+        //第一次判断，如果instance不为null，不进入抢锁阶段，直接返回实例
+        if (instance == null)
+        {
+            synchronized (Singleton.class)
+            {
+                //抢到锁之后再次判断是否为null
+                if (instance == null)
+                {
+                    System.out.println("创建对象实例");
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
+}
+```
+
+
+
+```java
+package mao.m5;
+
+
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m5
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 22:34
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args) throws ClassNotFoundException, InterruptedException
+    {
+        Class.forName("mao.m5.Singleton");
+        Thread.sleep(1000);
+        System.out.println(Singleton.getInstance().str);
+        System.out.println(Singleton.getInstance().show());
+        //打印的内存地址都一样，单例
+        System.out.println(Singleton.getInstance());
+        System.out.println(Singleton.getInstance());
+        System.out.println(Singleton.getInstance());
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.m5;
+
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m5
+ * Class(类名): Test2
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 22:35
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test2
+{
+    public static void main(String[] args)
+    {
+        Thread[] threads = new Thread[100];
+        for (int i = 0; i < 100; i++)
+        {
+            //可简写为：new Thread(Singleton::getInstance);
+            threads[i] = new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    System.out.println(Singleton.getInstance());
+                }
+            });
+        }
+        for (int i = 0; i < 100; i++)
+        {
+            threads[i].start();
+        }
+    }
+}
+```
+
+
+
+双重检查锁模式是一种非常好的单例实现模式，解决了单例、性能、线程安全问题，上面的双重检测锁模式看上去完美无缺，其实是存在问题，在多线程的情况下，可能会出现空指针问题，出现问题的原因是JVM在实例化对象的时候会进行优化和指令重排序操作。
+
+要解决双重检查锁模式带来空指针异常的问题，只需要使用 `volatile` 关键字, `volatile` 关键字可以保证可见性和有序性。
+
+
+
+```java
+package mao.m5;
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m5
+ * Class(类名): Singleton
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 22:28
+ * Version(版本): 1.0
+ * Description(描述)： 懒汉式-方式3（双重检查锁）
+ * <p>
+ * 在多线程的情况下，可能会出现空指针问题，出现问题的原因是JVM在实例化对象的时候会进行优化和指令重排序操作。
+ * 要解决双重检查锁模式带来空指针异常的问题，只需要使用 `volatile` 关键字, `volatile` 关键字可以保证可见性和有序性。
+ */
+
+public class Singleton
+{
+    public String str = "hello world";
+
+    public String show()
+    {
+        return "show";
+    }
+
+    /**
+     * 私有化构造方法
+     */
+    private Singleton()
+    {
+        System.out.println("实例私有化构造方法");
+    }
+
+    private static volatile Singleton instance;
+
+    /**
+     * 对外提供方法获取该对象
+     * 线程安全
+     *
+     * @return Singleton对象
+     */
+    public static Singleton getInstance()
+    {
+        //第一次判断，如果instance不为null，不进入抢锁阶段，直接返回实例
+        if (instance == null)
+        {
+            synchronized (Singleton.class)
+            {
+                //抢到锁之后再次判断是否为null
+                if (instance == null)
+                {
+                    System.out.println("创建对象实例");
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
+}
+```
+
+
+
+
+
+
+
+#### 懒汉式-方式4
+
+静态内部类方式
+
+
+
+静态内部类单例模式中实例由内部类创建，由于 JVM 在加载外部类的过程中, 是不会加载静态内部类的, 只有内部类的属性/方法被调用时才会被加载, 并初始化其静态属性。静态属性由于被 `static` 修饰，保证只被实例化一次，并且严格保证实例化顺序
+
+
+
+```java
+package mao.m6;
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m6
+ * Class(类名): Singleton
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 22:47
+ * Version(版本): 1.0
+ * Description(描述)： 懒汉式-方式4（静态内部类方式）
+ */
+
+public class Singleton
+{
+    public String str = "hello world";
+
+    public String show()
+    {
+        return "show";
+    }
+
+    /**
+     * 私有化构造方法
+     */
+    private Singleton()
+    {
+        System.out.println("实例私有化构造方法");
+    }
+
+    private static class SingletonHolder
+    {
+        //内部类里创建对象
+        private static final Singleton INSTANCE = new Singleton();
+    }
+
+    /**
+     * 对外提供方法获取该对象
+     * 线程安全
+     *
+     * @return Singleton对象
+     */
+    public static Singleton getInstance()
+    {
+        return SingletonHolder.INSTANCE;
+    }
+}
+```
+
+
+
+第一次加载Singleton类时不会去初始化INSTANCE，只有第一次调用getInstance，虚拟机加载SingletonHolder并初始化INSTANCE，这样不仅能确保线程安全，也能保证 Singleton 类的唯一性。
+
+
+
+静态内部类单例模式是一种优秀的单例模式，是开源项目中比较常用的一种单例模式。在没有加任何锁的情况下，保证了多线程下的安全，并且没有任何性能影响和空间的浪费。
+
+
+
+```java
+package mao.m6;
+
+
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m6
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 22:51
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args) throws ClassNotFoundException, InterruptedException
+    {
+        Class.forName("mao.m6.Singleton");
+        Thread.sleep(1000);
+        System.out.println(Singleton.getInstance().str);
+        System.out.println(Singleton.getInstance().show());
+        //打印的内存地址都一样，单例
+        System.out.println(Singleton.getInstance());
+        System.out.println(Singleton.getInstance());
+        System.out.println(Singleton.getInstance());
+    }
+}
+```
+
+
+
+```java
+package mao.m6;
+
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m6
+ * Class(类名): Test2
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 22:52
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test2
+{
+    public static void main(String[] args)
+    {
+        Thread[] threads = new Thread[100];
+        for (int i = 0; i < 100; i++)
+        {
+            //可简写为：new Thread(Singleton::getInstance);
+            threads[i] = new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    System.out.println(Singleton.getInstance());
+                }
+            });
+        }
+        for (int i = 0; i < 100; i++)
+        {
+            threads[i].start();
+        }
+    }
+}
+```
+
+
+
+
+
+
+
+#### 枚举方式
