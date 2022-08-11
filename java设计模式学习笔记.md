@@ -3085,6 +3085,10 @@ public class Test
 
 
 
+![image-20220811210208341](img/java设计模式学习笔记/image-20220811210208341.png)
+
+
+
 
 
 
@@ -3100,4 +3104,537 @@ public class Test
 
 
 # 创建者模式
+
+创建型模式的主要关注点是“怎样创建对象？”，它的主要特点是“将对象的创建与使用分离”。
+
+这样可以降低系统的耦合度，使用者不需要关注对象的创建细节。
+
+
+
+创建型模式分为：
+
+* 单例模式
+* 工厂方法模式
+* 抽象工厂模式
+* 原型模式
+* 建造者模式
+
+
+
+
+
+## 单例模式
+
+单例模式（Singleton Pattern）是 Java 中最简单的设计模式之一。这种类型的设计模式属于创建型模式，它提供了一种创建对象的最佳方式。
+
+这种模式涉及到一个单一的类，该类负责创建自己的对象，同时确保只有单个对象被创建。这个类提供了一种访问其唯一的对象的方式，可以直接访问，不需要实例化该类的对象。
+
+
+
+### 结构
+
+单例模式的主要有以下角色：
+
+* 单例类。只能创建一个实例的类
+* 访问类。使用单例类
+
+
+
+### 实现
+
+单例设计模式分类两种：
+
+* 饿汉式：类加载就会导致该单实例对象被创建	
+
+* 懒汉式：类加载不会导致该单实例对象被创建，而是首次使用该对象时才会创建
+
+
+
+
+
+#### 饿汉式-静态变量方式
+
+
+
+```java
+package mao.m1;
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m1
+ * Class(类名): Singleton
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 20:56
+ * Version(版本): 1.0
+ * Description(描述)： 饿汉式-方式1（静态变量方式）
+ */
+
+public class Singleton
+{
+    public String str = "hello world";
+
+    public String show()
+    {
+        return "show";
+    }
+
+    /**
+     * 私有化构造方法
+     */
+    private Singleton()
+    {
+        System.out.println("实例私有化构造方法");
+    }
+
+    private static final Singleton instance = new Singleton();
+
+    /**
+     * 对外提供静态方法获取该对象
+     *
+     * @return Singleton对象
+     */
+    public static Singleton getInstance()
+    {
+        return instance;
+    }
+}
+
+```
+
+
+
+```java
+package mao.m1;
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m1
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 20:59
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        System.out.println(Singleton.getInstance().str);
+        System.out.println(Singleton.getInstance().show());
+        //打印的内存地址都一样，单例
+        System.out.println(Singleton.getInstance());
+        System.out.println(Singleton.getInstance());
+        System.out.println(Singleton.getInstance());
+    }
+}
+```
+
+
+
+该方式在成员位置声明Singleton类型的静态变量，并创建Singleton类的对象instance。instance对象是随着类的加载而创建的。如果该对象足够大的话，而一直没有使用就会造成内存的浪费。
+
+
+
+
+
+#### 饿汉式-静态代码块方式
+
+
+
+```java
+package mao.m2;
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m2
+ * Class(类名): Singleton
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 21:08
+ * Version(版本): 1.0
+ * Description(描述)： 饿汉式-方式2（静态代码块方式）
+ */
+
+public class Singleton
+{
+    public String str = "hello world";
+
+    public String show()
+    {
+        return "show";
+    }
+
+    /**
+     * 私有化构造方法
+     */
+    private Singleton()
+    {
+        System.out.println("实例私有化构造方法");
+    }
+
+    private static final Singleton instance;
+
+
+    static
+    {
+        System.out.println("创建单例对象实例");
+        instance = new Singleton();
+    }
+
+    /**
+     * 对外提供静态方法获取该对象
+     *
+     * @return Singleton对象
+     */
+    public static Singleton getInstance()
+    {
+        return instance;
+    }
+}
+
+```
+
+
+
+
+
+```java
+package mao.m2;
+
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m2
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 21:10
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args) throws InterruptedException, ClassNotFoundException
+    {
+        Class.forName("mao.m2.Singleton");
+        Thread.sleep(1000);
+        System.out.println(Singleton.getInstance().str);
+        System.out.println(Singleton.getInstance().show());
+        //打印的内存地址都一样，单例
+        System.out.println(Singleton.getInstance());
+        System.out.println(Singleton.getInstance());
+        System.out.println(Singleton.getInstance());
+    }
+}
+```
+
+
+
+在成员位置声明Singleton类型的静态变量，而对象的创建是在静态代码块中，也是对着类的加载而创建。所以和饿汉式的方式1基本上一样，当然该方式也存在内存浪费问题
+
+
+
+
+
+
+
+#### 懒汉式-方式1
+
+
+
+```java
+package mao.m3;
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m3
+ * Class(类名): Singleton
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 21:14
+ * Version(版本): 1.0
+ * Description(描述)： 懒汉式-方式1（线程不安全）
+ */
+
+public class Singleton
+{
+    public String str = "hello world";
+
+    public String show()
+    {
+        return "show";
+    }
+
+    /**
+     * 私有化构造方法
+     */
+    private Singleton()
+    {
+        System.out.println("实例私有化构造方法");
+    }
+
+    private static Singleton instance;
+
+    /**
+     * 对外提供方法获取该对象
+     * 线程不安全
+     *
+     * @return Singleton对象
+     */
+    public static Singleton getInstance()
+    {
+        if (instance == null)
+        {
+            //线程1运行到这里，进行上下文切换，切换到线程2，线程2进行判空，并进行赋值，
+            //赋值后，线程2切换到线程1，由于判空已经执行，直接创建对象，对象创建两次
+            System.out.println("创建对象实例");
+            instance = new Singleton();
+        }
+        return instance;
+    }
+}
+
+```
+
+
+
+
+
+```java
+package mao.m3;
+
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m3
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 21:20
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args) throws ClassNotFoundException, InterruptedException
+    {
+        Class.forName("mao.m3.Singleton");
+        Thread.sleep(1000);
+        System.out.println(Singleton.getInstance().str);
+        System.out.println(Singleton.getInstance().show());
+        //打印的内存地址都一样，单例
+        System.out.println(Singleton.getInstance());
+        System.out.println(Singleton.getInstance());
+        System.out.println(Singleton.getInstance());
+    }
+}
+
+```
+
+
+
+
+
+```java
+package mao.m3;
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m3
+ * Class(类名): Test2
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 21:31
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test2
+{
+    public static void main(String[] args)
+    {
+        Thread[] threads = new Thread[100];
+        for (int i = 0; i < 100; i++)
+        {
+            //可简写为：new Thread(Singleton::getInstance);
+            threads[i] = new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    System.out.println(Singleton.getInstance());
+                }
+            });
+        }
+        for (int i = 0; i < 100; i++)
+        {
+            threads[i].start();
+        }
+    }
+}
+```
+
+
+
+test2运行结果：
+
+```sh
+创建对象实例
+创建对象实例
+实例私有化构造方法
+创建对象实例
+实例私有化构造方法
+创建对象实例
+实例私有化构造方法
+创建对象实例
+实例私有化构造方法
+创建对象实例
+创建对象实例
+实例私有化构造方法
+创建对象实例
+实例私有化构造方法
+mao.m3.Singleton@44919543
+mao.m3.Singleton@44919543
+创建对象实例
+实例私有化构造方法
+mao.m3.Singleton@44919543
+创建对象实例
+实例私有化构造方法
+创建对象实例
+实例私有化构造方法
+mao.m3.Singleton@eeed4d4
+mao.m3.Singleton@47b3f5dd
+mao.m3.Singleton@47b3f5dd
+mao.m3.Singleton@44919543
+mao.m3.Singleton@150a7ec8
+mao.m3.Singleton@13a6f77f
+mao.m3.Singleton@150a7ec8
+实例私有化构造方法
+mao.m3.Singleton@13a6f77f
+mao.m3.Singleton@13a6f77f
+mao.m3.Singleton@283642b1
+mao.m3.Singleton@180dfe73
+mao.m3.Singleton@180dfe73
+mao.m3.Singleton@5f57cf75
+mao.m3.Singleton@5f57cf75
+创建对象实例
+实例私有化构造方法
+实例私有化构造方法
+创建对象实例
+实例私有化构造方法
+mao.m3.Singleton@2d34897e
+mao.m3.Singleton@2d34897e
+mao.m3.Singleton@4e202e1f
+mao.m3.Singleton@ed99c76
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@ed99c76
+mao.m3.Singleton@ed99c76
+mao.m3.Singleton@ed99c76
+mao.m3.Singleton@ed99c76
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@ed99c76
+mao.m3.Singleton@451669b0
+mao.m3.Singleton@ed99c76
+mao.m3.Singleton@451669b0
+mao.m3.Singleton@451669b0
+mao.m3.Singleton@451669b0
+mao.m3.Singleton@451669b0
+mao.m3.Singleton@451669b0
+mao.m3.Singleton@eeed4d4
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836	
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+mao.m3.Singleton@6de48836
+```
+
+
+
+该方式在成员位置声明Singleton类型的静态变量，并没有进行对象的赋值操作，当调用getInstance()方法获取Singleton类的对象的时候才创建Singleton类的对象，这样就实现了懒加载的效果。但是，如果是多线程环境，会出现线程安全问题
+
+
+
+
+
+#### 懒汉式-方式2
+
+
 
