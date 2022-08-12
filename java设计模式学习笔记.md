@@ -4282,3 +4282,463 @@ public class Test2
 
 
 #### 枚举方式
+
+枚举类实现单例模式是极力推荐的单例实现模式，因为枚举类型是线程安全的，并且只会装载一次，设计者充分的利用了枚举的这个特性来实现单例模式，枚举的写法非常简单，而且枚举类型是所用单例实现中唯一一种不会被破坏的单例实现模式。
+
+
+
+```java
+package mao.m7;
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m7
+ * Enum(枚举名): Singleton
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 22:57
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public enum Singleton
+{
+    INSTANCE;
+
+    public String str = "hello world";
+
+    public String show()
+    {
+        return "show";
+    }
+
+    Singleton()
+    {
+        System.out.println("实例私有化构造方法");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.m7;
+
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m7
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 22:57
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    @SuppressWarnings("all")
+    public static void main(String[] args) throws InterruptedException, ClassNotFoundException
+    {
+        Class.forName("mao.m7.Singleton");
+        Thread.sleep(1000);
+        System.out.println(Singleton.INSTANCE.str);
+        System.out.println(Singleton.INSTANCE.show());
+        System.out.println(Singleton.INSTANCE == Singleton.INSTANCE);
+        System.out.println(Singleton.INSTANCE);
+    }
+}
+```
+
+
+
+```java
+package mao.m7;
+
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m7
+ * Class(类名): Test2
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 23:06
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test2
+{
+    @SuppressWarnings("all")
+    public static void main(String[] args)
+    {
+        Thread[] threads = new Thread[100];
+        for (int i = 0; i < 100; i++)
+        {
+            //可简写为：new Thread(Singleton::getInstance);
+            threads[i] = new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    System.out.println(Singleton.INSTANCE == Singleton.INSTANCE);
+                }
+            });
+        }
+        for (int i = 0; i < 100; i++)
+        {
+            threads[i].start();
+        }
+    }
+}
+```
+
+
+
+
+
+枚举方式属于恶汉式方式
+
+
+
+![image-20220811231154041](img/java设计模式学习笔记/image-20220811231154041.png)
+
+
+
+
+
+
+
+### 破坏单例模式
+
+
+
+使上面定义的单例类（Singleton）可以创建多个对象，枚举方式除外。有两种方式，分别是序列化和反射。
+
+
+
+#### 序列化反序列化
+
+拿懒汉式-方式3举例
+
+
+
+先实现Serializable接口
+
+
+
+```java
+package mao.m5;
+
+import java.io.Serializable;
+
+/**
+ * Project name(项目名称)：java设计模式_单例模式
+ * Package(包名): mao.m5
+ * Class(类名): Singleton
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/11
+ * Time(创建时间)： 22:28
+ * Version(版本): 1.0
+ * Description(描述)： 懒汉式-方式3（双重检查锁）
+ * <p>
+ * 在多线程的情况下，可能会出现空指针问题，出现问题的原因是JVM在实例化对象的时候会进行优化和指令重排序操作。
+ * 要解决双重检查锁模式带来空指针异常的问题，只需要使用 `volatile` 关键字, `volatile` 关键字可以保证可见性和有序性。
+ */
+
+public class Singleton implements Serializable
+{
+    public String str = "hello world";
+
+    public String show()
+    {
+        return "show";
+    }
+
+    /**
+     * 私有化构造方法
+     */
+    private Singleton()
+    {
+        System.out.println("实例私有化构造方法");
+    }
+
+    private static volatile Singleton instance;
+
+    /**
+     * 对外提供方法获取该对象
+     * 线程安全
+     *
+     * @return Singleton对象
+     */
+    public static Singleton getInstance()
+    {
+        //第一次判断，如果instance不为null，不进入抢锁阶段，直接返回实例
+        if (instance == null)
+        {
+            synchronized (Singleton.class)
+            {
+                //抢到锁之后再次判断是否为null
+                if (instance == null)
+                {
+                    System.out.println("创建对象实例");
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.serialization;
+
+
+import mao.m5.Singleton;
+
+import java.awt.*;
+import java.io.*;
+
+/**
+ * Project name(项目名称)：java设计模式_破坏单例模式
+ * Package(包名): mao.serialization
+ * Class(类名): SingletonIO
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 19:38
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class SingletonIO
+{
+    private SingletonIO()
+    {
+
+    }
+
+    /**
+     * 将对象写入文件
+     *
+     * @param singleton mao.m5.Singleton
+     * @param path      文件的路径
+     */
+    public static void write(mao.m5.Singleton singleton, String path)
+    {
+        File file = null;
+        FileOutputStream fileOutputStream = null;
+        ObjectOutputStream objectOutputStream = null;
+        try                                  //文件流打开，文件读写
+        {
+            file = new File(path);
+            fileOutputStream = new FileOutputStream(file);
+            objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(singleton);
+        }
+        catch (FileNotFoundException e)      //文件未找到
+        {
+            Toolkit.getDefaultToolkit().beep();
+            System.err.println("文件未找到！！！  " + "\n错误内容：" + e.toString());
+        }
+        catch (Exception e)                  //其它异常
+        {
+            Toolkit.getDefaultToolkit().beep();
+            e.printStackTrace();
+        }
+        finally
+        {
+            try                              //关闭流
+            {
+                if (fileOutputStream != null)
+                {
+                    fileOutputStream.close();
+                }
+
+            }
+            catch (NullPointerException e)    //空指针异常
+            {
+                Toolkit.getDefaultToolkit().beep();
+                System.err.println("文件已经被关闭，无法再次关闭！！！");
+            }
+            catch (Exception e)              //其它异常
+            {
+                Toolkit.getDefaultToolkit().beep();
+                e.printStackTrace();
+            }
+
+            try                              //关闭流
+            {
+                if (objectOutputStream != null)
+                {
+                    objectOutputStream.close();
+                }
+            }
+            catch (NullPointerException e)    //空指针异常
+            {
+                Toolkit.getDefaultToolkit().beep();
+                System.err.println("文件已经被关闭，无法再次关闭！！！");
+            }
+            catch (Exception e)              //其它异常
+            {
+                Toolkit.getDefaultToolkit().beep();
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 从文件里读对象
+     *
+     * @param path 文件路径
+     * @return mao.m5.Singleton
+     */
+    public static mao.m5.Singleton read(String path)
+    {
+        File file = null;
+        FileInputStream fileInputStream = null;
+        ObjectInputStream objectInputStream = null;
+        try                                  //文件流打开，文件读写
+        {
+            file = new File(path);
+            fileInputStream = new FileInputStream(file);
+            objectInputStream = new ObjectInputStream(fileInputStream);
+            Object object = objectInputStream.readObject();
+            return (Singleton) object;
+        }
+        catch (FileNotFoundException e)      //文件未找到
+        {
+            Toolkit.getDefaultToolkit().beep();
+            System.err.println("文件未找到！！！  " + "\n错误内容：" + e.toString());
+        }
+        catch (Exception e)                  //其它异常
+        {
+            Toolkit.getDefaultToolkit().beep();
+            e.printStackTrace();
+        }
+        finally
+        {
+            try                              //关闭流
+            {
+                if (fileInputStream != null)
+                {
+                    fileInputStream.close();
+                }
+            }
+            catch (NullPointerException e)    //空指针异常
+            {
+                Toolkit.getDefaultToolkit().beep();
+                System.err.println("文件已经被关闭，无法再次关闭！！！");
+            }
+            catch (Exception e)              //其它异常
+            {
+                Toolkit.getDefaultToolkit().beep();
+                e.printStackTrace();
+            }
+            try                              //关闭流
+            {
+                if (objectInputStream != null)
+                {
+                    objectInputStream.close();
+                }
+            }
+            catch (NullPointerException e)    //空指针异常
+            {
+                Toolkit.getDefaultToolkit().beep();
+                System.err.println("文件已经被关闭，无法再次关闭！！！");
+            }
+            catch (Exception e)              //其它异常
+            {
+                Toolkit.getDefaultToolkit().beep();
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.serialization;
+
+import mao.m5.Singleton;
+
+/**
+ * Project name(项目名称)：java设计模式_破坏单例模式
+ * Package(包名): mao.serialization
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 19:49
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    private static final String PATH = "./Singleton.txt";
+
+    public static void main(String[] args)
+    {
+        System.out.println(Singleton.getInstance());
+        System.out.println(Singleton.getInstance());
+        System.out.println("-----");
+        SingletonIO.write(Singleton.getInstance(), PATH);
+        System.out.println(SingletonIO.read(PATH));
+        System.out.println(SingletonIO.read(PATH));
+        System.out.println(SingletonIO.read(PATH));
+        System.out.println(SingletonIO.read(PATH));
+        System.out.println(SingletonIO.read(PATH));
+    }
+}
+```
+
+
+
+测试结果：
+
+```sh
+创建对象实例
+实例私有化构造方法
+mao.m5.Singleton@776ec8df
+mao.m5.Singleton@776ec8df
+-----
+mao.m5.Singleton@45ff54e6
+mao.m5.Singleton@2328c243
+mao.m5.Singleton@bebdb06
+mao.m5.Singleton@7a4f0f29
+mao.m5.Singleton@45283ce2
+```
+
+
+
+
+
+后面打印的内存地址都不一样，序列化和反序列化已经破坏了单例设计模式
+
+
+
+
