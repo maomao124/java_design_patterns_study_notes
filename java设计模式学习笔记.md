@@ -5572,7 +5572,758 @@ java虚拟机即将关闭!!!
 
 ## 简单工厂模式
 
+### 概念
+
+简单工厂不是一种设计模式，反而比较像是一种编程习惯。
 
 
 
+### 结构
+
+简单工厂包含如下角色：
+
+* 抽象产品 ：定义了产品的规范，描述了产品的主要特性和功能。
+* 具体产品 ：实现或者继承抽象产品的子类
+* 具体工厂 ：提供了创建产品的方法，调用者通过该方法来获取产品。
+
+
+
+
+
+### 示例
+
+需求：设计一个咖啡店点餐系统。
+
+设计一个咖啡类（Coffee），并定义其两个子类（美式咖啡【AmericanCoffee】和拿铁咖啡【LatteCoffee】）；再设计一个咖啡店类（CoffeeStore），咖啡店具有点咖啡的功能。
+
+
+
+在java中，万物皆对象，这些对象都需要创建，如果创建的时候直接new该对象，就会对该对象耦合严重，假如我们要更换对象，所有new对象的地方都需要修改一遍，这显然违背了软件设计的开闭原则。如果我们使用工厂来生产对象，我们就只和工厂打交道就可以了，彻底和对象解耦，如果要更换对象，直接在工厂里更换该对象即可，达到了与对象解耦的目的；所以说，工厂模式最大的优点就是：**解耦**。
+
+
+
+![image-20220812210902922](img/java设计模式学习笔记/image-20220812210902922.png)
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_简单工厂模式
+ * Package(包名): mao.before
+ * Class(类名): Coffee
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 21:11
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+public class Coffee
+{
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
+    public String getName()
+    {
+        return "咖啡";
+    }
+
+    /**
+     * Add milk.
+     */
+    public void addMilk()
+    {
+        System.out.println("添加牛奶");
+    }
+
+    /**
+     * Add sugar.
+     */
+    public void addSugar()
+    {
+        System.out.println("添加糖");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_简单工厂模式
+ * Package(包名): mao.before
+ * Class(类名): CoffeeStore
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 21:12
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class CoffeeStore
+{
+    public Coffee orderCoffee(String type)
+    {
+        if (type == null)
+        {
+            throw new RuntimeException("type不能为null");
+        }
+        Coffee coffee = null;
+        if (type.equals("latte"))
+        {
+            coffee = new LatteCoffee();
+        }
+        else if (type.equals("american"))
+        {
+            coffee = new AmericanCoffee();
+        }
+        else
+        {
+            throw new RuntimeException("type没有匹配到如何一种");
+        }
+        coffee.addMilk();
+        coffee.addSugar();
+        return coffee;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_简单工厂模式
+ * Package(包名): mao.before
+ * Class(类名): LatteCoffee
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 21:16
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class LatteCoffee extends Coffee
+{
+    @Override
+    public String getName()
+    {
+        return "拿铁咖啡";
+    }
+
+    @Override
+    public void addMilk()
+    {
+        System.out.println("拿铁咖啡添加牛奶");
+    }
+
+    @Override
+    public void addSugar()
+    {
+        System.out.println("拿铁咖啡添加糖");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_简单工厂模式
+ * Package(包名): mao.before
+ * Class(类名): AmericanCoffee
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 21:17
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class AmericanCoffee extends Coffee
+{
+    @Override
+    public String getName()
+    {
+        return "美式咖啡";
+    }
+
+    @Override
+    public void addMilk()
+    {
+        System.out.println("美式咖啡添加牛奶");
+    }
+
+    @Override
+    public void addSugar()
+    {
+        System.out.println("美式咖啡添加糖");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_简单工厂模式
+ * Package(包名): mao.before
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 21:23
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        CoffeeStore coffeeStore = new CoffeeStore();
+        Coffee coffee = coffeeStore.orderCoffee("latte");
+        System.out.println(coffee.getName());
+        coffee = coffeeStore.orderCoffee("american");
+        System.out.println(coffee.getName());
+    }
+}
+```
+
+
+
+
+
+**改进：**
+
+![image-20220812214509192](img/java设计模式学习笔记/image-20220812214509192.png)
+
+
+
+
+
+```java
+package mao.after;
+
+
+
+/**
+ * Project name(项目名称)：java设计模式_简单工厂模式
+ * Package(包名): mao.after
+ * Class(类名): SimpleCoffeeFactory
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 21:49
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class SimpleCoffeeFactory
+{
+    public Coffee createCoffee(String type)
+    {
+        if (type == null)
+        {
+            throw new RuntimeException("type不能为null");
+        }
+        Coffee coffee = null;
+        if (type.equals("latte"))
+        {
+            coffee = new LatteCoffee();
+        }
+        else if (type.equals("american"))
+        {
+            coffee = new AmericanCoffee();
+        }
+        else
+        {
+            throw new RuntimeException("type没有匹配到如何一种");
+        }
+        coffee.addMilk();
+        coffee.addSugar();
+        return coffee;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+
+/**
+ * Project name(项目名称)：java设计模式_简单工厂模式
+ * Package(包名): mao.after
+ * Class(类名): CoffeeStore
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 21:51
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class CoffeeStore
+{
+    private static final SimpleCoffeeFactory simpleCoffeeFactory = new SimpleCoffeeFactory();
+
+    public Coffee orderCoffee(String type)
+    {
+        return simpleCoffeeFactory.createCoffee(type);
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+
+/**
+ * Project name(项目名称)：java设计模式_简单工厂模式
+ * Package(包名): mao.after
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 21:53
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        CoffeeStore coffeeStore = new CoffeeStore();
+        Coffee coffee = coffeeStore.orderCoffee("latte");
+        System.out.println(coffee.getName());
+        coffee = coffeeStore.orderCoffee("american");
+        System.out.println(coffee.getName());
+    }
+}
+```
+
+
+
+
+
+工厂（factory）处理创建对象的细节，一旦有了SimpleCoffeeFactory，CoffeeStore类中的orderCoffee()就变成此对象的客户，后期如果需要Coffee对象直接从工厂中获取即可。这样也就解除了和Coffee实现类的耦合，同时又产生了新的耦合，CoffeeStore对象和SimpleCoffeeFactory工厂对象的耦合，工厂对象和商品对象的耦合。
+
+后期如果再加新品种的咖啡，我们势必要需求修改SimpleCoffeeFactory的代码，违反了开闭原则。工厂类的客户端可能有很多，比如创建美团外卖等，这样只需要修改工厂类的代码，省去其他的修改操作。
+
+
+
+
+
+### 优缺点
+
+**优点：**
+
+封装了创建对象的过程，可以通过参数直接获取对象。把对象的创建和业务逻辑层分开，这样以后就避免了修改客户代码，如果要实现新产品直接修改工厂类，而不需要在原代码中修改，这样就降低了客户代码修改的可能性，更加容易扩展。
+
+**缺点：**
+
+增加新产品时还是需要修改工厂类的代码，违背了“开闭原则”。
+
+
+
+
+
+### 扩展
+
+
+
+静态工厂
+
+
+
+在开发中也有一部分人将工厂类中的创建对象的功能定义为静态的，这个就是静态工厂模式
+
+
+
+```java
+package mao.static_factory;
+
+
+/**
+ * Project name(项目名称)：java设计模式_简单工厂模式
+ * Package(包名): mao.after
+ * Class(类名): SimpleCoffeeFactory
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 21:49
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class SimpleCoffeeFactory
+{
+    public static Coffee createCoffee(String type)
+    {
+        if (type == null)
+        {
+            throw new RuntimeException("type不能为null");
+        }
+        Coffee coffee = null;
+        if (type.equals("latte"))
+        {
+            coffee = new LatteCoffee();
+        }
+        else if (type.equals("american"))
+        {
+            coffee = new AmericanCoffee();
+        }
+        else
+        {
+            throw new RuntimeException("type没有匹配到如何一种");
+        }
+        coffee.addMilk();
+        coffee.addSugar();
+        return coffee;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.static_factory;
+
+
+/**
+ * Project name(项目名称)：java设计模式_简单工厂模式
+ * Package(包名): mao.after
+ * Class(类名): CoffeeStore
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 21:51
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class CoffeeStore
+{
+    public static Coffee orderCoffee(String type)
+    {
+        return SimpleCoffeeFactory.createCoffee(type);
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.static_factory;
+
+/**
+ * Project name(项目名称)：java设计模式_简单工厂模式
+ * Package(包名): mao.static_factory
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 22:00
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        Coffee latte = CoffeeStore.orderCoffee("latte");
+        System.out.println(latte.getName());
+        Coffee american = CoffeeStore.orderCoffee("american");
+        System.out.println(american.getName());
+    }
+}
+```
+
+
+
+
+
+
+
+## 工厂方法模式
+
+
+
+### 概念
+
+定义一个用于创建对象的接口，让子类决定实例化哪个产品类对象。工厂方法使一个产品类的实例化延迟到其工厂的子类。
+
+
+
+### 结构
+
+工厂方法模式的主要角色：
+
+* 抽象工厂（Abstract Factory）：提供了创建产品的接口，调用者通过它访问具体工厂的工厂方法来创建产品。
+* 具体工厂（ConcreteFactory）：主要是实现抽象工厂中的抽象方法，完成具体产品的创建。
+* 抽象产品（Product）：定义了产品的规范，描述了产品的主要特性和功能。
+* 具体产品（ConcreteProduct）：实现了抽象产品角色所定义的接口，由具体工厂来创建，它同具体工厂之间一一对应。
+
+
+
+
+
+### 示例
+
+
+
+![image-20220812225239944](img/java设计模式学习笔记/image-20220812225239944.png)
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_工厂方法模式
+ * Package(包名): mao
+ * Interface(接口名): CoffeeFactory
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 22:42
+ * Version(版本): 1.0
+ * Description(描述)： 抽象工厂
+ */
+
+public interface CoffeeFactory
+{
+    /**
+     * Create coffee.
+     *
+     * @return the coffee
+     */
+    Coffee createCoffee();
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_工厂方法模式
+ * Package(包名): mao
+ * Class(类名): LatteCoffeeFactory
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 22:43
+ * Version(版本): 1.0
+ * Description(描述)： 具体工厂
+ */
+
+public class LatteCoffeeFactory implements CoffeeFactory
+{
+
+    @Override
+    public Coffee createCoffee()
+    {
+        return new LatteCoffee();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_工厂方法模式
+ * Package(包名): mao
+ * Class(类名): AmericanCoffeeFactory
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 22:44
+ * Version(版本): 1.0
+ * Description(描述)： 具体工厂
+ */
+
+public class AmericanCoffeeFactory implements CoffeeFactory
+{
+
+    @Override
+    public Coffee createCoffee()
+    {
+        return new AmericanCoffee();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_工厂方法模式
+ * Package(包名): mao
+ * Class(类名): CoffeeStore
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 22:09
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class CoffeeStore
+{
+    private final CoffeeFactory factory;
+
+    public CoffeeStore(CoffeeFactory factory)
+    {
+        this.factory = factory;
+    }
+
+    public Coffee orderCoffee()
+    {
+        Coffee coffee = factory.createCoffee();
+        coffee.addMilk();
+        coffee.addSugar();
+        return coffee;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_工厂方法模式
+ * Package(包名): mao
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 22:48
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        Coffee coffee = new CoffeeStore(new AmericanCoffeeFactory()).orderCoffee();
+        System.out.println(coffee.getName());
+        coffee = new CoffeeStore(new LatteCoffeeFactory()).orderCoffee();
+        System.out.println(coffee.getName());
+    }
+}
+```
+
+
+
+
+
+要增加产品类时也要相应地增加工厂类，不需要修改工厂类的代码了，这样就解决了简单工厂模式的缺点。
+
+工厂方法模式是简单工厂模式的进一步抽象。由于使用了多态性，工厂方法模式保持了简单工厂模式的优点，而且克服了它的缺点
+
+
+
+
+
+### 优缺点
+
+**优点：**
+
+- 用户只需要知道具体工厂的名称就可得到所要的产品，无须知道产品的具体创建过程；
+- 在系统增加新的产品时只需要添加具体产品类和对应的具体工厂类，无须对原工厂进行任何修改，满足开闭原则；
+
+**缺点：**
+
+* 每增加一个产品就要增加一个具体产品类和一个对应的具体工厂类，这增加了系统的复杂度。
+
+
+
+
+
+![image-20220812225804574](img/java设计模式学习笔记/image-20220812225804574.png)
+
+
+
+
+
+
+
+
+
+
+
+## 抽象工厂模式
 
