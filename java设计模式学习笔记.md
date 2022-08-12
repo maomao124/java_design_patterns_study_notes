@@ -5202,3 +5202,157 @@ private Object readOrdinaryObject(boolean unshared) throws IOException {
 
 
 #### 反射
+
+当通过反射方式调用构造方法进行创建创建时，直接抛异常。
+
+
+
+```java
+package mao.reflex_resolve;
+
+/**
+ * Project name(项目名称)：java设计模式_破坏单例模式
+ * Package(包名): mao.reflex_resolve
+ * Class(类名): Singleton
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 20:18
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Singleton
+{
+    public String str = "hello world";
+
+    public String show()
+    {
+        return "show";
+    }
+
+    /**
+     * 私有化构造方法
+     */
+    private Singleton()
+    {
+        if (instance != null)
+        {
+            throw new RuntimeException("此类的对象单例！");
+        }
+        System.out.println("实例私有化构造方法");
+    }
+
+    private static volatile Singleton instance;
+
+    /**
+     * 对外提供方法获取该对象
+     * 线程安全
+     *
+     * @return Singleton对象
+     */
+    public static Singleton getInstance()
+    {
+        //第一次判断，如果instance不为null，不进入抢锁阶段，直接返回实例
+        if (instance == null)
+        {
+            synchronized (Singleton.class)
+            {
+                //抢到锁之后再次判断是否为null
+                if (instance == null)
+                {
+                    System.out.println("创建对象实例");
+                    instance = new Singleton();
+                }
+            }
+        }
+        return instance;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.reflex_resolve;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
+/**
+ * Project name(项目名称)：java设计模式_破坏单例模式
+ * Package(包名): mao.reflex_resolve
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 20:19
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+            throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException
+    {
+        System.out.println(Singleton.getInstance());
+        System.out.println(Singleton.getInstance());
+        System.out.println("-----");
+        Class<Singleton> singletonClass = Singleton.class;
+        //获取Singleton类的私有无参构造方法对象
+        Constructor<Singleton> declaredConstructor = singletonClass.getDeclaredConstructor();
+        //取消访问检查
+        declaredConstructor.setAccessible(true);
+        //创建对象
+        System.out.println(declaredConstructor.newInstance());
+        System.out.println(declaredConstructor.newInstance());
+        System.out.println(declaredConstructor.newInstance());
+        System.out.println(declaredConstructor.newInstance());
+        System.out.println(declaredConstructor.newInstance());
+    }
+}
+```
+
+
+
+
+
+运行结果：
+
+```sh
+创建对象实例
+实例私有化构造方法
+mao.reflex_resolve.Singleton@776ec8df
+mao.reflex_resolve.Singleton@776ec8df
+-----
+Exception in thread "main" java.lang.reflect.InvocationTargetException
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:78)
+	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:480)
+	at mao.reflex_resolve.Test.main(Test.java:33)
+Caused by: java.lang.RuntimeException: 此类的对象单例！
+	at mao.reflex_resolve.Singleton.<init>(Singleton.java:32)
+	... 6 more
+```
+
+
+
+
+
+![image-20220812202424727](img/java设计模式学习笔记/image-20220812202424727.png)
+
+
+
+
+
+
+
+### 单例模式的使用场景
+
