@@ -6337,3 +6337,592 @@ public class Test
 
 ## 抽象工厂模式
 
+工厂方法模式中考虑的是一类产品的生产，如畜牧场只养动物、电视机厂只生产电视机
+
+这些工厂只生产同种类产品，同种类产品称为同等级产品，也就是说：工厂方法模式只考虑生产同等级的产品，但是在现实生活中许多工厂是综合型的工厂，能生产多等级（种类） 的产品，如电器厂既生产电视机又生产洗衣机或空调等
+
+
+
+抽象工厂模式将考虑多等级产品的生产，将同一个具体工厂所生产的位于不同等级的一组产品称为一个产品族，下图所示横轴是产品等级，也就是同一类产品；纵轴是产品族，也就是同一品牌的产品，同一品牌的产品产自同一个工厂。
+
+
+
+![image-20220812231844528](img/java设计模式学习笔记/image-20220812231844528.png)
+
+
+
+举例：
+
+* 同一级别：华为手机、小米手机、OPPO手机...
+* 同一产品族：华为手机、华为笔记本电脑、华为路由器...
+
+
+
+
+
+### 概念
+
+是一种为访问类提供一个创建一组相关或相互依赖对象的接口，且访问类无须指定所要产品的具体类就能得到同族的不同等级的产品的模式结构。
+
+抽象工厂模式是工厂方法模式的升级版本，工厂方法模式只生产一个等级的产品，而抽象工厂模式可生产多个等级的产品
+
+
+
+
+
+### 结构
+
+抽象工厂模式的主要角色如下：
+
+* 抽象工厂（Abstract Factory）：提供了创建产品的接口，它包含多个创建产品的方法，可以创建多个不同等级的产品。
+* 具体工厂（Concrete Factory）：主要是实现抽象工厂中的多个抽象方法，完成具体产品的创建。
+* 抽象产品（Product）：定义了产品的规范，描述了产品的主要特性和功能，抽象工厂模式有多个抽象产品。
+* 具体产品（ConcreteProduct）：实现了抽象产品角色所定义的接口，由具体工厂来创建，它同具体工厂之间是多对一的关系。
+
+
+
+
+
+### 示例
+
+现咖啡店业务发生改变，不仅要生产咖啡还要生产甜点，如提拉米苏、抹茶慕斯等，要是按照工厂方法模式，需要定义提拉米苏类、抹茶慕斯类、提拉米苏工厂、抹茶慕斯工厂、甜点工厂类，很容易发生类爆炸情况。其中拿铁咖啡、美式咖啡是一个产品等级，都是咖啡；提拉米苏、抹茶慕斯也是一个产品等级；拿铁咖啡和提拉米苏是同一产品族（也就是都属于意大利风味），美式咖啡和抹茶慕斯是同一产品族（也就是都属于美式风味）。所以这个案例可以使用抽象工厂模式实现。
+
+
+
+![image-20220812232437722](img/java设计模式学习笔记/image-20220812232437722.png)
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_抽象工厂模式
+ * Package(包名): mao
+ * Class(类名): Coffee
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 23:12
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Coffee
+{
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
+    public String getName()
+    {
+        return "咖啡";
+    }
+
+    /**
+     * Add milk.
+     */
+    public void addMilk()
+    {
+        System.out.println("添加牛奶");
+    }
+
+    /**
+     * Add sugar.
+     */
+    public void addSugar()
+    {
+        System.out.println("添加糖");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_抽象工厂模式
+ * Package(包名): mao
+ * Class(类名): LatteCoffee
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 23:13
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class LatteCoffee extends Coffee
+{
+    @Override
+    public String getName()
+    {
+        return "拿铁咖啡";
+    }
+
+    @Override
+    public void addMilk()
+    {
+        System.out.println("拿铁咖啡添加牛奶");
+    }
+
+    @Override
+    public void addSugar()
+    {
+        System.out.println("拿铁咖啡添加糖");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_抽象工厂模式
+ * Package(包名): mao
+ * Class(类名): AmericanCoffee
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/12
+ * Time(创建时间)： 23:13
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class AmericanCoffee extends Coffee
+{
+    @Override
+    public String getName()
+    {
+        return "美式咖啡";
+    }
+
+    @Override
+    public void addMilk()
+    {
+        System.out.println("美式咖啡添加牛奶");
+    }
+
+    @Override
+    public void addSugar()
+    {
+        System.out.println("美式咖啡添加糖");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_抽象工厂模式
+ * Package(包名): mao
+ * Class(类名): Dessert
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/13
+ * Time(创建时间)： 21:02
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Dessert
+{
+    public void show()
+    {
+        System.out.println("甜点");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_抽象工厂模式
+ * Package(包名): mao
+ * Class(类名): MatchaMousse
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/13
+ * Time(创建时间)： 21:04
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class MatchaMousse extends Dessert
+{
+    @Override
+    public void show()
+    {
+        System.out.println("抹茶慕斯");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_抽象工厂模式
+ * Package(包名): mao
+ * Class(类名): Tiramisu
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/13
+ * Time(创建时间)： 21:03
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Tiramisu extends Dessert
+{
+    @Override
+    public void show()
+    {
+        System.out.println("提拉米苏");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_抽象工厂模式
+ * Package(包名): mao
+ * Interface(接口名): DessertFactory
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/13
+ * Time(创建时间)： 21:08
+ * Version(版本): 1.0
+ * Description(描述)： 抽象工厂
+ */
+
+public interface DessertFactory
+{
+    Coffee createCoffee();
+
+    Dessert createDessert();
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_抽象工厂模式
+ * Package(包名): mao
+ * Class(类名): AmericanDessertFactory
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/13
+ * Time(创建时间)： 21:09
+ * Version(版本): 1.0
+ * Description(描述)： 具体工厂,美式甜点工厂
+ */
+
+public class AmericanDessertFactory implements DessertFactory
+{
+
+    @Override
+    public Coffee createCoffee()
+    {
+        return new AmericanCoffee();
+    }
+
+    @Override
+    public Dessert createDessert()
+    {
+        return new MatchaMousse();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_抽象工厂模式
+ * Package(包名): mao
+ * Class(类名): ItalyDessertFactory
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/13
+ * Time(创建时间)： 21:09
+ * Version(版本): 1.0
+ * Description(描述)： 具体工厂,意大利风味甜点工厂
+ */
+
+public class ItalyDessertFactory implements DessertFactory
+{
+
+    @Override
+    public Coffee createCoffee()
+    {
+        return new LatteCoffee();
+    }
+
+    @Override
+    public Dessert createDessert()
+    {
+        return new Tiramisu();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_抽象工厂模式
+ * Package(包名): mao
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/13
+ * Time(创建时间)： 21:10
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        DessertFactory dessertFactory = new AmericanDessertFactory();
+        Dessert dessert = dessertFactory.createDessert();
+        dessert.show();
+        Coffee coffee = dessertFactory.createCoffee();
+        System.out.println(coffee.getName());
+
+        dessertFactory = new ItalyDessertFactory();
+        Dessert dessert1 = dessertFactory.createDessert();
+        dessert1.show();
+        Coffee coffee1 = dessertFactory.createCoffee();
+        System.out.println(coffee1.getName());
+    }
+}
+```
+
+
+
+
+
+如果要加同一个产品族的话，只需要再加一个对应的工厂类即可，不需要修改其他的类。
+
+
+
+
+
+### 优缺点
+
+**优点：**
+
+当一个产品族中的多个对象被设计成一起工作时，它能保证客户端始终只使用同一个产品族中的对象。
+
+**缺点：**
+
+当产品族中需要增加一个新的产品时，所有的工厂类都需要进行修改。
+
+
+
+
+
+### 使用场景
+
+* 当需要创建的对象是一系列相互关联或相互依赖的产品族时，如电器工厂中的电视机、洗衣机、空调等。
+* 系统中有多个产品族，但每次只使用其中的某一族产品。如有人只喜欢穿某一个品牌的衣服和鞋。
+* 系统中提供了产品的类库，且所有产品的接口相同，客户端不依赖产品实例的创建细节和内部结构。
+
+
+
+
+
+
+
+### 模式扩展
+
+
+
+可以通过工厂模式+配置文件的方式解除工厂对象和产品对象的耦合。在工厂类中加载配置文件中的全类名，并创建对象进行存储，客户端如果需要对象，直接进行获取即可。
+
+
+
+**创建配置文件**
+
+名称为bean.properties
+
+```properties
+american=mao.AmericanCoffee
+latte=mao.LatteCoffee
+```
+
+
+
+**创建CoffeeFactory类**
+
+
+
+```java
+package mao.config;
+
+import mao.Coffee;
+
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+/**
+ * Project name(项目名称)：java设计模式_抽象工厂模式
+ * Package(包名): mao.config
+ * Class(类名): CoffeeFactory
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/13
+ * Time(创建时间)： 21:24
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class CoffeeFactory
+{
+    private static final Map<String, Coffee> map = new HashMap<>();
+
+    static
+    {
+        Properties properties = new Properties();
+        InputStream inputStream = CoffeeFactory.class.getClassLoader().getResourceAsStream("bean.properties");
+        try
+        {
+            properties.load(inputStream);
+            Set<Object> keys = properties.keySet();
+            for (Object key : keys)
+            {
+                String property = properties.getProperty((String) key);
+                Class<?> clazz = Class.forName(property);
+                Object o = clazz.newInstance();
+                map.put((String) key, (Coffee) o);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static Coffee createCoffee(String name)
+    {
+
+        return map.get(name);
+    }
+}
+```
+
+
+
+
+
+**创建测试类**
+
+
+
+```java
+package mao.config;
+
+import mao.Coffee;
+
+/**
+ * Project name(项目名称)：java设计模式_抽象工厂模式
+ * Package(包名): mao.config
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/13
+ * Time(创建时间)： 21:31
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        Coffee american = CoffeeFactory.createCoffee("american");
+        System.out.println(american.getName());
+        System.out.println(american);
+        Coffee latte = CoffeeFactory.createCoffee("latte");
+        System.out.println(latte.getName());
+        System.out.println(latte);
+    }
+}
+```
+
+
+
+
+
+静态成员变量用来存储创建的对象（键存储的是名称，值存储的是对应的对象），而读取配置文件以及创建对象写在静态代码块中，目的就是只需要执行一次。
+
+
+
+
+
+
+
+### 工厂模式的使用场景
+
