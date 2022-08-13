@@ -6920,9 +6920,824 @@ public class Test
 
 
 
+![image-20220813215113055](img/java设计模式学习笔记/image-20220813215113055.png)
+
+
+
+
+
 
 
 
 
 ### 工厂模式的使用场景
+
+Collection.iterator方法
+
+
+
+![image-20220813214608487](img/java设计模式学习笔记/image-20220813214608487.png)
+
+
+
+
+
+Collection接口是抽象工厂类，
+
+ArrayList是具体的工厂类；
+
+Iterator接口是抽象商品类，
+
+ArrayList类中的Iter内部类是具体的商品类。
+
+在具体的工厂类中iterator()方法创建具体的商品类的对象。
+
+
+
+DateForamt类中的getInstance()方法使用的是工厂模式
+
+Calendar类中的getInstance()方法使用的是工厂模式
+
+
+
+
+
+
+
+
+
+## 原型模式
+
+### 概念
+
+用一个已经创建的实例作为原型，通过复制该原型对象来创建一个和原型对象相同的新对象。
+
+
+
+### 结构
+
+原型模式包含如下角色：
+
+* 抽象原型类：规定了具体原型对象必须实现的的 clone() 方法。
+* 具体原型类：实现抽象原型类的 clone() 方法，它是可被复制的对象。
+* 访问类：使用具体原型类中的 clone() 方法来复制新的对象。
+
+
+
+
+
+![image-20220813215017491](img/java设计模式学习笔记/image-20220813215017491.png)
+
+
+
+
+
+### 浅克隆和深克隆
+
+原型模式的克隆分为浅克隆和深克隆
+
+
+
+* 浅克隆：创建一个新对象，新对象的属性和原来对象完全相同，对于非基本类型属性，仍指向原有属性所指向的对象的内存地址
+* 深克隆：创建一个新对象，属性中引用的其他对象也会被克隆，不再指向原有对象地址
+
+
+
+Java中的Object类中提供了 `clone()` 方法来实现浅克隆。 Cloneable 接口是上面的类图中的抽象原型类，而实现了Cloneable接口的子实现类就是具体的原型类。
+
+
+
+
+
+### 示例
+
+
+
+```java
+package mao.test;
+
+/**
+ * Project name(项目名称)：java设计模式_原型模式
+ * Package(包名): mao.test
+ * Class(类名): RealizeType
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/13
+ * Time(创建时间)： 21:54
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class RealizeType implements Cloneable
+{
+    public RealizeType()
+    {
+        System.out.println("具体的原型对象创建完成！");
+    }
+
+    @Override
+    protected RealizeType clone() throws CloneNotSupportedException
+    {
+        System.out.println("具体原型复制成功！");
+        return (RealizeType) super.clone();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.test;
+
+/**
+ * Project name(项目名称)：java设计模式_原型模式
+ * Package(包名): mao.test
+ * Class(类名): PrototypeTest
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/13
+ * Time(创建时间)： 21:54
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class PrototypeTest
+{
+    public static void main(String[] args) throws CloneNotSupportedException
+    {
+        RealizeType realizeType1 = new RealizeType();
+        System.out.println(realizeType1);
+        RealizeType realizeType2 = realizeType1.clone();
+        System.out.println(realizeType2);
+        RealizeType realizeType3 = realizeType1.clone();
+        System.out.println(realizeType3);
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+具体的原型对象创建完成！
+mao.test.RealizeType@776ec8df
+具体原型复制成功！
+mao.test.RealizeType@4eec7777
+具体原型复制成功！
+mao.test.RealizeType@3b07d329
+```
+
+
+
+
+
+### 浅克隆示例
+
+**用原型模式生成“三好学生”奖状**
+
+
+
+同一学校的“三好学生”奖状除了获奖人姓名不同，其他都相同，可以使用原型模式复制多个“三好学生”奖状出来，然后在修改奖状上的名字即可。
+
+
+
+![image-20220813220209523](img/java设计模式学习笔记/image-20220813220209523.png)
+
+
+
+
+
+```java
+package mao.shallowClone;
+
+/**
+ * Project name(项目名称)：java设计模式_原型模式
+ * Package(包名): mao.shallowClone
+ * Class(类名): Citation
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/13
+ * Time(创建时间)： 22:03
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+public class Citation implements Cloneable
+{
+    private String name;
+
+    /**
+     * Instantiates a new Citation.
+     *
+     * @param name the name
+     */
+    public Citation(String name)
+    {
+        this.name = name;
+    }
+
+    /**
+     * Instantiates a new Citation.
+     */
+    public Citation()
+    {
+
+    }
+
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
+     * Sets name.
+     *
+     * @param name the name
+     */
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    /**
+     * Show.
+     */
+    public void show()
+    {
+        System.out.println(getName() + "同学：在2022学年第一学期中表现优秀，被评为三好学生。特发此状！");
+    }
+
+    @Override
+    protected Citation clone() throws CloneNotSupportedException
+    {
+        return (Citation) super.clone();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.shallowClone;
+
+/**
+ * Project name(项目名称)：java设计模式_原型模式
+ * Package(包名): mao.shallowClone
+ * Class(类名): CitationTest
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/13
+ * Time(创建时间)： 22:05
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class CitationTest
+{
+    public static void main(String[] args) throws CloneNotSupportedException
+    {
+        Citation citation1 = new Citation("张三");
+        //复制
+        Citation citation2 = citation1.clone();
+        citation2.setName("李四");
+        Citation citation3 = citation2.clone();
+        citation3.setName("王五");
+        //显示
+        citation1.show();
+        citation2.show();
+        citation3.show();
+    }
+}
+```
+
+
+
+
+
+### 浅克隆使用场景
+
+* 对象的创建非常复杂，可以使用原型模式快捷的创建对象。
+* 性能和安全要求比较高。
+
+
+
+
+
+
+
+### 深克隆示例
+
+将上面的“三好学生”奖状的案例中Citation类的name属性修改为Student类型的属性。
+
+
+
+```java
+package mao.deepClone;
+
+/**
+ * Project name(项目名称)：java设计模式_原型模式
+ * Package(包名): mao.deepClone
+ * Class(类名): Student
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/13
+ * Time(创建时间)： 22:10
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+public class Student
+{
+    //名字
+    private String name;
+    //住址
+    private String address;
+
+    /**
+     * Instantiates a new Student.
+     */
+    public Student()
+    {
+
+    }
+
+    /**
+     * Instantiates a new Student.
+     *
+     * @param name    the name
+     * @param address the address
+     */
+    public Student(String name, String address)
+    {
+        this.name = name;
+        this.address = address;
+    }
+
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
+     * Sets name.
+     *
+     * @param name the name
+     */
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    /**
+     * Gets address.
+     *
+     * @return the address
+     */
+    public String getAddress()
+    {
+        return address;
+    }
+
+    /**
+     * Sets address.
+     *
+     * @param address the address
+     */
+    public void setAddress(String address)
+    {
+        this.address = address;
+    }
+
+    @Override
+    @SuppressWarnings("all")
+    public String toString()
+    {
+        final StringBuilder stringbuilder = new StringBuilder();
+        stringbuilder.append("name：").append(name).append('\n');
+        stringbuilder.append("address：").append(address).append('\n');
+        return stringbuilder.toString();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.deepClone;
+
+/**
+ * Project name(项目名称)：java设计模式_原型模式
+ * Package(包名): mao.deepClone
+ * Class(类名): Citation
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/13
+ * Time(创建时间)： 22:11
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+public class Citation implements Cloneable
+{
+    private Student student;
+
+    /**
+     * Instantiates a new Citation.
+     */
+    public Citation()
+    {
+
+    }
+
+    /**
+     * Instantiates a new Citation.
+     *
+     * @param student the student
+     */
+    public Citation(Student student)
+    {
+        this.student = student;
+    }
+
+    /**
+     * Gets student.
+     *
+     * @return the student
+     */
+    public Student getStudent()
+    {
+        return student;
+    }
+
+    /**
+     * Sets student.
+     *
+     * @param student the student
+     */
+    public void setStudent(Student student)
+    {
+        this.student = student;
+    }
+
+    /**
+     * Show.
+     */
+    void show()
+    {
+        System.out.println(student.getName() + "同学：在2022学年第一学期中表现优秀，被评为三好学生。特发此状！");
+    }
+
+    @Override
+    protected Citation clone() throws CloneNotSupportedException
+    {
+        return (Citation) super.clone();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.deepClone;
+
+/**
+ * Project name(项目名称)：java设计模式_原型模式
+ * Package(包名): mao.deepClone
+ * Class(类名): CitationTest
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/13
+ * Time(创建时间)： 22:13
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class CitationTest
+{
+    public static void main(String[] args) throws CloneNotSupportedException
+    {
+        Citation citation1 = new Citation();
+        Student student = new Student("张三", "北京");
+        citation1.setStudent(student);
+        //复制
+        Citation citation2 = citation1.clone();
+        citation2.getStudent().setName("李四");
+        //打印
+        citation1.show();
+        citation2.show();
+        System.out.println(citation1);
+        System.out.println(citation2);
+        System.out.println(citation1.getStudent());
+        System.out.println(citation2.getStudent());
+        System.out.println(citation1 == citation2);
+        System.out.println(citation1.getStudent() == citation2.getStudent());
+    }
+}
+```
+
+
+
+
+
+运行结果：
+
+```sh
+李四同学：在2022学年第一学期中表现优秀，被评为三好学生。特发此状！
+李四同学：在2022学年第一学期中表现优秀，被评为三好学生。特发此状！
+mao.deepClone.Citation@6d311334
+mao.deepClone.Citation@682a0b20
+name：李四
+address：北京
+
+name：李四
+address：北京
+
+false
+true
+```
+
+
+
+citation1.getStudent()对象和citation2.getStudent()对象是同一个对象，就会产生将citation2.getStudent()对象中name属性值改为“李四”，两个Citation（奖状）对象中显示的都是李四。这就是浅克隆的效果，对具体原型类（Citation）中的引用类型的属性进行引用的复制。这种情况需要使用深克隆，而进行深克隆需要使用对象流。
+
+
+
+**Student和Citation都需要实现Serializable接口**
+
+
+
+```java
+package mao.deepClone;
+
+import java.awt.*;
+import java.io.*;
+
+/**
+ * Project name(项目名称)：java设计模式_原型模式
+ * Package(包名): mao.deepClone
+ * Class(类名): CitationIO
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/13
+ * Time(创建时间)： 22:23
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class CitationIO
+{
+    /**
+     * 将 Citation对象写入到文件里
+     *
+     * @param citation Citation
+     * @param path     文件路径
+     */
+    public static boolean write(Citation citation, String path)
+    {
+        File file = null;
+        FileOutputStream fileOutputStream = null;
+        ObjectOutputStream objectOutputStream = null;
+        try                                  //文件流打开，文件读写
+        {
+            file = new File(path);
+            fileOutputStream = new FileOutputStream(file);
+            objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(citation);
+            return true;
+        }
+        catch (FileNotFoundException e)      //文件未找到
+        {
+            Toolkit.getDefaultToolkit().beep();
+            System.err.println("文件未找到！！！  " + "\n错误内容：" + e.toString());
+            return false;
+        }
+        catch (Exception e)                  //其它异常
+        {
+            Toolkit.getDefaultToolkit().beep();
+            e.printStackTrace();
+            return false;
+        }
+        finally
+        {
+            try                              //关闭流
+            {
+                if (fileOutputStream != null)
+                {
+                    fileOutputStream.close();
+                }
+            }
+            catch (NullPointerException e)    //空指针异常
+            {
+                Toolkit.getDefaultToolkit().beep();
+                System.err.println("文件已经被关闭，无法再次关闭！！！");
+            }
+            catch (Exception e)              //其它异常
+            {
+                Toolkit.getDefaultToolkit().beep();
+                e.printStackTrace();
+            }
+            try                              //关闭流
+            {
+                if (objectOutputStream != null)
+                {
+                    objectOutputStream.close();
+                }
+            }
+            catch (NullPointerException e)    //空指针异常
+            {
+                Toolkit.getDefaultToolkit().beep();
+                System.err.println("文件已经被关闭，无法再次关闭！！！");
+            }
+            catch (Exception e)              //其它异常
+            {
+                Toolkit.getDefaultToolkit().beep();
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 从文件里读对象
+     *
+     * @param path 文件路径
+     * @return Citation对象
+     */
+    public static Citation read(String path)
+    {
+        File file = null;
+        FileInputStream fileInputStream = null;
+        ObjectInputStream objectInputStream = null;
+        try                                  //文件流打开，文件读写
+        {
+            file = new File(path);
+            fileInputStream = new FileInputStream(file);
+            objectInputStream = new ObjectInputStream(fileInputStream);
+            Object o = objectInputStream.readObject();
+            return (Citation) o;
+        }
+        catch (FileNotFoundException e)      //文件未找到
+        {
+            Toolkit.getDefaultToolkit().beep();
+            System.err.println("文件未找到！！！  " + "\n错误内容：" + e.toString());
+            return null;
+        }
+        catch (Exception e)                  //其它异常
+        {
+            Toolkit.getDefaultToolkit().beep();
+            e.printStackTrace();
+            return null;
+        }
+        finally
+        {
+            try                              //关闭流
+            {
+                if (fileInputStream != null)
+                {
+                    fileInputStream.close();
+                }
+            }
+            catch (NullPointerException e)    //空指针异常
+            {
+                Toolkit.getDefaultToolkit().beep();
+                System.err.println("文件已经被关闭，无法再次关闭！！！");
+            }
+            catch (Exception e)              //其它异常
+            {
+                Toolkit.getDefaultToolkit().beep();
+                e.printStackTrace();
+            }
+
+            try                              //关闭流
+            {
+                if (objectInputStream != null)
+                {
+                    objectInputStream.close();
+                }
+            }
+            catch (NullPointerException e)    //空指针异常
+            {
+                Toolkit.getDefaultToolkit().beep();
+                System.err.println("文件已经被关闭，无法再次关闭！！！");
+            }
+            catch (Exception e)              //其它异常
+            {
+                Toolkit.getDefaultToolkit().beep();
+                e.printStackTrace();
+            }
+        }
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.deepClone;
+
+/**
+ * Project name(项目名称)：java设计模式_原型模式
+ * Package(包名): mao.deepClone
+ * Class(类名): CitationTest2
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/13
+ * Time(创建时间)： 22:23
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class CitationTest2
+{
+    public static final String PATH = "./Citation.txt";
+
+    public static void main(String[] args)
+    {
+        Citation citation1 = new Citation();
+        Student student = new Student("张三", "北京");
+        citation1.setStudent(student);
+        //写到文件里
+        System.out.println(CitationIO.write(citation1, PATH));
+        //从文件里读
+        Citation citation2 = CitationIO.read(PATH);
+        assert citation2 != null;
+        citation2.getStudent().setName("李四");
+        //打印
+        citation1.show();
+        citation2.show();
+        System.out.println(citation1);
+        System.out.println(citation2);
+        System.out.println(citation1.getStudent());
+        System.out.println(citation2.getStudent());
+        System.out.println(citation1 == citation2);
+        System.out.println(citation1.getStudent() == citation2.getStudent());
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+true
+张三同学：在2022学年第一学期中表现优秀，被评为三好学生。特发此状！
+李四同学：在2022学年第一学期中表现优秀，被评为三好学生。特发此状！
+mao.deepClone.Citation@7aec35a
+mao.deepClone.Citation@4ccabbaa
+name：张三
+address：北京
+
+name：李四
+address：北京
+
+false
+false
+```
+
+
+
+![image-20220813231632066](img/java设计模式学习笔记/image-20220813231632066.png)
+
+
+
+
+
+
+
+## 建造者模式
+
+### 概念
 
