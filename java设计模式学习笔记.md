@@ -7741,3 +7741,502 @@ false
 
 ### 概念
 
+将一个复杂对象的构建与表示分离，使得同样的构建过程可以创建不同的表示。
+
+
+
+* 分离了部件的构造(由Builder来负责)和装配(由Director负责)。 从而可以构造出复杂的对象。这个模式适用于：某个对象的构建过程复杂的情况。
+* 由于实现了构建和装配的解耦。不同的构建器，相同的装配，也可以做出不同的对象；相同的构建器，不同的装配顺序也可以做出不同的对象。也就是实现了构建算法、装配算法的解耦，实现了更好的复用。
+* 建造者模式可以将部件和其组装过程分开，一步一步创建一个复杂的对象。用户只需要指定复杂对象的类型就可以得到该对象，而无须知道其内部的具体构造细节。
+
+
+
+
+
+### 结构
+
+建造者（Builder）模式包含如下角色：
+
+* 抽象建造者类（Builder）：这个接口规定要实现复杂对象的那些部分的创建，并不涉及具体的部件对象的创建。 
+* 具体建造者类（ConcreteBuilder）：实现 Builder 接口，完成复杂产品的各个部件的具体创建方法。在构造过程完成后，提供产品的实例。 
+* 产品类（Product）：要创建的复杂对象。
+* 指挥者类（Director）：调用具体建造者来创建复杂对象的各个部分，在指导者中不涉及具体产品的信息，只负责保证对象各部分完整创建或按某种顺序创建。 
+
+
+
+![image-20220814132923352](img/java设计模式学习笔记/image-20220814132923352.png)
+
+
+
+
+
+
+
+### 示例
+
+创建共享单车
+
+生产自行车是一个复杂的过程，它包含了车架，车座等组件的生产。而车架又有碳纤维，铝合金等材质的，车座有橡胶，真皮等材质。对于自行车的生产就可以使用建造者模式。
+
+这里Bike是产品，包含车架，车座等组件；Builder是抽象建造者，MobikeBuilder和OfoBuilder是具体的建造者；Director是指挥者。
+
+
+
+![image-20220814133035539](img/java设计模式学习笔记/image-20220814133035539.png)
+
+
+
+
+
+```java
+package mao.builder_mode;
+
+/**
+ * Project name(项目名称)：java设计模式_建造者模式
+ * Package(包名): mao.builder_mode
+ * Class(类名): Bike
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/14
+ * Time(创建时间)： 13:34
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+public class Bike
+{
+    //车架
+    private String frame;
+    //车座
+    private String seat;
+
+    /**
+     * Instantiates a new Bike.
+     */
+    public Bike()
+    {
+
+    }
+
+    /**
+     * Instantiates a new Bike.
+     *
+     * @param frame the frame
+     * @param seat  the seat
+     */
+    public Bike(String frame, String seat)
+    {
+        this.frame = frame;
+        this.seat = seat;
+    }
+
+    /**
+     * Gets frame.
+     *
+     * @return the frame
+     */
+    public String getFrame()
+    {
+        return frame;
+    }
+
+    /**
+     * Sets frame.
+     *
+     * @param frame the frame
+     */
+    public void setFrame(String frame)
+    {
+        this.frame = frame;
+    }
+
+    /**
+     * Gets seat.
+     *
+     * @return the seat
+     */
+    public String getSeat()
+    {
+        return seat;
+    }
+
+    /**
+     * Sets seat.
+     *
+     * @param seat the seat
+     */
+    public void setSeat(String seat)
+    {
+        this.seat = seat;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.builder_mode;
+
+/**
+ * Project name(项目名称)：java设计模式_建造者模式
+ * Package(包名): mao.builder_mode
+ * Class(类名): Builder
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/14
+ * Time(创建时间)： 13:35
+ * Version(版本): 1.0
+ * Description(描述)： 抽象 builder 类
+ */
+
+public abstract class Builder
+{
+    /**
+     * The Bike.
+     */
+    protected Bike bike = new Bike();
+
+    /**
+     * Build frame.
+     */
+    public abstract void buildFrame();
+
+    /**
+     * Build seat.
+     */
+    public abstract void buildSeat();
+
+    /**
+     * Create bike.
+     *
+     * @return the bike
+     */
+    public abstract Bike createBike();
+}
+```
+
+
+
+
+
+```java
+package mao.builder_mode;
+
+/**
+ * Project name(项目名称)：java设计模式_建造者模式
+ * Package(包名): mao.builder_mode
+ * Class(类名): MobikeBuilder
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/14
+ * Time(创建时间)： 13:37
+ * Version(版本): 1.0
+ * Description(描述)： 摩拜单车Builder类
+ */
+
+public class MobikeBuilder extends Builder
+{
+
+    @Override
+    public void buildFrame()
+    {
+        bike.setFrame("铝合金车架");
+    }
+
+    @Override
+    public void buildSeat()
+    {
+        bike.setSeat("真皮车座");
+    }
+
+    @Override
+    public Bike createBike()
+    {
+        return bike;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.builder_mode;
+
+/**
+ * Project name(项目名称)：java设计模式_建造者模式
+ * Package(包名): mao.builder_mode
+ * Class(类名): OfoBuilder
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/14
+ * Time(创建时间)： 13:38
+ * Version(版本): 1.0
+ * Description(描述)： ofo单车Builder类
+ */
+
+public class OfoBuilder extends Builder
+{
+
+    @Override
+    public void buildFrame()
+    {
+        bike.setFrame("碳纤维车架");
+    }
+
+    @Override
+    public void buildSeat()
+    {
+        bike.setSeat("橡胶车座");
+    }
+
+    @Override
+    public Bike createBike()
+    {
+        return bike;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.builder_mode;
+
+/**
+ * Project name(项目名称)：java设计模式_建造者模式
+ * Package(包名): mao.builder_mode
+ * Class(类名): Director
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/14
+ * Time(创建时间)： 13:39
+ * Version(版本): 1.0
+ * Description(描述)： 指挥者类
+ */
+
+
+public class Director
+{
+    private final Builder builder;
+
+    /**
+     * Instantiates a new Director.
+     *
+     * @param builder the builder
+     */
+    public Director(Builder builder)
+    {
+        this.builder = builder;
+    }
+
+    /**
+     * Construct bike.
+     *
+     * @return the bike
+     */
+    public Bike construct()
+    {
+        builder.buildFrame();
+        builder.buildSeat();
+        return builder.createBike();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.builder_mode;
+
+/**
+ * Project name(项目名称)：java设计模式_建造者模式
+ * Package(包名): mao.builder_mode
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/14
+ * Time(创建时间)： 13:42
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        {
+            Director director=new Director(new MobikeBuilder());
+            Bike bike = director.construct();
+            System.out.println(bike.getFrame());
+            System.out.println(bike.getSeat());
+        }
+
+        {
+            Director director=new Director(new OfoBuilder());
+            Bike bike = director.construct();
+            System.out.println(bike.getFrame());
+            System.out.println(bike.getSeat());
+        }
+
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+铝合金车架
+真皮车座
+碳纤维车架
+橡胶车座
+```
+
+
+
+上面示例是 Builder模式的常规用法，指挥者类 Director 在建造者模式中具有很重要的作用，它用于指导具体构建者如何构建产品，控制调用先后次序，并向调用者返回完整的产品类，但是有些情况下需要简化系统结构，可以把指挥者类和抽象建造者进行结合
+
+
+
+```java
+package mao.builder_mode2;
+
+
+/**
+ * Project name(项目名称)：java设计模式_建造者模式
+ * Package(包名): mao.builder_mode2
+ * Class(类名): Builder
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/14
+ * Time(创建时间)： 13:48
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+public abstract class Builder
+{
+    /**
+     * The Bike.
+     */
+    protected Bike bike = new Bike();
+
+    /**
+     * Build frame.
+     */
+    public abstract void buildFrame();
+
+    /**
+     * Build seat.
+     */
+    public abstract void buildSeat();
+
+    /**
+     * Create bike.
+     *
+     * @return the bike
+     */
+    public abstract Bike createBike();
+
+    /**
+     * Construct bike.
+     *
+     * @return the bike
+     */
+    public Bike construct()
+    {
+        this.buildFrame();
+        this.buildSeat();
+        return this.createBike();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.builder_mode2;
+
+/**
+ * Project name(项目名称)：java设计模式_建造者模式
+ * Package(包名): mao.builder_mode2
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/14
+ * Time(创建时间)： 13:51
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        {
+            Builder builder = new MobikeBuilder();
+            Bike bike = builder.construct();
+            System.out.println(bike.getFrame());
+            System.out.println(bike.getSeat());
+        }
+
+        {
+            Builder builder = new OfoBuilder();
+            Bike bike = builder.construct();
+            System.out.println(bike.getFrame());
+            System.out.println(bike.getSeat());
+        }
+    }
+}
+```
+
+
+
+
+
+这样做确实简化了系统结构，但同时也加重了抽象建造者类的职责，也不是太符合单一职责原则，如果construct() 过于复杂，建议还是封装到 Director 中。
+
+
+
+
+
+### 优缺点
+
+**优点：**
+
+- 建造者模式的封装性很好。使用建造者模式可以有效的封装变化，在使用建造者模式的场景中，一般产品类和建造者类是比较稳定的，因此，将主要的业务逻辑封装在指挥者类中对整体而言可以取得比较好的稳定性。
+- 在建造者模式中，客户端不必知道产品内部组成的细节，将产品本身与产品的创建过程解耦，使得相同的创建过程可以创建不同的产品对象。
+- 可以更加精细地控制产品的创建过程 。将复杂产品的创建步骤分解在不同的方法中，使得创建过程更加清晰，也更方便使用程序来控制创建过程。
+- 建造者模式很容易进行扩展。如果有新的需求，通过实现一个新的建造者类就可以完成，基本上不用修改之前已经测试通过的代码，因此也就不会对原有功能引入风险。符合开闭原则。
+
+
+
+**缺点：**
+
+造者模式所创建的产品一般具有较多的共同点，其组成部分相似，如果产品之间的差异性很大，则不适合使用建造者模式，因此其使用范围受到一定的限制。
+
+
+
+
+
+### 使用场景
+
