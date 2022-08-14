@@ -8698,3 +8698,506 @@ public class Test
 
 
 重构后的代码在使用起来更方便，某种程度上也可以提高开发效率。从软件设计上，对程序员的要求比较高。
+
+
+
+
+
+另一种方式：
+
+
+
+```java
+package mao.builder_mode4;
+
+/**
+ * Project name(项目名称)：java设计模式_建造者模式
+ * Package(包名): mao.builder_mode4
+ * Class(类名): Phone
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/14
+ * Time(创建时间)： 14:22
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+public class Phone
+{
+    private String cpu;
+    private String screen;
+    private String memory;
+    private String motherboard;
+    private String frontCamera;
+    private String rearCamera;
+    private String speaker;
+
+    /**
+     * Instantiates a new Phone.
+     */
+    public Phone()
+    {
+
+    }
+
+    /**
+     * Instantiates a new Phone.
+     *
+     * @param cpu         the cpu
+     * @param screen      the screen
+     * @param memory      the memory
+     * @param motherboard the motherboard
+     * @param frontCamera the front camera
+     * @param rearCamera  the rear camera
+     * @param speaker     the speaker
+     */
+    public Phone(String cpu, String screen, String memory, String motherboard, String frontCamera, String rearCamera, String speaker)
+    {
+        this.cpu = cpu;
+        this.screen = screen;
+        this.memory = memory;
+        this.motherboard = motherboard;
+        this.frontCamera = frontCamera;
+        this.rearCamera = rearCamera;
+        this.speaker = speaker;
+    }
+
+    /**
+     * Gets cpu.
+     *
+     * @return the cpu
+     */
+    public String getCpu()
+    {
+        return cpu;
+    }
+
+    /**
+     * Sets cpu.
+     *
+     * @param cpu the cpu
+     */
+    public void setCpu(String cpu)
+    {
+        this.cpu = cpu;
+    }
+
+    /**
+     * Gets screen.
+     *
+     * @return the screen
+     */
+    public String getScreen()
+    {
+        return screen;
+    }
+
+    /**
+     * Sets screen.
+     *
+     * @param screen the screen
+     */
+    public void setScreen(String screen)
+    {
+        this.screen = screen;
+    }
+
+    /**
+     * Gets memory.
+     *
+     * @return the memory
+     */
+    public String getMemory()
+    {
+        return memory;
+    }
+
+    /**
+     * Sets memory.
+     *
+     * @param memory the memory
+     */
+    public void setMemory(String memory)
+    {
+        this.memory = memory;
+    }
+
+    /**
+     * Gets motherboard.
+     *
+     * @return the motherboard
+     */
+    public String getMotherboard()
+    {
+        return motherboard;
+    }
+
+    /**
+     * Sets motherboard.
+     *
+     * @param motherboard the motherboard
+     */
+    public void setMotherboard(String motherboard)
+    {
+        this.motherboard = motherboard;
+    }
+
+    /**
+     * Gets front camera.
+     *
+     * @return the front camera
+     */
+    public String getFrontCamera()
+    {
+        return frontCamera;
+    }
+
+    /**
+     * Sets front camera.
+     *
+     * @param frontCamera the front camera
+     */
+    public void setFrontCamera(String frontCamera)
+    {
+        this.frontCamera = frontCamera;
+    }
+
+    /**
+     * Gets rear camera.
+     *
+     * @return the rear camera
+     */
+    public String getRearCamera()
+    {
+        return rearCamera;
+    }
+
+    /**
+     * Sets rear camera.
+     *
+     * @param rearCamera the rear camera
+     */
+    public void setRearCamera(String rearCamera)
+    {
+        this.rearCamera = rearCamera;
+    }
+
+    /**
+     * Gets speaker.
+     *
+     * @return the speaker
+     */
+    public String getSpeaker()
+    {
+        return speaker;
+    }
+
+    /**
+     * Sets speaker.
+     *
+     * @param speaker the speaker
+     */
+    public void setSpeaker(String speaker)
+    {
+        this.speaker = speaker;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        Phone phone = (Phone) o;
+
+        if (getCpu() != null ? !getCpu().equals(phone.getCpu()) : phone.getCpu() != null)
+        {
+            return false;
+        }
+        if (getScreen() != null ? !getScreen().equals(phone.getScreen()) : phone.getScreen() != null)
+        {
+            return false;
+        }
+        if (getMemory() != null ? !getMemory().equals(phone.getMemory()) : phone.getMemory() != null)
+        {
+            return false;
+        }
+        if (getMotherboard() != null ? !getMotherboard().equals(phone.getMotherboard()) : phone.getMotherboard() != null)
+        {
+            return false;
+        }
+        if (getFrontCamera() != null ? !getFrontCamera().equals(phone.getFrontCamera()) : phone.getFrontCamera() != null)
+        {
+            return false;
+        }
+        if (getRearCamera() != null ? !getRearCamera().equals(phone.getRearCamera()) : phone.getRearCamera() != null)
+        {
+            return false;
+        }
+        return getSpeaker() != null ? getSpeaker().equals(phone.getSpeaker()) : phone.getSpeaker() == null;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = getCpu() != null ? getCpu().hashCode() : 0;
+        result = 31 * result + (getScreen() != null ? getScreen().hashCode() : 0);
+        result = 31 * result + (getMemory() != null ? getMemory().hashCode() : 0);
+        result = 31 * result + (getMotherboard() != null ? getMotherboard().hashCode() : 0);
+        result = 31 * result + (getFrontCamera() != null ? getFrontCamera().hashCode() : 0);
+        result = 31 * result + (getRearCamera() != null ? getRearCamera().hashCode() : 0);
+        result = 31 * result + (getSpeaker() != null ? getSpeaker().hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    @SuppressWarnings("all")
+    public String toString()
+    {
+        final StringBuilder stringbuilder = new StringBuilder();
+        stringbuilder.append("cpu：").append(cpu).append('\n');
+        stringbuilder.append("screen：").append(screen).append('\n');
+        stringbuilder.append("memory：").append(memory).append('\n');
+        stringbuilder.append("motherboard：").append(motherboard).append('\n');
+        stringbuilder.append("frontCamera：").append(frontCamera).append('\n');
+        stringbuilder.append("rearCamera：").append(rearCamera).append('\n');
+        stringbuilder.append("speaker：").append(speaker).append('\n');
+        return stringbuilder.toString();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.builder_mode4;
+
+/**
+ * Project name(项目名称)：java设计模式_建造者模式
+ * Package(包名): mao.builder_mode4
+ * Class(类名): PhoneBuilder
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/14
+ * Time(创建时间)： 14:23
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+public class PhoneBuilder
+{
+    private String cpu;
+    private String screen;
+    private String memory;
+    private String motherboard;
+    private String frontCamera;
+    private String rearCamera;
+    private String speaker;
+
+    /**
+     * Instantiates a new Phone builder.
+     */
+    public PhoneBuilder()
+    {
+
+    }
+
+    /**
+     * Sets cpu.
+     *
+     * @param cpu the cpu
+     * @return the cpu
+     */
+    public PhoneBuilder setCpu(String cpu)
+    {
+        this.cpu = cpu;
+        return this;
+    }
+
+    /**
+     * Sets screen.
+     *
+     * @param screen the screen
+     * @return the screen
+     */
+    public PhoneBuilder setScreen(String screen)
+    {
+        this.screen = screen;
+        return this;
+    }
+
+    /**
+     * Sets memory.
+     *
+     * @param memory the memory
+     * @return the memory
+     */
+    public PhoneBuilder setMemory(String memory)
+    {
+        this.memory = memory;
+        return this;
+    }
+
+    /**
+     * Sets motherboard.
+     *
+     * @param motherboard the motherboard
+     * @return the motherboard
+     */
+    public PhoneBuilder setMotherboard(String motherboard)
+    {
+        this.motherboard = motherboard;
+        return this;
+    }
+
+    /**
+     * Sets front camera.
+     *
+     * @param frontCamera the front camera
+     * @return the front camera
+     */
+    public PhoneBuilder setFrontCamera(String frontCamera)
+    {
+        this.frontCamera = frontCamera;
+        return this;
+    }
+
+    /**
+     * Sets rear camera.
+     *
+     * @param rearCamera the rear camera
+     * @return the rear camera
+     */
+    public PhoneBuilder setRearCamera(String rearCamera)
+    {
+        this.rearCamera = rearCamera;
+        return this;
+    }
+
+    /**
+     * Sets speaker.
+     *
+     * @param speaker the speaker
+     * @return the speaker
+     */
+    public PhoneBuilder setSpeaker(String speaker)
+    {
+        this.speaker = speaker;
+        return this;
+    }
+
+    /**
+     * Build phone.
+     *
+     * @return the phone
+     */
+    public Phone build()
+    {
+        Phone phone = new Phone();
+        phone.setCpu(this.cpu);
+        phone.setScreen(this.screen);
+        phone.setMemory(this.memory);
+        phone.setMotherboard(this.motherboard);
+        phone.setFrontCamera(this.frontCamera);
+        phone.setRearCamera(this.rearCamera);
+        phone.setSpeaker(this.speaker);
+        return phone;
+    }
+}
+```
+
+
+
+```java
+package mao.builder_mode4;
+
+/**
+ * Project name(项目名称)：java设计模式_建造者模式
+ * Package(包名): mao.builder_mode4
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/14
+ * Time(创建时间)： 14:28
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        PhoneBuilder phoneBuilder = new PhoneBuilder();
+        Phone phone = phoneBuilder.setCpu("cpu")
+                .setScreen("Screen")
+                .setRearCamera("RearCamera")
+                .build();
+        System.out.println(phone);
+
+        Phone phone1 = new PhoneBuilder()
+                .setMemory("Memory")
+                .build();
+        System.out.println(phone1);
+    }
+}
+```
+
+
+
+![image-20220814143948072](img/java设计模式学习笔记/image-20220814143948072.png)
+
+
+
+
+
+
+
+
+
+## 创建者模式对比
+
+### 工厂方法模式VS建造者模式
+
+工厂方法模式注重的是整体对象的创建方式；而建造者模式注重的是部件构建的过程，意在通过一步一步地精确构造创建出一个复杂的对象。
+
+我们举个简单例子来说明两者的差异，如要制造一个超人，如果使用工厂方法模式，直接产生出来的就是一个力大无穷、能够飞翔、内裤外穿的超人；而如果使用建造者模式，则需要组装手、头、脚、躯干等部分，然后再把内裤外穿，于是一个超人就诞生了。
+
+
+
+### 抽象工厂模式VS建造者模式
+
+抽象工厂模式实现对产品家族的创建，一个产品家族是这样的一系列产品：具有不同分类维度的产品组合，采用抽象工厂模式则是不需要关心构建过程，只关心什么产品由什么工厂生产即可。
+
+建造者模式则是要求按照指定的蓝图建造产品，它的主要目的是通过组装零配件而产生一个新产品。
+
+如果将抽象工厂模式看成汽车配件生产工厂，生产一个产品族的产品，那么建造者模式就是一个汽车组装工厂，通过对部件的组装可以返回一辆完整的汽车。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 结构型模式
+
