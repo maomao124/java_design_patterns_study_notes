@@ -10697,6 +10697,10 @@ public class Test3
 
 
 
+![image-20220815220859914](img/java设计模式学习笔记/image-20220815220859914.png)
+
+
+
 
 
 
@@ -10705,4 +10709,55 @@ public class Test3
 
 * 以前开发的系统存在满足新系统功能需求的类，但其接口同新系统的接口不一致。
 * 使用第三方提供的组件，但组件接口定义和自己要求的接口定义不同。
+
+
+
+
+
+
+
+### JDK源码
+
+
+
+Reader（字符流）、InputStream（字节流）的适配使用的是InputStreamReader。
+
+InputStreamReader继承自java.io包中的Reader，对他中的抽象的未实现的方法给出实现。
+
+
+
+```java
+public int read() throws IOException 
+{
+    return sd.read();
+}
+
+public int read(char cbuf[], int offset, int length) throws IOException 
+{
+    return sd.read(cbuf, offset, length);
+}
+```
+
+
+
+![image-20220815220728701](img/java设计模式学习笔记/image-20220815220728701.png)
+
+
+
+* InputStreamReader是对同样实现了Reader的StreamDecoder的封装。
+* StreamDecoder不是Java SE API中的内容，是Sun  JDK给出的自身实现。但我们知道他们对构造方法中的字节流类（InputStream）进行封装，并通过该类进行了字节流和字符流之间的解码转换。
+
+从表层来看，InputStreamReader做了InputStream字节流类到Reader字符流之间的转换。而从如上Sun JDK中的实现类关系结构中可以看出，是StreamDecoder的设计实现在实际上采用了适配器模式
+
+
+
+
+
+
+
+
+
+
+
+### 装饰者模式
 
