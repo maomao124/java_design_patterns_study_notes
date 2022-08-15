@@ -9785,6 +9785,10 @@ public class Test
 
 
 
+![image-20220815213029203](img/java设计模式学习笔记/image-20220815213029203.png)
+
+
+
 
 
 
@@ -9811,7 +9815,894 @@ public class Test
 
 ### 优缺点
 
+**优点：**
+
+- 代理模式在客户端与目标对象之间起到一个中介作用和保护目标对象的作用；
+- 代理对象可以扩展目标对象的功能；
+- 代理模式能将客户端与目标对象分离，在一定程度上降低了系统的耦合度；
+
+**缺点：**
+
+* 增加了系统的复杂度；
 
 
 
+
+
+### 使用场景 
+
+* 远程（Remote）代理
+
+  本地服务通过网络请求远程服务。为了实现本地到远程的通信，我们需要实现网络通信，处理其中可能的异常。为良好的代码设计和可维护性，我们将网络通信部分隐藏起来，只暴露给本地服务一个接口，通过该接口即可访问远程服务提供的功能，而不必过多关心通信部分的细节。
+
+* 防火墙（Firewall）代理
+
+  当你将浏览器配置成使用代理功能时，防火墙就将你的浏览器的请求转给互联网；当互联网返回响应时，代理服务器再把它转给你的浏览器。
+
+* 保护（Protect or Access）代理
+
+  控制对一个对象的访问，如果需要，可以给不同的用户提供不同级别的使用权限。
+
+
+
+
+
+
+
+## 适配器模式
+
+### 概念
+
+如果去欧洲国家去旅游的话，他们的插座是欧洲标准。而我们使用的插头如下图最右边的。因此我们的笔记本电脑，手机在当地不能直接充电。所以就需要一个插座转换器，转换器第1面插入当地的插座，第2面供我们充电，这样使得我们的插头在当地能使用。生活中这样的例子很多，手机充电器（将220v转换为5v的电压），读卡器等，其实就是使用到了适配器模式。
+
+
+
+![image-20220815210340539](img/java设计模式学习笔记/image-20220815210340539.png)
+
+
+
+
+
+**将一个类的接口转换成客户希望的另外一个接口，使得原本由于接口不兼容而不能一起工作的那些类能一起工作。**
+
+适配器模式分为类适配器模式和对象适配器模式，前者类之间的耦合度比后者高，且要求程序员了解现有组件库中的相关组件的内部结构，所以应用相对较少些。
+
+
+
+
+
+### 结构
+
+适配器模式（Adapter）包含以下主要角色：
+
+* 目标（Target）接口：当前系统业务所期待的接口，它可以是抽象类或接口。
+* 适配者（Adaptee）类：它是被访问和适配的现存组件库中的组件接口。
+* 适配器（Adapter）类：它是一个转换器，通过继承或引用适配者的对象，把适配者接口转换成目标接口，让客户按目标接口的格式访问适配者。
+
+
+
+
+
+### 类适配器模式
+
+实现方式：定义一个适配器类来实现当前系统的业务接口，同时又继承现有组件库中已经存在的组件。
+
+
+
+**示例：读卡器**
+
+现有一台电脑只能读取SD卡，而要读取TF卡中的内容的话就需要使用到适配器模式。创建一个读卡器，将TF卡中的内容读取出来。
+
+
+
+![image-20220815210844822](img/java设计模式学习笔记/image-20220815210844822.png)
+
+
+
+
+
+```java
+package mao.class_adapter;
+
+/**
+ * Project name(项目名称)：java设计模式_适配器模式
+ * Package(包名): mao.class_adapter
+ * Interface(接口名): SDCard
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 21:09
+ * Version(版本): 1.0
+ * Description(描述)： SD卡的接口
+ */
+
+public interface SDCard
+{
+    /**
+     * 读取SD卡
+     *
+     * @return String
+     */
+    String readSD();
+
+    /**
+     * 写入SD卡
+     *
+     * @param msg 写入的数据
+     */
+    void writeSD(String msg);
+
+}
+
+```
+
+
+
+
+
+```java
+package mao.class_adapter;
+
+/**
+ * Project name(项目名称)：java设计模式_适配器模式
+ * Package(包名): mao.class_adapter
+ * Class(类名): SDCardImpl
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 21:10
+ * Version(版本): 1.0
+ * Description(描述)： SD卡实现类
+ */
+
+public class SDCardImpl implements SDCard
+{
+
+    @Override
+    public String readSD()
+    {
+        return "读取SD卡";
+    }
+
+    @Override
+    public void writeSD(String msg)
+    {
+        System.out.println("写入SD卡：" + msg);
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.class_adapter;
+
+/**
+ * Project name(项目名称)：java设计模式_适配器模式
+ * Package(包名): mao.class_adapter
+ * Class(类名): Computer
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 21:11
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Computer
+{
+    public String readSD(SDCard sdCard)
+    {
+        if (sdCard == null)
+        {
+            throw new NullPointerException("sd card is null!");
+        }
+        return sdCard.readSD();
+    }
+
+    public void writeSD(SDCard sdCard, String msg)
+    {
+        if (sdCard == null)
+        {
+            throw new NullPointerException("sd card is null!");
+        }
+        sdCard.writeSD(msg);
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.class_adapter;
+
+/**
+ * Project name(项目名称)：java设计模式_适配器模式
+ * Package(包名): mao.class_adapter
+ * Interface(接口名): TFCard
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 21:15
+ * Version(版本): 1.0
+ * Description(描述)： TF卡接口
+ */
+
+public interface TFCard
+{
+    /**
+     * 读取TF卡
+     *
+     * @return String
+     */
+    String readTF();
+
+    /**
+     * 写入TF卡
+     *
+     * @param msg 数据
+     */
+    void writeTF(String msg);
+
+}
+```
+
+
+
+
+
+```java
+package mao.class_adapter;
+
+/**
+ * Project name(项目名称)：java设计模式_适配器模式
+ * Package(包名): mao.class_adapter
+ * Class(类名): TFCardImpl
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 21:16
+ * Version(版本): 1.0
+ * Description(描述)： TF卡实现类
+ */
+
+public class TFCardImpl implements TFCard
+{
+
+    @Override
+    public String readTF()
+    {
+        return "读取TF卡";
+    }
+
+    @Override
+    public void writeTF(String msg)
+    {
+        System.out.println("写入TF卡：" + msg);
+    }
+}
+```
+
+
+
+```java
+package mao.class_adapter;
+
+/**
+ * Project name(项目名称)：java设计模式_适配器模式
+ * Package(包名): mao.class_adapter
+ * Class(类名): SDAdapterTF
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 21:17
+ * Version(版本): 1.0
+ * Description(描述)： 适配器类（SD兼容TF）
+ */
+
+public class SDAdapterTF extends TFCardImpl implements SDCard
+{
+
+    @Override
+    public String readSD()
+    {
+        return this.readTF();
+    }
+
+    @Override
+    public void writeSD(String msg)
+    {
+        this.writeTF(msg);
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.class_adapter;
+
+/**
+ * Project name(项目名称)：java设计模式_适配器模式
+ * Package(包名): mao.class_adapter
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 21:19
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        Computer computer = new Computer();
+        SDCard sdCard = new SDCardImpl();
+        System.out.println(computer.readSD(sdCard));
+        computer.writeSD(sdCard, "hello");
+
+        SDCard sdCard1 = new SDAdapterTF();
+        System.out.println(computer.readSD(sdCard1));
+        computer.writeSD(sdCard1, "hello");
+    }
+}
+```
+
+
+
+类适配器模式违背了合成复用原则。类适配器是客户类有一个接口规范的情况下可用，反之不可用。
+
+
+
+
+
+### 对象适配器模式
+
+实现方式：对象适配器模式可釆用将现有组件库中已经实现的组件引入适配器类中，该类同时实现当前系统的业务接口。
+
+
+
+![image-20220815212740108](img/java设计模式学习笔记/image-20220815212740108.png)
+
+
+
+
+
+```java
+package mao.object_adapter;
+
+/**
+ * Project name(项目名称)：java设计模式_适配器模式
+ * Package(包名): mao.object_adapter
+ * Class(类名): SDAdapterTF
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 21:30
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class SDAdapterTF implements SDCard
+{
+    private final TFCard tfCard;
+
+    public SDAdapterTF(TFCard tfCard)
+    {
+        this.tfCard = tfCard;
+    }
+
+    @Override
+    public String readSD()
+    {
+        return tfCard.readTF();
+    }
+
+    @Override
+    public void writeSD(String msg)
+    {
+        tfCard.writeTF(msg);
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.object_adapter;
+
+/**
+ * Project name(项目名称)：java设计模式_适配器模式
+ * Package(包名): mao.object_adapter
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 21:33
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        Computer computer = new Computer();
+        SDCard sdCard = new SDCardImpl();
+        System.out.println(computer.readSD(sdCard));
+        computer.writeSD(sdCard, "hello");
+
+        SDAdapterTF sdAdapterTF = new SDAdapterTF(new TFCardImpl());
+        System.out.println(computer.readSD(sdAdapterTF));
+        computer.writeSD(sdAdapterTF, "hello");
+    }
+}
+```
+
+
+
+
+
+### 接口适配器模式
+
+当不希望实现一个接口中所有的方法时，可以创建一个抽象类Adapter ，实现所有方法。而此时我们只需要继承该抽象类即可。
+
+
+
+```java
+package mao.interface_adapter;
+
+/**
+ * Project name(项目名称)：java设计模式_适配器模式
+ * Package(包名): mao.interface_adapter
+ * Interface(接口名): interface_s
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 21:39
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface interface_s
+{
+    void a();
+
+    void b();
+
+    void c();
+
+    void d();
+
+    void e();
+
+    void f();
+
+}
+```
+
+
+
+
+
+```java
+package mao.interface_adapter;
+
+/**
+ * Project name(项目名称)：java设计模式_适配器模式
+ * Package(包名): mao.interface_adapter
+ * Class(类名): interfaceAdapter
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 21:41
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public abstract class interfaceAdapter implements interface_s
+{
+    @Override
+    public void a()
+    {
+        
+    }
+
+    @Override
+    public void b()
+    {
+
+    }
+
+    @Override
+    public void c()
+    {
+
+    }
+
+    @Override
+    public void d()
+    {
+
+    }
+
+    @Override
+    public void e()
+    {
+
+    }
+
+    @Override
+    public void f()
+    {
+
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.interface_adapter;
+
+/**
+ * Project name(项目名称)：java设计模式_适配器模式
+ * Package(包名): mao.interface_adapter
+ * Class(类名): Run
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 21:44
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Run
+{
+    private final interface_s s;
+
+    public Run(interface_s s)
+    {
+        this.s = s;
+    }
+
+    public void run()
+    {
+        s.a();
+        s.b();
+        s.c();
+        s.d();
+        s.e();
+        s.f();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.interface_adapter;
+
+/**
+ * Project name(项目名称)：java设计模式_适配器模式
+ * Package(包名): mao.interface_adapter
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 21:41
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        {
+            Run run = new Run(new interface_s()
+            {
+                @Override
+                public void a()
+                {
+                    System.out.println("a方法运行");
+                }
+
+                @Override
+                public void b()
+                {
+                    System.out.println("b方法运行");
+                }
+
+                @Override
+                public void c()
+                {
+                    System.out.println("c方法运行");
+                }
+
+                @Override
+                public void d()
+                {
+                    System.out.println("d方法运行");
+                }
+
+                @Override
+                public void e()
+                {
+                    System.out.println("e方法运行");
+                }
+
+                @Override
+                public void f()
+                {
+                    System.out.println("f方法运行");
+                }
+            });
+            run.run();
+        }
+
+        System.out.println("---------------");
+
+        {
+            Run run = new Run(new interfaceAdapter()
+            {
+                @Override
+                public void a()
+                {
+                    System.out.println("a方法运行");
+                }
+
+                @Override
+                public void c()
+                {
+                    System.out.println("c方法运行");
+                }
+
+                @Override
+                public void f()
+                {
+                    System.out.println("f方法运行");
+                }
+            });
+            run.run();
+        }
+
+    }
+}
+```
+
+
+
+
+
+运行结果：
+
+```sh
+a方法运行
+b方法运行
+c方法运行
+d方法运行
+e方法运行
+f方法运行
+---------------
+a方法运行
+c方法运行
+f方法运行
+```
+
+
+
+
+
+在swing中的Listener中用到了大量的接口适配器模式
+
+
+
+```java
+package mao.interface_adapter;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
+/**
+ * Project name(项目名称)：java设计模式_适配器模式
+ * Package(包名): mao.interface_adapter
+ * Class(类名): Test2
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 21:50
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test2
+{
+    public static void main(String[] args)
+    {
+        JFrame jFrame = new JFrame("接口适配器模式");                            //初始化顶层面板
+        jFrame.setSize(1280, 720);
+        int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;       //获取屏幕宽度
+        int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;     //获取屏幕高度
+        jFrame.setLocation(screenWidth / 2 - jFrame.getWidth() / 2, screenHeight / 2 - jFrame.getHeight() / 2);  //位于屏幕中央
+        jFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
+        jFrame.addWindowListener(new WindowListener()
+        {
+            @Override
+            public void windowOpened(WindowEvent e)
+            {
+
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                System.out.println("窗口即将关闭...");
+                System.exit(0);
+            }
+
+            @Override
+            public void windowClosed(WindowEvent e)
+            {
+
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e)
+            {
+
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e)
+            {
+
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e)
+            {
+
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e)
+            {
+
+            }
+        });
+
+        jFrame.addKeyListener(new KeyListener()
+        {
+            @Override
+            public void keyTyped(KeyEvent e)
+            {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                System.out.println("按下按键："+e.getKeyChar());
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e)
+            {
+
+            }
+        });
+        jFrame.setVisible(true);
+    }
+}
+```
+
+
+
+
+
+改成抽象类
+
+
+
+```java
+package mao.interface_adapter;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+/**
+ * Project name(项目名称)：java设计模式_适配器模式
+ * Package(包名): mao.interface_adapter
+ * Class(类名): Test3
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 21:59
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test3
+{
+    public static void main(String[] args)
+    {
+        JFrame jFrame = new JFrame("接口适配器模式");                          //初始化顶层面板
+        jFrame.setSize(1280, 720);
+        int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;       //获取屏幕宽度
+        int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;     //获取屏幕高度
+        jFrame.setLocation(screenWidth / 2 - jFrame.getWidth() / 2, screenHeight / 2 - jFrame.getHeight() / 2);  //位于屏幕中央
+        jFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
+        jFrame.addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                System.out.println("窗口即将关闭...");
+                System.exit(0);
+            }
+        });
+
+        jFrame.addKeyListener(new KeyAdapter()
+        {
+            @Override
+            public void keyPressed(KeyEvent e)
+            {
+                System.out.println("按下按键：" + e.getKeyChar());
+            }
+        });
+        jFrame.setVisible(true);
+    }
+}
+```
+
+
+
+
+
+
+
+### 应用场景
+
+* 以前开发的系统存在满足新系统功能需求的类，但其接口同新系统的接口不一致。
+* 使用第三方提供的组件，但组件接口定义和自己要求的接口定义不同。
 
