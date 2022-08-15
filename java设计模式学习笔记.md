@@ -9531,3 +9531,287 @@ public class Test
 
 
 
+### JDK动态代理原理
+
+ProxyFactory不是代理模式中所说的代理类，而代理类是程序在运行过程中动态的在内存中生成的类。通过阿里巴巴开源的 Java 诊断工具（Arthas【阿尔萨斯】）查看代理类的结构
+
+
+
+```java
+public final class $Proxy0 extends Proxy implements SellTickets {
+    private static Method m1;
+    private static Method m2;
+    private static Method m3;
+    private static Method m0;
+
+    public $Proxy0(InvocationHandler invocationHandler) {
+        super(invocationHandler);
+    }
+
+    static {
+        try {
+            m1 = Class.forName("java.lang.Object").getMethod("equals", Class.forName("java.lang.Object"));
+            m2 = Class.forName("java.lang.Object").getMethod("toString", new Class[0]);
+            m3 = Class.forName("com.itheima.proxy.dynamic.jdk.SellTickets").getMethod("sell", new Class[0]);
+            m0 = Class.forName("java.lang.Object").getMethod("hashCode", new Class[0]);
+            return;
+        }
+        catch (NoSuchMethodException noSuchMethodException) {
+            throw new NoSuchMethodError(noSuchMethodException.getMessage());
+        }
+        catch (ClassNotFoundException classNotFoundException) {
+            throw new NoClassDefFoundError(classNotFoundException.getMessage());
+        }
+    }
+
+    public final boolean equals(Object object) {
+        try {
+            return (Boolean)this.h.invoke(this, m1, new Object[]{object});
+        }
+        catch (Error | RuntimeException throwable) {
+            throw throwable;
+        }
+        catch (Throwable throwable) {
+            throw new UndeclaredThrowableException(throwable);
+        }
+    }
+
+    public final String toString() {
+        try {
+            return (String)this.h.invoke(this, m2, null);
+        }
+        catch (Error | RuntimeException throwable) {
+            throw throwable;
+        }
+        catch (Throwable throwable) {
+            throw new UndeclaredThrowableException(throwable);
+        }
+    }
+
+    public final int hashCode() {
+        try {
+            return (Integer)this.h.invoke(this, m0, null);
+        }
+        catch (Error | RuntimeException throwable) {
+            throw throwable;
+        }
+        catch (Throwable throwable) {
+            throw new UndeclaredThrowableException(throwable);
+        }
+    }
+
+    public final void sell() {
+        try {
+            this.h.invoke(this, m3, null);
+            return;
+        }
+        catch (Error | RuntimeException throwable) {
+            throw throwable;
+        }
+        catch (Throwable throwable) {
+            throw new UndeclaredThrowableException(throwable);
+        }
+    }
+}
+```
+
+
+
+* 代理类（$Proxy0）实现了SellTickets。这也就印证了我们之前说的真实类和代理类实现同样的接口。
+* 代理类（$Proxy0）将我们提供了的匿名内部类对象传递给了父类。
+
+
+
+
+
+执行流程如下：
+
+    1. 在测试类中通过代理对象调用sell()方法
+    2. 根据多态的特性，执行的是代理类（$Proxy0）中的sell()方法
+    3. 代理类（$Proxy0）中的sell()方法中又调用了InvocationHandler接口的子实现类对象的invoke方法
+    4. invoke方法通过反射执行了真实对象所属类(TrainStation)中的sell()方法
+
+
+
+
+
+### CGLIB动态代理
+
+SellTickets接口，只定义了TrainStation(火车站类)。很显然JDK代理是无法使用了，因为JDK动态代理要求必须定义接口，对接口进行代理。
+
+CGLIB是一个功能强大，高性能的代码生成包。它为没有实现接口的类提供代理，为JDK的动态代理提供了很好的补充。
+
+
+
+需要导入依赖：
+
+```xml
+<dependencies>
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+    </dependencies>
+```
+
+
+
+**如果java8以上，运行时需要加jvm参数**
+
+**--add-opens java.base/java.lang=ALL-UNNAMED**
+
+
+
+```java
+package cglib_proxy;
+
+/**
+ * Project name(项目名称)：java设计模式_代理模式
+ * Package(包名): cglib_proxy
+ * Class(类名): TrainStation
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 20:34
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class TrainStation
+{
+    public void sell()
+    {
+        System.out.println("火车站卖票");
+    }
+}
+```
+
+
+
+
+
+```java
+package cglib_proxy;
+
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.MethodProxy;
+
+import java.lang.reflect.Method;
+
+/**
+ * Project name(项目名称)：java设计模式_代理模式
+ * Package(包名): cglib_proxy
+ * Class(类名): ProxyFactory
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 20:34
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class ProxyFactory implements MethodInterceptor
+{
+
+    private final TrainStation trainStation = new TrainStation();
+
+    /**
+     * @param o           代理对象
+     * @param method      真实对象中的方法的Method实例
+     * @param objects     实际参数
+     * @param methodProxy 代理对象中的方法的method实例
+     * @return TrainStation对象
+     * @throws Throwable Throwable
+     */
+    @Override
+    public TrainStation intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable
+    {
+        System.out.println("代理点收取一些服务费用");
+        Object result = methodProxy.invokeSuper(o, objects);
+        return (TrainStation) result;
+    }
+
+    /**
+     * 获得代理对象
+     *
+     * @return TrainStation对象
+     */
+    public TrainStation getProxyObject()
+    {
+        //创建Enhancer对象
+        Enhancer enhancer = new Enhancer();
+        //设置父类的字节码对象
+        enhancer.setSuperclass(trainStation.getClass());
+        //设置回调函数
+        enhancer.setCallback(this);
+        Object o = enhancer.create();
+        return (TrainStation) o;
+    }
+}
+```
+
+
+
+```java
+package cglib_proxy;
+
+/**
+ * Project name(项目名称)：java设计模式_代理模式
+ * Package(包名): cglib_proxy
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 20:41
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        ProxyFactory proxyFactory = new ProxyFactory();
+        TrainStation trainStation = proxyFactory.getProxyObject();
+        trainStation.sell();
+    }
+}
+```
+
+
+
+
+
+
+
+### 三种代理对比
+
+* jdk代理和CGLIB代理
+
+  使用CGLib实现动态代理，CGLib底层采用ASM字节码生成框架，使用字节码技术生成代理类，在JDK1.6之前比使用Java反射效率要高。唯一需要注意的是，CGLib不能对声明为final的类或者方法进行代理，因为CGLib原理是动态生成被代理类的子类。
+
+  在JDK1.6、JDK1.7、JDK1.8逐步对JDK动态代理优化之后，在调用次数较少的情况下，JDK代理效率高于CGLib代理效率，只有当进行大量调用的时候，JDK1.6和JDK1.7比CGLib代理效率低一点，但是到JDK1.8的时候，JDK代理效率高于CGLib代理。所以如果有接口使用JDK动态代理，如果没有接口使用CGLIB代理。
+
+* 动态代理和静态代理
+
+  动态代理与静态代理相比较，最大的好处是接口中声明的所有方法都被转移到调用处理器一个集中的方法中处理（InvocationHandler.invoke）。这样，在接口方法数量比较多的时候，我们可以进行灵活处理，而不需要像静态代理那样每一个方法进行中转。
+
+  如果接口增加一个方法，静态代理模式除了所有实现类需要实现这个方法外，所有代理类也需要实现此方法。增加了代码维护的复杂度。而动态代理不会出现该问题
+
+
+
+
+
+
+
+### 优缺点
+
+
+
+
+
