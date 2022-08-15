@@ -10759,5 +10759,470 @@ public int read(char cbuf[], int offset, int length) throws IOException
 
 
 
-### 装饰者模式
+## 装饰者模式
+
+### 概念
+
+先来看一个快餐店的例子
+
+快餐店有炒面、炒饭这些快餐，可以额外附加鸡蛋、火腿、培根这些配菜，当然加配菜需要额外加钱，每个配菜的价钱通常不太一样，那么计算总价就会显得比较麻烦。
+
+![image-20220815221622686](img/java设计模式学习笔记/image-20220815221622686.png)
+
+
+
+使用继承的方式存在的问题：
+
+* 扩展性不好
+
+  如果要再加一种配料（火腿肠），我们就会发现需要给FriedRice和FriedNoodles分别定义一个子类。如果要新增一个快餐品类（炒河粉）的话，就需要定义更多的子类。
+
+* 产生过多的子类
+
+
+
+**定义：**
+
+​	指在不改变现有对象结构的情况下，动态地给该对象增加一些职责（即增加其额外功能）的模式。
+
+
+
+
+
+### 结构
+
+装饰（Decorator）模式中的角色：
+
+* 抽象构件（Component）角色 ：定义一个抽象接口以规范准备接收附加责任的对象。
+* 具体构件（Concrete  Component）角色 ：实现抽象构件，通过装饰角色为其添加一些职责。
+* 抽象装饰（Decorator）角色 ： 继承或实现抽象构件，并包含具体构件的实例，可以通过其子类扩展具体构件的功能。
+* 具体装饰（ConcreteDecorator）角色 ：实现抽象装饰的相关方法，并给具体构件对象添加附加的责任。
+
+
+
+
+
+
+
+### 示例
+
+我们使用装饰者模式对快餐店案例进行改进
+
+
+
+![image-20220815222225954](img/java设计模式学习笔记/image-20220815222225954.png)
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_装饰者模式
+ * Package(包名): mao
+ * Class(类名): FastFood
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 22:25
+ * Version(版本): 1.0
+ * Description(描述)： 炒面
+ */
+
+public abstract class FastFood
+{
+    //基础价格
+    private float price;
+    //描述
+    private String desc;
+
+    /**
+     * Instantiates a new Fast food.
+     */
+    public FastFood()
+    {
+    }
+
+    /**
+     * Instantiates a new Fast food.
+     *
+     * @param price the price
+     * @param desc  the desc
+     */
+    public FastFood(float price, String desc)
+    {
+        this.price = price;
+        this.desc = desc;
+    }
+
+    /**
+     * Gets price.
+     *
+     * @return the price
+     */
+    public float getPrice()
+    {
+        return price;
+    }
+
+    /**
+     * Sets price.
+     *
+     * @param price the price
+     */
+    public void setPrice(float price)
+    {
+        this.price = price;
+    }
+
+    /**
+     * Gets desc.
+     *
+     * @return the desc
+     */
+    public String getDesc()
+    {
+        return desc;
+    }
+
+    /**
+     * Sets desc.
+     *
+     * @param desc the desc
+     */
+    public void setDesc(String desc)
+    {
+        this.desc = desc;
+    }
+
+    /**
+     * 获取价格的抽象方法
+     *
+     * @return 价格 float
+     */
+    public abstract float cost();
+
+
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_装饰者模式
+ * Package(包名): mao
+ * Class(类名): FriedRice
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 22:26
+ * Version(版本): 1.0
+ * Description(描述)： 炒饭
+ */
+
+public class FriedRice extends FastFood
+{
+    public FriedRice()
+    {
+        super(10, "炒饭");
+    }
+
+    @Override
+    public float cost()
+    {
+        return this.getPrice();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_装饰者模式
+ * Package(包名): mao
+ * Class(类名): FriedNoodles
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 22:28
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class FriedNoodles extends FastFood
+{
+
+    public FriedNoodles()
+    {
+        super(12, "炒面");
+    }
+
+    @Override
+    public float cost()
+    {
+        return this.getPrice();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_装饰者模式
+ * Package(包名): mao
+ * Class(类名): Garnish
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 22:29
+ * Version(版本): 1.0
+ * Description(描述)： 配料类
+ */
+
+public abstract class Garnish extends FastFood
+{
+    private FastFood fastFood;
+
+    /**
+     * Gets fast food.
+     *
+     * @return the fast food
+     */
+    public FastFood getFastFood()
+    {
+        return fastFood;
+    }
+
+    /**
+     * Sets fast food.
+     *
+     * @param fastFood the fast food
+     */
+    public void setFastFood(FastFood fastFood)
+    {
+        this.fastFood = fastFood;
+    }
+
+    /**
+     * Instantiates a new Garnish.
+     *
+     * @param price    the price
+     * @param desc     the desc
+     * @param fastFood the fast food
+     */
+    public Garnish(float price, String desc, FastFood fastFood)
+    {
+        super(price, desc);
+        this.fastFood = fastFood;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_装饰者模式
+ * Package(包名): mao
+ * Class(类名): Egg
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 22:31
+ * Version(版本): 1.0
+ * Description(描述)： 鸡蛋配料
+ */
+
+public class Egg extends Garnish
+{
+    public Egg(FastFood fastFood)
+    {
+        super(1, "鸡蛋", fastFood);
+    }
+
+    @Override
+    public float cost()
+    {
+        return super.getPrice() + getFastFood().cost();
+    }
+
+    @Override
+    public String getDesc()
+    {
+        return super.getDesc() + getFastFood().getDesc();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_装饰者模式
+ * Package(包名): mao
+ * Class(类名): Bacon
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 22:35
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Bacon extends Garnish
+{
+
+    public Bacon(FastFood fastFood)
+    {
+        super(2, "培根", fastFood);
+    }
+
+    @Override
+    public float cost()
+    {
+        return getPrice() + getFastFood().cost();
+    }
+
+    @Override
+    public String getDesc()
+    {
+        return super.getDesc() + getFastFood().getDesc();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_装饰者模式
+ * Package(包名): mao
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/15
+ * Time(创建时间)： 22:38
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        {
+            //炒饭
+            FastFood fastFood = new FriedRice();
+            //花费的价格
+            System.out.println(fastFood.getDesc() + "：" + fastFood.cost() + "元");
+            //加鸡蛋
+            fastFood = new Egg(fastFood);
+            //花费的价格
+            System.out.println(fastFood.getDesc() + "：" + fastFood.cost() + "元");
+            //加培根
+            fastFood = new Bacon(fastFood);
+            //花费的价格
+            System.out.println(fastFood.getDesc() + "：" + fastFood.cost() + "元");
+            //再加鸡蛋
+            fastFood = new Egg(fastFood);
+            //花费的价格
+            System.out.println(fastFood.getDesc() + "：" + fastFood.cost() + "元");
+        }
+        System.out.println("----------------");
+        {
+            //炒面
+            FastFood fastFood = new FriedNoodles();
+            //花费的价格
+            System.out.println(fastFood.getDesc() + "：" + fastFood.cost() + "元");
+            //加鸡蛋
+            fastFood = new Egg(fastFood);
+            //花费的价格
+            System.out.println(fastFood.getDesc() + "：" + fastFood.cost() + "元");
+            //加培根
+            fastFood = new Bacon(fastFood);
+            //花费的价格
+            System.out.println(fastFood.getDesc() + "：" + fastFood.cost() + "元");
+            //再加鸡蛋
+            fastFood = new Egg(fastFood);
+            //花费的价格
+            System.out.println(fastFood.getDesc() + "：" + fastFood.cost() + "元");
+            //加培根
+            fastFood = new Bacon(fastFood);
+            //花费的价格
+            System.out.println(fastFood.getDesc() + "：" + fastFood.cost() + "元");
+        }
+    }
+}
+
+```
+
+
+
+运行结果：
+
+```sh
+炒饭：10.0元
+鸡蛋炒饭：11.0元
+培根鸡蛋炒饭：13.0元
+鸡蛋培根鸡蛋炒饭：14.0元
+----------------
+炒面：12.0元
+鸡蛋炒面：13.0元
+培根鸡蛋炒面：15.0元
+鸡蛋培根鸡蛋炒面：16.0元
+培根鸡蛋培根鸡蛋炒面：18.0元
+```
+
+
+
+
+
+
+
+### 优点
+
+* 饰者模式可以带来比继承更加灵活性的扩展功能，使用更加方便，可以通过组合不同的装饰者对象来获取具有不同行为状态的多样化的结果。装饰者模式比继承更具良好的扩展性，完美的遵循开闭原则，继承是静态的附加责任，装饰者则是动态的附加责任。
+* 装饰类和被装饰类可以独立发展，不会相互耦合，装饰模式是继承的一个替代模式，装饰模式可以动态扩展一个实现类的功能。
+
+
+
+
+
+### 使用场景
 
