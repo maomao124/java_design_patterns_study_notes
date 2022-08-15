@@ -9201,3 +9201,333 @@ public class Test
 
 # 结构型模式
 
+结构型模式描述如何将类或对象按某种布局组成更大的结构。它分为类结构型模式和对象结构型模式，前者采用继承机制来组织接口和类，后者釆用组合或聚合来组合对象。
+
+由于组合关系或聚合关系比继承关系耦合度低，满足“合成复用原则”，所以对象结构型模式比类结构型模式具有更大的灵活性。
+
+结构型模式分为以下 7 种：
+
+* 代理模式
+* 适配器模式
+* 装饰者模式
+* 桥接模式
+* 外观模式
+* 组合模式
+* 享元模式
+
+
+
+
+
+
+
+
+
+## 代理模式
+
+### 概念
+
+由于某些原因需要给某对象提供一个代理以控制对该对象的访问。这时，访问对象不适合或者不能直接引用目标对象，代理对象作为访问对象和目标对象之间的中介。
+
+Java中的代理按照代理类生成时机不同又分为静态代理和动态代理。静态代理代理类在编译期就生成，而动态代理代理类则是在Java运行时动态生成。动态代理又有JDK代理和CGLib代理两种。
+
+
+
+
+
+### 结构
+
+代理（Proxy）模式分为三种角色：
+
+* 抽象主题（Subject）类： 通过接口或抽象类声明真实主题和代理对象实现的业务方法。
+* 真实主题（Real Subject）类： 实现了抽象主题中的具体业务，是代理对象所代表的真实对象，是最终要引用的对象。
+* 代理（Proxy）类 ： 提供了与真实主题相同的接口，其内部含有对真实主题的引用，它可以访问、控制或扩展真实主题的功能。
+
+
+
+
+
+### 静态代理
+
+静态代理代理类在编译期生成
+
+
+
+**示例：火车站卖票**
+
+如果要买火车票的话，需要去火车站买票，坐车到火车站，排队等一系列的操作，显然比较麻烦。而火车站在多个地方都有代售点，我们去代售点买票就方便很多了。这个例子其实就是典型的代理模式，火车站是目标对象，代售点是代理对象。
+
+
+
+
+
+![image-20220814220003172](img/java设计模式学习笔记/image-20220814220003172.png)
+
+
+
+```java
+package static_proxy;
+
+/**
+ * Project name(项目名称)：java设计模式_代理模式
+ * Package(包名): static_proxy
+ * Interface(接口名): SellTickets
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/14
+ * Time(创建时间)： 22:00
+ * Version(版本): 1.0
+ * Description(描述)： 卖票接口
+ */
+
+public interface SellTickets
+{
+    void sell();
+}
+```
+
+
+
+
+
+```java
+package static_proxy;
+
+/**
+ * Project name(项目名称)：java设计模式_代理模式
+ * Package(包名): static_proxy
+ * Class(类名): TrainStation
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/14
+ * Time(创建时间)： 22:01
+ * Version(版本): 1.0
+ * Description(描述)： 火车站  火车站具有卖票功能
+ */
+
+public class TrainStation implements SellTickets
+{
+
+    @Override
+    public void sell()
+    {
+        System.out.println("火车站卖票");
+    }
+}
+```
+
+
+
+
+
+```java
+package static_proxy;
+
+/**
+ * Project name(项目名称)：java设计模式_代理模式
+ * Package(包名): static_proxy
+ * Class(类名): ProxyPoint
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/14
+ * Time(创建时间)： 22:01
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class ProxyPoint implements SellTickets
+{
+
+    private final TrainStation station = new TrainStation();
+
+    @Override
+    public void sell()
+    {
+        System.out.println("代理点收取一些服务费用");
+        station.sell();
+    }
+}
+```
+
+
+
+
+
+```java
+package static_proxy;
+
+/**
+ * Project name(项目名称)：java设计模式_代理模式
+ * Package(包名): static_proxy
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/14
+ * Time(创建时间)： 22:04
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        SellTickets sellTickets = new ProxyPoint();
+        sellTickets.sell();
+    }
+}
+```
+
+
+
+ProxyPoint作为访问对象和目标对象的中介。同时也对sell方法进行了增强
+
+
+
+
+
+### JDK动态代理
+
+Java中提供了一个动态代理类Proxy，提供了一个创建代理对象的静态方法（newProxyInstance方法）来获取代理对象
+
+
+
+```java
+package jdk_proxy;
+
+/**
+ * Project name(项目名称)：java设计模式_代理模式
+ * Package(包名): jdk_proxy
+ * Interface(接口名): SellTickets
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/14
+ * Time(创建时间)： 22:07
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface SellTickets
+{
+    void sell();
+}
+```
+
+
+
+```java
+package jdk_proxy;
+
+/**
+ * Project name(项目名称)：java设计模式_代理模式
+ * Package(包名): jdk_proxy
+ * Class(类名): TrainStation
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/14
+ * Time(创建时间)： 22:08
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class TrainStation implements SellTickets
+{
+
+    @Override
+    public void sell()
+    {
+        System.out.println("火车站卖票");
+    }
+}
+```
+
+
+
+
+
+```java
+package jdk_proxy;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
+/**
+ * Project name(项目名称)：java设计模式_代理模式
+ * Package(包名): jdk_proxy
+ * Class(类名): ProxyFactory
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/14
+ * Time(创建时间)： 22:08
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class ProxyFactory
+{
+    TrainStation trainStation = new TrainStation();
+
+    public SellTickets getProxy()
+    {
+        return (SellTickets) Proxy.newProxyInstance(trainStation.getClass().getClassLoader(), new Class[]{SellTickets.class}, new InvocationHandler()
+        {
+            @Override
+            public Object invoke(Object proxy1, Method method, Object[] args) throws Throwable
+            {
+                if (method.getName().equals("sell"))
+                {
+                    System.out.println("代理点收取一些服务费用");
+                    return method.invoke(trainStation, args);
+                }
+                else
+                {
+                    return method.invoke(trainStation, args);
+                }
+            }
+        });
+    }
+}
+```
+
+
+
+
+
+```java
+package jdk_proxy;
+
+/**
+ * Project name(项目名称)：java设计模式_代理模式
+ * Package(包名): jdk_proxy
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/14
+ * Time(创建时间)： 22:17
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        SellTickets sellTickets = new ProxyFactory().getProxy();
+        sellTickets.sell();
+    }
+}
+```
+
+
+
+
+
