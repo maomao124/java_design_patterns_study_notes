@@ -11289,5 +11289,614 @@ BufferedWriter使用装饰者模式对Writer子实现类进行了增强，添加
 
 ## 桥接模式
 
+### 概念
 
+现在有一个需求，需要创建不同的图形，并且每个图形都有可能会有不同的颜色。我们可以利用继承的方式来设计类的关系
+
+
+
+![image-20220816132817421](img/java设计模式学习笔记/image-20220816132817421.png)
+
+
+
+我们可以发现有很多的类，假如我们再增加一个形状或再增加一种颜色，就需要创建更多的类。
+
+试想，在一个有多种可能会变化的维度的系统中，用继承方式会造成类爆炸，扩展起来不灵活。每次在一个维度上新增一个具体实现都要增加多个子类。为了更加灵活的设计系统，我们此时可以考虑使用桥接模式。
+
+**定义：**
+
+​	将抽象与实现分离，使它们可以独立变化。它是用组合关系代替继承关系来实现，从而降低了抽象和实现这两个可变维度的耦合度。
+
+
+
+
+
+### 结构
+
+桥接（Bridge）模式包含以下主要角色：
+
+* 抽象化（Abstraction）角色 ：定义抽象类，并包含一个对实现化对象的引用。
+* 扩展抽象化（Refined  Abstraction）角色 ：是抽象化角色的子类，实现父类中的业务方法，并通过组合关系调用实现化角色中的业务方法。
+* 实现化（Implementor）角色 ：定义实现化角色的接口，供扩展抽象化角色调用。
+* 具体实现化（Concrete Implementor）角色 ：给出实现化角色接口的具体实现。
+
+
+
+
+
+### 示例
+
+**视频播放器**
+
+需要开发一个跨平台视频播放器，可以在不同操作系统平台（如Windows、Mac、Linux等）上播放多种格式的视频文件，常见的视频格式包括RMVB、AVI、WMV等。该播放器包含了两个维度，适合使用桥接模式。
+
+
+
+![image-20220816132921728](img/java设计模式学习笔记/image-20220816132921728.png)
+
+
+
+
+
+
+
+
+
+```java
+package mao.video_player;
+
+/**
+ * Project name(项目名称)：java设计模式_桥接模式
+ * Package(包名): mao.video_player
+ * Interface(接口名): VideoFile
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/16
+ * Time(创建时间)： 13:31
+ * Version(版本): 1.0
+ * Description(描述)： 视频文件
+ */
+
+public interface VideoFile
+{
+    /**
+     * 解码操作
+     *
+     * @param fileName 文件名
+     */
+    void decode(String fileName);
+}
+```
+
+
+
+
+
+
+```java
+package mao.video_player;
+
+/**
+ * Project name(项目名称)：java设计模式_桥接模式
+ * Package(包名): mao.video_player
+ * Class(类名): AVIFile
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/16
+ * Time(创建时间)： 13:31
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class AVIFile implements VideoFile
+{
+
+    @Override
+    public void decode(String fileName)
+    {
+        System.out.println("avi视频文件：" + fileName);
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.video_player;
+
+/**
+ * Project name(项目名称)：java设计模式_桥接模式
+ * Package(包名): mao.video_player
+ * Class(类名): RMVBFile
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/16
+ * Time(创建时间)： 13:43
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class RMVBFile implements VideoFile
+{
+
+    @Override
+    public void decode(String fileName)
+    {
+        System.out.println("rmvb文件：" + fileName);
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.video_player;
+
+/**
+ * Project name(项目名称)：java设计模式_桥接模式
+ * Package(包名): mao.video_player
+ * Class(类名): OperatingSystem
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/16
+ * Time(创建时间)： 13:33
+ * Version(版本): 1.0
+ * Description(描述)： 操作系统
+ */
+
+public abstract class OperatingSystem
+{
+    protected VideoFile videoFile;
+
+    public OperatingSystem(VideoFile videoFile)
+    {
+        this.videoFile = videoFile;
+    }
+
+    public abstract void play(String fileName);
+}
+```
+
+
+
+
+
+```java
+package mao.video_player;
+
+/**
+ * Project name(项目名称)：java设计模式_桥接模式
+ * Package(包名): mao.video_player
+ * Class(类名): Windows
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/16
+ * Time(创建时间)： 13:34
+ * Version(版本): 1.0
+ * Description(描述)： windows操作系统
+ */
+
+public class Windows extends OperatingSystem
+{
+
+    public Windows(VideoFile videoFile)
+    {
+        super(videoFile);
+    }
+
+    @Override
+    public void play(String fileName)
+    {
+        System.out.println("windows操作系统播放视频");
+        videoFile.decode(fileName);
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.video_player;
+
+/**
+ * Project name(项目名称)：java设计模式_桥接模式
+ * Package(包名): mao.video_player
+ * Class(类名): Mac
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/16
+ * Time(创建时间)： 13:35
+ * Version(版本): 1.0
+ * Description(描述)： Mac操作系统
+ */
+
+public class Mac extends OperatingSystem
+{
+
+    public Mac(VideoFile videoFile)
+    {
+        super(videoFile);
+    }
+
+    @Override
+    public void play(String fileName)
+    {
+        System.out.println("mac操作系统播放视频");
+        videoFile.decode(fileName);
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.video_player;
+
+/**
+ * Project name(项目名称)：java设计模式_桥接模式
+ * Package(包名): mao.video_player
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/16
+ * Time(创建时间)： 13:35
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        OperatingSystem windows = new Windows(new AVIFile());
+        windows.play("./hello.avi");
+        windows = new Windows(new RMVBFile());
+        windows.play("./hello.rmvb");
+
+        System.out.println("-------");
+
+        OperatingSystem mac = new Mac(new AVIFile());
+        mac.play("./hello.avi");
+        mac = new Mac(new RMVBFile());
+        mac.play("./hello.rmvb");
+    }
+}
+```
+
+
+
+
+
+
+
+**概念中的示例**
+
+
+
+```java
+package mao.shape;
+
+/**
+ * Project name(项目名称)：java设计模式_桥接模式
+ * Package(包名): mao.shape
+ * Interface(接口名): Shape
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/16
+ * Time(创建时间)： 13:46
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface Shape
+{
+    /**
+     * 画图形
+     */
+    void draw();
+}
+```
+
+
+
+
+
+```java
+package mao.shape;
+
+/**
+ * Project name(项目名称)：java设计模式_桥接模式
+ * Package(包名): mao.shape
+ * Interface(接口名): Color
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/16
+ * Time(创建时间)： 13:47
+ * Version(版本): 1.0
+ * Description(描述)： 颜色接口
+ */
+
+public interface Color
+{
+    /**
+     * 获得颜色
+     *
+     * @return 颜色
+     */
+    String getColor();
+}
+```
+
+
+
+
+
+```java
+package mao.shape;
+
+/**
+ * Project name(项目名称)：java设计模式_桥接模式
+ * Package(包名): mao.shape
+ * Class(类名): Black
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/16
+ * Time(创建时间)： 13:48
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Black implements Color
+{
+
+    @Override
+    public String getColor()
+    {
+        return "黑色";
+    }
+}
+```
+
+
+
+```java
+package mao.shape;
+
+/**
+ * Project name(项目名称)：java设计模式_桥接模式
+ * Package(包名): mao.shape
+ * Class(类名): White
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/16
+ * Time(创建时间)： 13:49
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class White implements Color
+{
+
+    @Override
+    public String getColor()
+    {
+        return "白色";
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.shape;
+
+/**
+ * Project name(项目名称)：java设计模式_桥接模式
+ * Package(包名): mao.shape
+ * Class(类名): Gray
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/16
+ * Time(创建时间)： 13:49
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Gray implements Color
+{
+
+    @Override
+    public String getColor()
+    {
+        return "灰色";
+    }
+}
+```
+
+
+
+```java
+package mao.shape;
+
+/**
+ * Project name(项目名称)：java设计模式_桥接模式
+ * Package(包名): mao.shape
+ * Class(类名): Circle
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/16
+ * Time(创建时间)： 13:50
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Circle implements Shape
+{
+    private final Color color;
+
+    public Circle(Color color)
+    {
+        this.color = color;
+    }
+
+    @Override
+    public void draw()
+    {
+        System.out.println("画一个颜色为" + color.getColor() + "的圆");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.shape;
+
+/**
+ * Project name(项目名称)：java设计模式_桥接模式
+ * Package(包名): mao.shape
+ * Class(类名): Rectangle
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/16
+ * Time(创建时间)： 13:52
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Rectangle implements Shape
+{
+    private final Color color;
+
+    public Rectangle(Color color)
+    {
+        this.color = color;
+    }
+
+    @Override
+    public void draw()
+    {
+        System.out.println("画一个颜色为" + color.getColor() + "的长方形");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.shape;
+
+/**
+ * Project name(项目名称)：java设计模式_桥接模式
+ * Package(包名): mao.shape
+ * Class(类名): Square
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/16
+ * Time(创建时间)： 13:53
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Square implements Shape
+{
+    private final Color color;
+
+    public Square(Color color)
+    {
+        this.color = color;
+    }
+
+    @Override
+    public void draw()
+    {
+        System.out.println("画一个颜色为" + color.getColor() + "的正方形");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.shape;
+
+/**
+ * Project name(项目名称)：java设计模式_桥接模式
+ * Package(包名): mao.shape
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/16
+ * Time(创建时间)： 13:54
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        Shape shape = new Circle(new Black());
+        shape.draw();
+        shape = new Circle(new Gray());
+        shape.draw();
+        shape = new Circle(new White());
+        shape.draw();
+        System.out.println("--------");
+        shape = new Rectangle(new Black());
+        shape.draw();
+        shape = new Rectangle(new Gray());
+        shape.draw();
+        shape = new Rectangle(new White());
+        shape.draw();
+        System.out.println("--------");
+        shape = new Square(new Black());
+        shape.draw();
+        shape = new Square(new Gray());
+        shape.draw();
+        shape = new Square(new White());
+        shape.draw();
+    }
+}
+```
+
+
+
+
+
+
+
+### 优点
 
