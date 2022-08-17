@@ -12322,6 +12322,333 @@ RequestFacade类就使用了外观模式
 
 ## 组合模式
 
+### 概念
+
+![image-20220817202628526](img/java设计模式学习笔记/image-20220817202628526.png)
+
+
+
+上图我们可以看做是一个文件系统，对于这样的结构我们称之为树形结构。在树形结构中可以通过调用某个方法来遍历整个树，当我们找到某个叶子节点后，就可以对叶子节点进行相关的操作。可以将这颗树理解成一个大的容器，容器里面包含很多的成员对象，这些成员对象即可是容器对象也可以是叶子对象。但是由于容器对象和叶子对象在功能上面的区别，使得我们在使用的过程中必须要区分容器对象和叶子对象，但是这样就会给客户带来不必要的麻烦，作为客户而已，它始终希望能够一致的对待容器对象和叶子对象。
+
+
+
+**定义：**
+
+组合模式又名部分整体模式，是用于把一组相似的对象当作一个单一的对象。组合模式依据树形结构来组合对象，用来表示部分以及整体层次。这种类型的设计模式属于结构型模式，它创建了对象组的树形结构。
+
+
+
+
+
+### 结构
+
+组合模式主要包含三种角色：
+
+* 抽象根节点（Component）：定义系统各层次对象的共有方法和属性，可以预先定义一些默认行为和属性。
+* 树枝节点（Composite）：定义树枝节点的行为，存储子节点，组合树枝节点和叶子节点形成一个树形结构。
+* 叶子节点（Leaf）：叶子节点对象，其下再无分支，是系统层次遍历的最小单位。
+
+
+
+
+
+### 示例
+
+**软件菜单**
+
+我们在访问别的一些管理系统时，经常可以看到类似的菜单。一个菜单可以包含菜单项（菜单项是指不再包含其他内容的菜单条目），也可以包含带有其他菜单项的菜单，因此使用组合模式描述菜单就很恰当，我们的需求是针对一个菜单，打印出其包含的所有菜单以及菜单项的名称。
+
+
+
+![image-20220817202802410](img/java设计模式学习笔记/image-20220817202802410.png)
+
+
+
+![image-20220817202820030](img/java设计模式学习笔记/image-20220817202820030.png)
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_组合模式
+ * Package(包名): mao
+ * Class(类名): MenuComponent
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/17
+ * Time(创建时间)： 20:29
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public abstract class MenuComponent
+{
+    //菜单或者菜单项的名字
+    protected String name;
+    //菜单级别
+    protected int level;
+
+    /**
+     * 添加菜单，子类可以重写方法
+     *
+     * @param menuComponent MenuComponent对象，传入的是子实现类，菜单或者菜单项
+     */
+    public void add(MenuComponent menuComponent)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * 移除菜单
+     *
+     * @param menuComponent MenuComponent对象
+     */
+    public void remove(MenuComponent menuComponent)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * 获取指定的子菜单
+     *
+     * @param i 子菜单的索引
+     * @return MenuComponent对象
+     */
+    public MenuComponent getChild(int i)
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * 获取菜单的名称
+     *
+     * @return 菜单的名称
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
+     * 打印菜单
+     */
+    public void print()
+    {
+        throw new UnsupportedOperationException();
+    }
+
+}
+```
+
+
+
+这里的MenuComponent定义为抽象类，因为有一些共有的属性和行为要在该类中实现，Menu和MenuItem类就可以只覆盖自己感兴趣的方法，而不用搭理不需要或者不感兴趣的方法，举例来说，Menu类可以包含子菜单，因此需要覆盖add()、remove()、getChild()方法，但是MenuItem就不应该有这些方法。这里给出的默认实现是抛出异常，你也可以根据自己的需要改写默认实现。
+
+
+
+```java
+package mao;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Project name(项目名称)：java设计模式_组合模式
+ * Package(包名): mao
+ * Class(类名): Menu
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/17
+ * Time(创建时间)： 20:35
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Menu extends MenuComponent
+{
+    private final List<MenuComponent> menuComponentList;
+
+    public Menu(String name, int level)
+    {
+        this.level = level;
+        this.name = name;
+        menuComponentList = new ArrayList<>();
+    }
+
+    @Override
+    public void add(MenuComponent menuComponent)
+    {
+        menuComponentList.add(menuComponent);
+    }
+
+    @Override
+    public void remove(MenuComponent menuComponent)
+    {
+        menuComponentList.remove(menuComponent);
+    }
+
+    @Override
+    public MenuComponent getChild(int i)
+    {
+        return menuComponentList.get(i);
+    }
+
+    @Override
+    public void print()
+    {
+        System.out.print("+");
+        for (int i = 1; i < this.level; i++)
+        {
+            System.out.print("---");
+        }
+        System.out.println(this.name);
+        for (MenuComponent menuComponent : menuComponentList)
+        {
+            menuComponent.print();
+        }
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_组合模式
+ * Package(包名): mao
+ * Class(类名): MenuItem
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/17
+ * Time(创建时间)： 20:40
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class MenuItem extends MenuComponent
+{
+    public MenuItem(String name, int level)
+    {
+        this.name = name;
+        this.level = level;
+    }
+
+    @Override
+    public void print()
+    {
+        System.out.print("|");
+        for (int i = 1; i < this.level; i++)
+        {
+            System.out.print("---");
+        }
+        System.out.println(this.name);
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_组合模式
+ * Package(包名): mao
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/17
+ * Time(创建时间)： 20:41
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        MenuComponent menuComponent = new Menu("系统管理", 1);
+        MenuComponent menuComponent1 = new Menu("菜单管理", 2);
+        MenuComponent menuComponent2 = new Menu("权限设置", 2);
+        MenuComponent menuComponent3 = new Menu("角色管理", 2);
+
+        menuComponent.add(menuComponent1);
+        menuComponent.add(menuComponent2);
+        menuComponent.add(menuComponent3);
+
+        MenuComponent menuComponent4 = new MenuItem("页面访问", 3);
+        MenuComponent menuComponent5 = new MenuItem("展开菜单", 3);
+        MenuComponent menuComponent6 = new MenuItem("编辑菜单", 3);
+        MenuComponent menuComponent7 = new MenuItem("删除菜单", 3);
+        MenuComponent menuComponent8 = new MenuItem("新增菜单", 3);
+
+        menuComponent1.add(menuComponent4);
+        menuComponent1.add(menuComponent5);
+        menuComponent1.add(menuComponent6);
+        menuComponent1.add(menuComponent7);
+        menuComponent1.add(menuComponent8);
+
+        MenuComponent menuComponent9 = new MenuItem("权限设置", 3);
+        MenuComponent menuComponent10 = new MenuItem("新增菜单", 3);
+
+        menuComponent2.add(menuComponent9);
+        menuComponent2.add(menuComponent10);
+
+        MenuComponent menuComponent11 = new MenuItem("页面访问", 3);
+        MenuComponent menuComponent12 = new MenuItem("新增角色", 3);
+        MenuComponent menuComponent13 = new MenuItem("修改角色", 3);
+
+        menuComponent3.add(menuComponent11);
+        menuComponent3.add(menuComponent12);
+        menuComponent3.add(menuComponent13);
+
+        menuComponent.print();
+
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
++系统管理
++---菜单管理
+|------页面访问
+|------展开菜单
+|------编辑菜单
+|------删除菜单
+|------新增菜单
++---权限设置
+|------权限设置
+|------新增菜单
++---角色管理
+|------页面访问
+|------新增角色
+|------修改角色
+```
+
+
+
+
+
+![image-20220817205909633](img/java设计模式学习笔记/image-20220817205909633.png)
+
 
 
 
