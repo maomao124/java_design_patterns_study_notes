@@ -13129,3 +13129,227 @@ mao.LBox@3b07d329
 
 ### JDK源码解析
 
+Integer类使用了享元模式。
+
+
+
+```java
+package mao.jdk;
+
+/**
+ * Project name(项目名称)：java设计模式_享元模式
+ * Package(包名): mao.jdk
+ * Class(类名): IntegerTest
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/17
+ * Time(创建时间)： 21:47
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class IntegerTest
+{
+    @SuppressWarnings("all")
+    public static void main(String[] args)
+    {
+        Integer i1 = 127;
+        Integer i2 = 127;
+
+        Integer i3 = 128;
+        Integer i4 = 128;
+
+        System.out.println("i1和i2对象是否是同一个对象？" + (i1 == i2));
+        System.out.println("i3和i4对象是否是同一个对象？" + (i3 == i4));
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+i1和i2对象是否是同一个对象？true
+i3和i4对象是否是同一个对象？false
+```
+
+
+
+因为直接给Integer类型的变量赋值基本数据类型数据的操作底层使用的是 `valueOf()`
+
+
+
+```java
+public final class Integer extends Number
+        implements Comparable<Integer>, Constable, ConstantDesc 
+{
+...
+/**
+ * Returns an {@code Integer} object holding the value
+ * extracted from the specified {@code String} when parsed
+ * with the radix given by the second argument. The first argument
+ * is interpreted as representing a signed integer in the radix
+ * specified by the second argument, exactly as if the arguments
+ * were given to the {@link #parseInt(java.lang.String, int)}
+ * method. The result is an {@code Integer} object that
+ * represents the integer value specified by the string.
+ *
+ * <p>In other words, this method returns an {@code Integer}
+ * object equal to the value of:
+ *
+ * <blockquote>
+ *  {@code new Integer(Integer.parseInt(s, radix))}
+ * </blockquote>
+ *
+ * @param      s   the string to be parsed.
+ * @param      radix the radix to be used in interpreting {@code s}
+ * @return     an {@code Integer} object holding the value
+ *             represented by the string argument in the specified
+ *             radix.
+ * @throws    NumberFormatException if the {@code String}
+ *            does not contain a parsable {@code int}.
+ */
+public static Integer valueOf(String s, int radix) throws NumberFormatException {
+    return Integer.valueOf(parseInt(s,radix));
+}
+
+/**
+ * Returns an {@code Integer} object holding the
+ * value of the specified {@code String}. The argument is
+ * interpreted as representing a signed decimal integer, exactly
+ * as if the argument were given to the {@link
+ * #parseInt(java.lang.String)} method. The result is an
+ * {@code Integer} object that represents the integer value
+ * specified by the string.
+ *
+ * <p>In other words, this method returns an {@code Integer}
+ * object equal to the value of:
+ *
+ * <blockquote>
+ *  {@code new Integer(Integer.parseInt(s))}
+ * </blockquote>
+ *
+ * @param      s   the string to be parsed.
+ * @return     an {@code Integer} object holding the value
+ *             represented by the string argument.
+ * @throws     NumberFormatException  if the string cannot be parsed
+ *             as an integer.
+ */
+public static Integer valueOf(String s) throws NumberFormatException {
+    return Integer.valueOf(parseInt(s, 10));
+}
+
+/**
+ * Cache to support the object identity semantics of autoboxing for values between
+ * -128 and 127 (inclusive) as required by JLS.
+ *
+ * The cache is initialized on first usage.  The size of the cache
+ * may be controlled by the {@code -XX:AutoBoxCacheMax=<size>} option.
+ * During VM initialization, java.lang.Integer.IntegerCache.high property
+ * may be set and saved in the private system properties in the
+ * jdk.internal.misc.VM class.
+ *
+ * WARNING: The cache is archived with CDS and reloaded from the shared
+ * archive at runtime. The archived cache (Integer[]) and Integer objects
+ * reside in the closed archive heap regions. Care should be taken when
+ * changing the implementation and the cache array should not be assigned
+ * with new Integer object(s) after initialization.
+ */
+
+private static class IntegerCache {
+    static final int low = -128;
+    static final int high;
+    static final Integer[] cache;
+    static Integer[] archivedCache;
+
+    static {
+        // high value may be configured by property
+        int h = 127;
+        String integerCacheHighPropValue =
+            VM.getSavedProperty("java.lang.Integer.IntegerCache.high");
+        if (integerCacheHighPropValue != null) {
+            try {
+                h = Math.max(parseInt(integerCacheHighPropValue), 127);
+                // Maximum array size is Integer.MAX_VALUE
+                h = Math.min(h, Integer.MAX_VALUE - (-low) -1);
+            } catch( NumberFormatException nfe) {
+                // If the property cannot be parsed into an int, ignore it.
+            }
+        }
+        high = h;
+
+        // Load IntegerCache.archivedCache from archive, if possible
+        CDS.initializeFromArchive(IntegerCache.class);
+        int size = (high - low) + 1;
+
+        // Use the archived cache if it exists and is large enough
+        if (archivedCache == null || size > archivedCache.length) {
+            Integer[] c = new Integer[size];
+            int j = low;
+            for(int i = 0; i < c.length; i++) {
+                c[i] = new Integer(j++);
+            }
+            archivedCache = c;
+        }
+        cache = archivedCache;
+        // range [-128, 127] must be interned (JLS7 5.1.7)
+        assert IntegerCache.high >= 127;
+    }
+
+    private IntegerCache() {}
+}
+
+/**
+ * Returns an {@code Integer} instance representing the specified
+ * {@code int} value.  If a new {@code Integer} instance is not
+ * required, this method should generally be used in preference to
+ * the constructor {@link #Integer(int)}, as this method is likely
+ * to yield significantly better space and time performance by
+ * caching frequently requested values.
+ *
+ * This method will always cache values in the range -128 to 127,
+ * inclusive, and may cache other values outside of this range.
+ *
+ * @param  i an {@code int} value.
+ * @return an {@code Integer} instance representing {@code i}.
+ * @since  1.5
+ */
+@IntrinsicCandidate
+public static Integer valueOf(int i) {
+    if (i >= IntegerCache.low && i <= IntegerCache.high)
+        return IntegerCache.cache[i + (-IntegerCache.low)];
+    return new Integer(i);
+}
+
+/**
+ * The value of the {@code Integer}.
+ *
+ * @serial
+ */
+private final int value;
+    
+...
+...
+...
+```
+
+
+
+`Integer` 默认先创建并缓存 `-128 ~ 127` 之间数的 `Integer` 对象，当调用 `valueOf` 时如果参数在 `-128 ~ 127` 之间则计算下标并从缓存中返回，否则创建一个新的 `Integer` 对象。
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 行为型模式
+
