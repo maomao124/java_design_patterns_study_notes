@@ -13351,5 +13351,383 @@ private final int value;
 
 
 
+
+
 # 行为型模式
+
+行为型模式用于描述程序在运行时复杂的流程控制，即描述多个类或对象之间怎样相互协作共同完成单个对象都无法单独完成的任务，它涉及算法与对象间职责的分配。
+
+行为型模式分为类行为模式和对象行为模式，前者采用继承机制来在类间分派行为，后者采用组合或聚合在对象间分配行为。由于组合关系或聚合关系比继承关系耦合度低，满足“合成复用原则”，所以对象行为模式比类行为模式具有更大的灵活性。
+
+行为型模式分为：
+
+* 模板方法模式
+* 策略模式
+* 命令模式
+* 职责链模式
+* 状态模式
+* 观察者模式
+* 中介者模式
+* 迭代器模式
+* 访问者模式
+* 备忘录模式
+* 解释器模式
+
+以上 11 种行为型模式，除了模板方法模式和解释器模式是类行为型模式，其他的全部属于对象行为型模式。
+
+
+
+
+
+
+
+## 模板方法模式
+
+### 概念
+
+在面向对象程序设计过程中，程序员常常会遇到这种情况：设计一个系统时知道了算法所需的关键步骤，而且确定了这些步骤的执行顺序，但某些步骤的具体实现还未知，或者说某些步骤的实现与具体的环境相关。
+
+例如，去银行办理业务一般要经过以下4个流程：取号、排队、办理具体业务、对银行工作人员进行评分等，其中取号、排队和对银行工作人员进行评分的业务对每个客户是一样的，可以在父类中实现，但是办理具体业务却因人而异，它可能是存款、取款或者转账等，可以延迟到子类中实现。
+
+**定义：**
+
+定义一个操作中的算法骨架，而将算法的一些步骤延迟到子类中，使得子类可以不改变该算法结构的情况下重定义该算法的某些特定步骤。
+
+
+
+
+
+### 结构
+
+模板方法（Template Method）模式包含以下主要角色：
+
+* 抽象类（Abstract Class）：负责给出一个算法的轮廓和骨架。它由一个模板方法和若干个基本方法构成。
+
+  * 模板方法：定义了算法的骨架，按某种顺序调用其包含的基本方法。
+
+  * 基本方法：是实现算法各个步骤的方法，是模板方法的组成部分。基本方法又可以分为三种：
+
+    * 抽象方法(Abstract Method) ：一个抽象方法由抽象类声明、由其具体子类实现。
+
+    * 具体方法(Concrete Method) ：一个具体方法由一个抽象类或具体类声明并实现，其子类可以进行覆盖也可以直接继承。
+
+    * 钩子方法(Hook Method) ：在抽象类中已经实现，包括用于判断的逻辑方法和需要子类重写的空方法两种。
+
+      一般钩子方法是用于判断的逻辑方法，这类方法名一般为isXxx，返回值类型为boolean类型。
+
+* 具体子类（Concrete Class）：实现抽象类中所定义的抽象方法和钩子方法，它们是一个顶级逻辑的组成步骤。
+
+
+
+
+
+
+
+### 示例
+
+**炒菜**
+
+炒菜的步骤是固定的，分为倒油、热油、倒蔬菜、倒调料品、翻炒等步骤。现通过模板方法模式来用代码模拟。
+
+
+
+![image-20220818195204993](img/java设计模式学习笔记/image-20220818195204993.png)
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_模板方法模式
+ * Package(包名): mao
+ * Class(类名): AbstractClass
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 19:52
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public abstract class AbstractClass
+{
+    /**
+     * 模板方法。定义了算法的骨架，按某种顺序调用其包含的基本方法
+     */
+    public final void cookProcess()
+    {
+        //第一步：倒油
+        this.pourOil();
+        //第二步：热油
+        this.heatOil();
+        //第三步：倒蔬菜
+        this.pourVegetable();
+        //第四步：倒调味料
+        this.pourSauce();
+        //第五步：翻炒
+        this.fry();
+    }
+
+    public void pourOil()
+    {
+        System.out.println("倒油");
+    }
+
+    public void heatOil()
+    {
+        System.out.println("热油");
+    }
+
+    /**
+     * 倒蔬菜
+     */
+    public abstract void pourVegetable();
+
+    /**
+     * 倒调味料
+     */
+    public abstract void pourSauce();
+
+    public void fry()
+    {
+        System.out.println("翻炒");
+    }
+
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_模板方法模式
+ * Package(包名): mao
+ * Class(类名): ConcreteClass_BaoCai
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 19:55
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class ConcreteClass_BaoCai extends AbstractClass
+{
+
+    @Override
+    public void pourVegetable()
+    {
+        System.out.println("下包菜");
+    }
+
+    @Override
+    public void pourSauce()
+    {
+        System.out.println("倒辣椒");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_模板方法模式
+ * Package(包名): mao
+ * Class(类名): ConcreteClass_CaiXin
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 19:56
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class ConcreteClass_CaiXin extends AbstractClass
+{
+
+    @Override
+    public void pourVegetable()
+    {
+        System.out.println("下菜心");
+    }
+
+    @Override
+    public void pourSauce()
+    {
+        System.out.println("下蒜蓉");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_模板方法模式
+ * Package(包名): mao
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 19:57
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        AbstractClass abstractClass = new ConcreteClass_BaoCai();
+        abstractClass.cookProcess();
+        System.out.println("-----");
+        abstractClass = new ConcreteClass_CaiXin();
+        abstractClass.cookProcess();
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+倒油
+热油
+下包菜
+倒辣椒
+翻炒
+-----
+倒油
+热油
+下菜心
+下蒜蓉
+翻炒
+```
+
+
+
+
+
+为防止恶意操作，一般模板方法都加上 final 关键词。
+
+
+
+![image-20220818200446178](img/java设计模式学习笔记/image-20220818200446178.png)
+
+
+
+
+
+
+
+### 优缺点
+
+**优点：**
+
+* 提高代码复用性
+
+  将相同部分的代码放在抽象的父类中，而将不同的代码放入不同的子类中。
+
+* 实现了反向控制
+
+  通过一个父类调用其子类的操作，通过对子类的具体实现扩展不同的行为，实现了反向控制 ，并符合“开闭原则”。
+
+**缺点：**
+
+* 对每个不同的实现都需要定义一个子类，这会导致类的个数增加，系统更加庞大，设计也更加抽象。
+* 父类中的抽象方法由子类实现，子类执行的结果会影响父类的结果，这导致一种反向的控制结构，它提高了代码阅读的难度。
+
+
+
+
+
+
+
+### 适用场景
+
+* 算法的整体步骤很固定，但其中个别部分易变时，这时候可以使用模板方法模式，将容易变的部分抽象出来，供子类实现。
+* 需要通过子类来决定父类算法中某个步骤是否执行，实现子类对父类的反向控制。
+
+
+
+
+
+### JDK源码解析
+
+InputStream类就使用了模板方法模式。在InputStream类中定义了多个 `read()` 方法
+
+
+
+```java
+public abstract class InputStream implements Closeable {
+    //抽象方法，要求子类必须重写
+    public abstract int read() throws IOException;
+
+    public int read(byte b[]) throws IOException {
+        return read(b, 0, b.length);
+    }
+
+    public int read(byte b[], int off, int len) throws IOException {
+        if (b == null) {
+            throw new NullPointerException();
+        } else if (off < 0 || len < 0 || len > b.length - off) {
+            throw new IndexOutOfBoundsException();
+        } else if (len == 0) {
+            return 0;
+        }
+
+        int c = read(); //调用了无参的read方法，该方法是每次读取一个字节数据
+        if (c == -1) {
+            return -1;
+        }
+        b[off] = (byte)c;
+
+        int i = 1;
+        try {
+            for (; i < len ; i++) {
+                c = read();
+                if (c == -1) {
+                    break;
+                }
+                b[off + i] = (byte)c;
+            }
+        } catch (IOException ee) {
+        }
+        return i;
+    }
+}
+```
+
+无参的 `read()` 方法是抽象方法，要求子类必须实现。而 `read(byte b[])` 方法调用了 `read(byte b[], int off, int len)` 方法
+
+在InputStream父类中已经定义好了读取一个字节数组数据的方法是每次读取一个字节，并将其存储到数组的第一个索引位置，读取len个字节数据。具体如何读取一个字节数据呢？由子类实现
+
+
+
+
+
+
+
+## 策略模式
 
