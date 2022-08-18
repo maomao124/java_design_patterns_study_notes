@@ -13731,3 +13731,515 @@ public abstract class InputStream implements Closeable {
 
 ## 策略模式
 
+### 概念
+
+该模式定义了一系列算法，并将每个算法封装起来，使它们可以相互替换，且算法的变化不会影响使用算法的客户。策略模式属于对象行为模式，它通过对算法进行封装，把使用算法的责任和算法的实现分割开来，并委派给不同的对象对这些算法进行管理。
+
+如满减活动中，可以有满30减5元、满50减10元等，
+如购物系统中针对不通过用户等级进行不同的折扣，原价（普通顾客），九折（会员），八折（超级会员）和七折（金牌会员）等，这些策略相互排斥、可替换。
+
+
+
+
+
+### 结构
+
+策略模式的主要角色如下：
+
+* 抽象策略（Strategy）类：这是一个抽象角色，通常由一个接口或抽象类实现。此角色给出所有的具体策略类所需的接口。
+* 具体策略（Concrete Strategy）类：实现了抽象策略定义的接口，提供具体的算法实现或行为。
+* 环境（Context）类：持有一个策略类的引用，最终给客户端调用。
+
+
+
+
+
+### 示例
+
+**促销活动**
+
+一家百货公司在定年度的促销活动。针对不同的节日（春节、中秋节、圣诞节）推出不同的促销活动，由促销员将促销活动展示给客户
+
+
+
+![image-20220818201631237](img/java设计模式学习笔记/image-20220818201631237.png)
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_策略模式
+ * Package(包名): mao.t1
+ * Interface(接口名): Strategy
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 20:16
+ * Version(版本): 1.0
+ * Description(描述)： 抽象策略（Strategy）类
+ */
+
+public interface Strategy
+{
+    void show();
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_策略模式
+ * Package(包名): mao.t1
+ * Class(类名): StrategyA
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 20:17
+ * Version(版本): 1.0
+ * Description(描述)： 为春节准备的促销活动A
+ */
+
+public class StrategyA implements Strategy
+{
+
+    @Override
+    public void show()
+    {
+        System.out.println("买一送一");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_策略模式
+ * Package(包名): mao.t1
+ * Class(类名): StrategyB
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 20:17
+ * Version(版本): 1.0
+ * Description(描述)： 为中秋准备的促销活动B
+ */
+
+public class StrategyB implements Strategy
+{
+
+    @Override
+    public void show()
+    {
+        System.out.println("满200元减50元");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_策略模式
+ * Package(包名): mao.t1
+ * Class(类名): StrategyC
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 20:18
+ * Version(版本): 1.0
+ * Description(描述)： 为圣诞准备的促销活动C
+ */
+
+public class StrategyC implements Strategy
+{
+
+    @Override
+    public void show()
+    {
+        System.out.println("满1000元加一元换购任意200元以下商品");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_策略模式
+ * Package(包名): mao.t1
+ * Class(类名): SalesMan
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 20:19
+ * Version(版本): 1.0
+ * Description(描述)： 环境角色类
+ */
+
+public class SalesMan
+{
+    //抽象策略角色的引用
+    private final Strategy strategy;
+
+    public SalesMan(Strategy strategy)
+    {
+        this.strategy = strategy;
+    }
+
+    public void salesManShow()
+    {
+        strategy.show();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_策略模式
+ * Package(包名): mao.t1
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 20:20
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        SalesMan salesMan = new SalesMan(new StrategyA());
+        salesMan.salesManShow();
+        salesMan = new SalesMan(new StrategyB());
+        salesMan.salesManShow();
+        salesMan = new SalesMan(new StrategyC());
+        salesMan.salesManShow();
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+买一送一
+满200元减50元
+满1000元加一元换购任意200元以下商品
+```
+
+
+
+
+
+**实现加减乘除**
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_策略模式
+ * Package(包名): mao.t2
+ * Interface(接口名): Strategy
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 20:25
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface Strategy
+{
+    int doOperation(int num1, int num2);
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_策略模式
+ * Package(包名): mao.t2
+ * Class(类名): OperationAdd
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 20:26
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class OperationAdd implements Strategy
+{
+
+    @Override
+    public int doOperation(int num1, int num2)
+    {
+        return num1 + num2;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_策略模式
+ * Package(包名): mao.t2
+ * Class(类名): OperationSubtract
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 20:27
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class OperationSubtract implements Strategy
+{
+
+    @Override
+    public int doOperation(int num1, int num2)
+    {
+        return num1 - num2;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_策略模式
+ * Package(包名): mao.t2
+ * Class(类名): OperationMultiply
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 20:27
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class OperationMultiply implements Strategy
+{
+
+    @Override
+    public int doOperation(int num1, int num2)
+    {
+        return num1 * num2;
+    }
+
+}
+```
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_策略模式
+ * Package(包名): mao.t2
+ * Class(类名): OperationDivision
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 20:28
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class OperationDivision implements Strategy
+{
+
+    @Override
+    public int doOperation(int num1, int num2)
+    {
+        return num1 / num2;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_策略模式
+ * Package(包名): mao.t2
+ * Class(类名): Context
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 20:29
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Context
+{
+    private final Strategy strategy;
+
+    public Context(Strategy strategy)
+    {
+        this.strategy = strategy;
+    }
+
+    public int executeStrategy(int num1, int num2)
+    {
+        return strategy.doOperation(num1, num2);
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_策略模式
+ * Package(包名): mao.t2
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 20:29
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        {
+            Context context = new Context(new OperationAdd());
+            System.out.println(context.executeStrategy(3, 8));
+            System.out.println(context.executeStrategy(45, 4));
+            System.out.println(context.executeStrategy(40, 20));
+        }
+
+        {
+            Context context = new Context(new OperationSubtract());
+            System.out.println(context.executeStrategy(3, 8));
+            System.out.println(context.executeStrategy(45, 4));
+            System.out.println(context.executeStrategy(40, 20));
+        }
+
+        {
+            Context context = new Context(new OperationMultiply());
+            System.out.println(context.executeStrategy(3, 8));
+            System.out.println(context.executeStrategy(45, 4));
+            System.out.println(context.executeStrategy(40, 20));
+        }
+
+        {
+            Context context = new Context(new OperationDivision());
+            System.out.println(context.executeStrategy(3, 8));
+            System.out.println(context.executeStrategy(45, 4));
+            System.out.println(context.executeStrategy(40, 20));
+        }
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+11
+49
+60
+-5
+41
+20
+24
+180
+800
+0
+11
+2
+```
+
+
+
+
+
+![image-20220818203648786](img/java设计模式学习笔记/image-20220818203648786.png)
+
+
+
+
+
+
+
+
+
+### 优缺点
+
