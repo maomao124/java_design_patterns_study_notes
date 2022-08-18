@@ -14243,3 +14243,190 @@ public class Test
 
 ### 优缺点
 
+**优点：**
+
+* 策略类之间可以自由切换
+
+  由于策略类都实现同一个接口，所以使它们之间可以自由切换。
+
+* 易于扩展
+
+  增加一个新的策略只需要添加一个具体的策略类即可，基本不需要改变原有的代码，符合“开闭原则“
+
+* 避免使用多重条件选择语句（if else），充分体现面向对象设计思想。
+
+
+
+**缺点：**
+
+* 客户端必须知道所有的策略类，并自行决定使用哪一个策略类。
+* 策略模式将造成产生很多策略类，可以通过使用享元模式在一定程度上减少对象的数量。
+
+
+
+
+
+### 使用场景
+
+* 一个系统需要动态地在几种算法中选择一种时，可将每个算法封装到策略类中。
+* 一个类定义了多种行为，并且这些行为在这个类的操作中以多个条件语句的形式出现，可将每个条件分支移入它们各自的策略类中以代替这些条件语句。
+* 系统中各算法彼此完全独立，且要求对客户隐藏具体算法的实现细节时。
+* 系统要求使用算法的客户不应该知道其操作的数据时，可使用策略模式来隐藏与算法相关的数据结构。
+* 多个类只区别在表现行为不同，可以使用策略模式，在运行时动态选择具体要执行的行为。
+
+
+
+
+
+
+
+### JDK源码解析
+
+`Comparator` 中的策略模式。在Arrays类中有一个 `sort()` 方法
+
+```java
+public class Arrays{
+    public static <T> void sort(T[] a, Comparator<? super T> c) {
+        if (c == null) {
+            sort(a);
+        } else {
+            if (LegacyMergeSort.userRequested)
+                legacyMergeSort(a, c);
+            else
+                TimSort.sort(a, 0, a.length, c, null, 0, 0);
+        }
+    }
+}
+```
+
+
+
+
+
+Arrays就是一个环境角色类，这个sort方法可以传一个新策略让Arrays根据这个策略来进行排序
+
+
+
+```java
+package mao.jdk;
+
+import java.util.Arrays;
+import java.util.Comparator;
+
+/**
+ * Project name(项目名称)：java设计模式_策略模式
+ * Package(包名): mao.jdk
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 21:06
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static int getIntRandom(int min, int max)
+    {
+        if (min > max)
+        {
+            min = max;
+        }
+        return min + (int) (Math.random() * (max - min + 1));
+    }
+
+
+    public static void main(String[] args)
+    {
+        Integer[] integers = new Integer[20];
+        for (int i = 0; i < 20; i++)
+        {
+            integers[i] = getIntRandom(50, 100);
+        }
+
+        System.out.println(Arrays.stream(integers).toList());
+
+        Arrays.sort(integers, new Comparator<Integer>()
+        {
+            @Override
+            public int compare(Integer o1, Integer o2)
+            {
+                return o2 - o1;
+            }
+        });
+
+        System.out.println(Arrays.stream(integers).toList());
+    }
+
+}
+```
+
+
+
+运行结果：
+
+```sh
+[96, 52, 99, 96, 79, 94, 82, 99, 74, 90, 98, 62, 72, 85, 82, 53, 79, 67, 97, 88]
+[99, 99, 98, 97, 96, 96, 94, 90, 88, 85, 82, 82, 79, 79, 74, 72, 67, 62, 53, 52]
+```
+
+
+
+在调用Arrays的sort方法时，第二个参数传递的是Comparator接口的子实现类对象。所以Comparator充当的是抽象策略角色，而具体的子实现类充当的是具体策略角色。环境角色类（Arrays）应该持有抽象策略的引用来调用。那么，Arrays类的sort方法到底有没有使用Comparator子实现类中的 `compare()` 方法吗？让我们继续查看TimSort类的 `sort()` 方法
+
+
+
+```java
+class TimSort<T> {
+    static <T> void sort(T[] a, int lo, int hi, Comparator<? super T> c,
+                         T[] work, int workBase, int workLen) {
+        assert c != null && a != null && lo >= 0 && lo <= hi && hi <= a.length;
+
+        int nRemaining  = hi - lo;
+        if (nRemaining < 2)
+            return;  // Arrays of size 0 and 1 are always sorted
+
+        // If array is small, do a "mini-TimSort" with no merges
+        if (nRemaining < MIN_MERGE) {
+            int initRunLen = countRunAndMakeAscending(a, lo, hi, c);
+            binarySort(a, lo, hi, lo + initRunLen, c);
+            return;
+        }
+        ...
+    }   
+        
+    private static <T> int countRunAndMakeAscending(T[] a, int lo, int hi,Comparator<? super T> c) {
+        assert lo < hi;
+        int runHi = lo + 1;
+        if (runHi == hi)
+            return 1;
+
+        // Find end of run, and reverse range if descending
+        if (c.compare(a[runHi++], a[lo]) < 0) { // Descending
+            while (runHi < hi && c.compare(a[runHi], a[runHi - 1]) < 0)
+                runHi++;
+            reverseRange(a, lo, runHi);
+        } else {                              // Ascending
+            while (runHi < hi && c.compare(a[runHi], a[runHi - 1]) >= 0)
+                runHi++;
+        }
+
+        return runHi - lo;
+    }
+}
+```
+
+
+
+代码中最终会跑到 `countRunAndMakeAscending()` 这个方法中。我们可以看见，只用了compare方法，所以在调用Arrays.sort方法只传具体compare重写方法的类对象就行，这也是Comparator接口中必须要子类实现的一个方法
+
+
+
+
+
+
+
+## 命令模式
+
