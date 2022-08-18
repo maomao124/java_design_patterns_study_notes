@@ -14428,5 +14428,1093 @@ class TimSort<T> {
 
 
 
+
+
 ## 命令模式
+
+### 概念
+
+将一个请求封装为一个对象，使发出请求的责任和执行请求的责任分割开。这样两者之间通过命令对象进行沟通，这样方便将命令对象进行存储、传递、调用、增加与管理。
+
+
+
+比如：
+
+* 我们买了一套智能家电，有照明灯、风扇、冰箱、洗衣机，我们只要在手机上安装app 就可以控制对这些家电工作。
+* 这些智能家电来自不同的厂家，我们不想针对每一种家电都安装一个App ，分别控制，我们希望只要一个app 就可以控制全部智能家电。
+* 要实现一个app 控制所有智能家电的需要，则每个智能家电厂家都要提供一个统一的接口给app 调用，这时 就可以考虑使用命令模式。
+* 命令模式可将“动作的请求者”从“动作的执行者”对象中解耦出来.
+* 在我们的例子中，动作请求者是手机app，动作的执行者是每个厂商的一个家电产品
+
+
+
+
+
+### 结构
+
+命令模式包含以下主要角色：
+
+* 抽象命令类（Command）角色： 定义命令的接口，声明执行的方法。
+* 具体命令（Concrete  Command）角色：具体的命令，实现命令接口；通常会持有接收者，并调用接收者的功能来完成命令要执行的操作。
+* 实现者/接收者（Receiver）角色： 接收者，真正执行命令的对象。任何类都可能成为一个接收者，只要它能够实现命令要求实现的相应功能。
+* 调用者/请求者（Invoker）角色： 要求命令对象执行请求，通常会持有命令对象，可以持有很多的命令对象。这个是客户端真正触发命令并要求命令执行相应操作的地方，也就是说相当于使用命令对象的入口。
+
+
+
+
+
+### 示例
+
+**智能家电项目**
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.t1
+ * Interface(接口名): Command
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 21:29
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface Command
+{
+    /**
+     * 命令执行
+     */
+    void execute();
+
+    /**
+     * 命令撤销
+     */
+    void undo();
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+import java.awt.*;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.t1
+ * Class(类名): LightReceiver
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 21:30
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class LightReceiver
+{
+    public void on()
+    {
+        Toolkit.getDefaultToolkit().beep();
+        System.out.println("电灯打开了");
+    }
+
+    public void off()
+    {
+        Toolkit.getDefaultToolkit().beep();
+        System.out.println("电灯关闭了");
+    }
+}
+
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.t1
+ * Class(类名): LightOnCommand
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 21:31
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class LightOnCommand implements Command
+{
+    private final LightReceiver light;
+
+    /**
+     * Instantiates a new Light on command.
+     */
+    public LightOnCommand()
+    {
+        light = new LightReceiver();
+    }
+
+    /**
+     * Instantiates a new Light on command.
+     *
+     * @param light the light
+     */
+    public LightOnCommand(LightReceiver light)
+    {
+        this.light = light;
+    }
+
+    @Override
+    public void execute()
+    {
+        light.on();
+    }
+
+    @Override
+    public void undo()
+    {
+        light.off();
+    }
+}
+
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.t1
+ * Class(类名): LightOffCommand
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 21:33
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class LightOffCommand implements Command
+{
+    private final LightReceiver light;
+
+    /**
+     * Instantiates a new Light off command.
+     */
+    public LightOffCommand()
+    {
+        light = new LightReceiver();
+    }
+
+    /**
+     * Instantiates a new Light off command.
+     *
+     * @param light the light
+     */
+    public LightOffCommand(LightReceiver light)
+    {
+        this.light = light;
+    }
+
+    @Override
+    public void execute()
+    {
+        light.off();
+    }
+
+    @Override
+    public void undo()
+    {
+        light.on();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.t1
+ * Class(类名): NoCommand
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 21:34
+ * Version(版本): 1.0
+ * Description(描述)： 没有任何命令，即空执行: 用于初始化每个按钮, 当调用空命令时，对象什么都不做
+ * 其实，这样是一种设计模式, 可以省掉对空判断
+ */
+
+public class NoCommand implements Command
+{
+
+    @Override
+    public void execute()
+    {
+
+    }
+
+    @Override
+    public void undo()
+    {
+
+    }
+}
+```
+
+
+
+```java
+package mao.t1;
+
+import java.awt.*;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.t1
+ * Class(类名): TVReceiver
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 21:50
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class TVReceiver
+{
+    public void on()
+    {
+        Toolkit.getDefaultToolkit().beep();
+        System.out.println("电视机打开");
+    }
+
+    public void off()
+    {
+        Toolkit.getDefaultToolkit().beep();
+        System.out.println("电视机关闭");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.t1
+ * Class(类名): TVOnCommand
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 21:52
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class TVOnCommand implements Command
+{
+    private final TVReceiver tvReceiver;
+
+    /**
+     * Instantiates a new Tv on command.
+     */
+    public TVOnCommand()
+    {
+        tvReceiver = new TVReceiver();
+    }
+
+    /**
+     * Instantiates a new Tv on command.
+     *
+     * @param tvReceiver the tv receiver
+     */
+    public TVOnCommand(TVReceiver tvReceiver)
+    {
+        this.tvReceiver = tvReceiver;
+    }
+
+    @Override
+    public void execute()
+    {
+        tvReceiver.on();
+    }
+
+    @Override
+    public void undo()
+    {
+        tvReceiver.off();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.t1
+ * Class(类名): TVOffCommand
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 21:53
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class TVOffCommand implements Command
+{
+    private final TVReceiver tvReceiver;
+
+    /**
+     * Instantiates a new Tv off command.
+     */
+    public TVOffCommand()
+    {
+        this.tvReceiver = new TVReceiver();
+    }
+
+    /**
+     * Instantiates a new Tv off command.
+     *
+     * @param tvReceiver the tv receiver
+     */
+    public TVOffCommand(TVReceiver tvReceiver)
+    {
+        this.tvReceiver = tvReceiver;
+    }
+
+    @Override
+    public void execute()
+    {
+        tvReceiver.off();
+    }
+
+    @Override
+    public void undo()
+    {
+        tvReceiver.on();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+import java.awt.*;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.t1
+ * Class(类名): AirConditionerReceiver
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 21:59
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class AirConditionerReceiver
+{
+    public void on()
+    {
+        Toolkit.getDefaultToolkit().beep();
+        System.out.println("空调打开");
+    }
+
+    public void off()
+    {
+        Toolkit.getDefaultToolkit().beep();
+        System.out.println("空调关闭");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.t1
+ * Class(类名): AirConditionerOnCommand
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 21:59
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class AirConditionerOnCommand implements Command
+{
+    private final AirConditionerReceiver airConditionerReceiver;
+
+    /**
+     * Instantiates a new Air conditioner on command.
+     */
+    public AirConditionerOnCommand()
+    {
+        this.airConditionerReceiver = new AirConditionerReceiver();
+    }
+
+    /**
+     * Instantiates a new Air conditioner on command.
+     *
+     * @param airConditionerReceiver the air conditioner receiver
+     */
+    public AirConditionerOnCommand(AirConditionerReceiver airConditionerReceiver)
+    {
+        this.airConditionerReceiver = airConditionerReceiver;
+    }
+
+    @Override
+    public void execute()
+    {
+        airConditionerReceiver.on();
+    }
+
+    @Override
+    public void undo()
+    {
+        airConditionerReceiver.off();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.t1
+ * Class(类名): AirConditionerOffCommand
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 22:01
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class AirConditionerOffCommand implements Command
+{
+    private final AirConditionerReceiver airConditionerReceiver;
+
+    /**
+     * Instantiates a new Air conditioner off command.
+     */
+    public AirConditionerOffCommand()
+    {
+        this.airConditionerReceiver = new AirConditionerReceiver();
+    }
+
+    /**
+     * Instantiates a new Air conditioner off command.
+     *
+     * @param airConditionerReceiver the air conditioner receiver
+     */
+    public AirConditionerOffCommand(AirConditionerReceiver airConditionerReceiver)
+    {
+        this.airConditionerReceiver = airConditionerReceiver;
+    }
+
+    @Override
+    public void execute()
+    {
+        airConditionerReceiver.off();
+    }
+
+    @Override
+    public void undo()
+    {
+        airConditionerReceiver.on();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.t1
+ * Class(类名): RemoteController
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 21:37
+ * Version(版本): 1.0
+ * Description(描述)： 遥控器
+ */
+
+public class RemoteController
+{
+    private final Command[] onCommands;
+    private final Command[] offCommands;
+
+    //撤销命令
+    private Command undoCommand;
+
+    /**
+     * 构造方法，初始化操作，默认的命令总数为5
+     */
+    public RemoteController()
+    {
+        onCommands = new Command[5];
+        offCommands = new Command[5];
+
+        //初始化命令
+        for (int i = 0; i < 5; i++)
+        {
+            onCommands[i] = new NoCommand();
+            offCommands[i] = new NoCommand();
+        }
+    }
+
+    /**
+     * 构造方法，初始化操作
+     *
+     * @param total 命令的总数
+     */
+    public RemoteController(int total)
+    {
+        onCommands = new Command[total];
+        offCommands = new Command[total];
+
+        //初始化命令
+        for (int i = 0; i < total; i++)
+        {
+            onCommands[i] = new NoCommand();
+            offCommands[i] = new NoCommand();
+        }
+    }
+
+    /**
+     * 获得命令的总数
+     *
+     * @return int型
+     */
+    public int getCommandsTotal()
+    {
+        return onCommands.length;
+    }
+
+    /**
+     * 设置命令
+     *
+     * @param no         命令号
+     * @param onCommand  打开的命令
+     * @param offCommand 关闭的命令
+     */
+    public void setCommand(int no, Command onCommand, Command offCommand)
+    {
+        onCommands[no] = onCommand;
+        offCommands[no] = offCommand;
+    }
+
+    /**
+     * 按下按钮，执行打开操作
+     *
+     * @param no 要执行打开操作的命令号
+     */
+    public void onButtonWasPushed(int no)
+    {
+        onCommands[no].execute();
+        //记录这次的操作，用于撤销
+        undoCommand = onCommands[no];
+    }
+
+    /**
+     * 按下按钮，执行关闭操作
+     *
+     * @param no 要执行打开操作的命令号
+     */
+    public void offButtonWasPushed(int no)
+    {
+        offCommands[no].execute();
+        //记录这次的操作，用于撤销
+        undoCommand = offCommands[no];
+    }
+
+    /**
+     * 按下撤销按钮
+     */
+    public void undoButtonWasPushed()
+    {
+        undoCommand.undo();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.t1
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 22:05
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    private static void sleep()
+    {
+        try
+        {
+            Thread.sleep(1000);
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args)
+    {
+        RemoteController remoteController = new RemoteController(3);
+        System.out.println(remoteController.getCommandsTotal());
+        remoteController.setCommand(0, new LightOnCommand(), new LightOffCommand());
+        remoteController.setCommand(1, new TVOnCommand(), new TVOffCommand());
+        remoteController.setCommand(2, new AirConditionerOnCommand(), new AirConditionerOffCommand());
+
+        System.out.println("开始发送命令");
+
+        remoteController.onButtonWasPushed(0);
+        sleep();
+        remoteController.offButtonWasPushed(0);
+        sleep();
+        remoteController.onButtonWasPushed(1);
+        sleep();
+        remoteController.offButtonWasPushed(1);
+        sleep();
+        remoteController.onButtonWasPushed(2);
+        sleep();
+        remoteController.offButtonWasPushed(2);
+        sleep();
+        System.out.println("执行撤销操作");
+        remoteController.undoButtonWasPushed();
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+3
+开始发送命令
+电灯打开了
+电灯关闭了
+电视机打开
+电视机关闭
+空调打开
+空调关闭
+执行撤销操作
+空调打开
+```
+
+
+
+
+
+swing界面
+
+
+
+```java
+package mao.t1;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.t1
+ * Class(类名): SwingRemoteController
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 22:16
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class SwingRemoteController
+{
+    private JButton LightOnButton;
+    private JButton LightOffButton;
+
+    private JButton TVOnButton;
+    private JButton TVOffButton;
+
+    private JButton AirConditionerOnButton;
+    private JButton AirConditionerOffButton;
+
+    private JButton UndoButton;
+
+    //遥控器对象
+    private RemoteController remoteController;
+
+
+    public SwingRemoteController()
+    {
+        //初始化顶层面板
+        JFrame jFrame = new JFrame("遥控器");
+        jFrame.setSize(540, 720);
+        //获取屏幕宽度
+        int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
+        //获取屏幕高度
+        int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
+        //位于屏幕中央
+        jFrame.setLocation(screenWidth / 2 - jFrame.getWidth() / 2, screenHeight / 2 - jFrame.getHeight() / 2);
+        jFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
+        //注册虚拟机关闭挂钩
+        addShutdownHook();
+
+        //初始化按钮
+        initButton();
+
+        //个性化
+        setPersonalise();
+
+        //初始化遥控器对象
+        initRemoteController();
+
+        //设置布局
+        setLayout(jFrame);
+
+        //设置关闭的监听器
+        setCloseListener(jFrame);
+
+        //给按钮添加监听器
+        setButtonListener();
+
+
+        jFrame.setVisible(true);
+
+    }
+
+    /**
+     * 给按钮添加监听器
+     */
+    private void setButtonListener()
+    {
+        UndoButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                try
+                {
+                    remoteController.undoButtonWasPushed();
+                }
+                catch (NullPointerException ex)
+                {
+                    Toolkit.getDefaultToolkit().beep();
+                    System.err.println(ex.getMessage());
+                    JOptionPane.showMessageDialog(null, "还未进行如何操作，无法撤销", "提示", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        LightOnButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                remoteController.onButtonWasPushed(0);
+            }
+        });
+
+        LightOffButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                remoteController.offButtonWasPushed(0);
+            }
+        });
+
+        TVOnButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                remoteController.onButtonWasPushed(1);
+            }
+        });
+
+        TVOffButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                remoteController.offButtonWasPushed(1);
+            }
+        });
+
+        AirConditionerOnButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                remoteController.onButtonWasPushed(2);
+            }
+        });
+
+        AirConditionerOffButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                remoteController.offButtonWasPushed(2);
+            }
+        });
+    }
+
+    /**
+     * 初始化遥控器对象
+     */
+    private void initRemoteController()
+    {
+        remoteController = new RemoteController(3);
+        remoteController.setCommand(0, new LightOnCommand(), new LightOffCommand());
+        remoteController.setCommand(1, new TVOnCommand(), new TVOffCommand());
+        remoteController.setCommand(2, new AirConditionerOnCommand(), new AirConditionerOffCommand());
+    }
+
+    /**
+     * 设个性化
+     */
+    private void setPersonalise()
+    {
+        Font font = new Font("宋体", Font.BOLD, 32);
+        //字体设置
+        UndoButton.setFont(font);
+        LightOnButton.setFont(font);
+        LightOffButton.setFont(font);
+        TVOnButton.setFont(font);
+        TVOffButton.setFont(font);
+        AirConditionerOnButton.setFont(font);
+        AirConditionerOffButton.setFont(font);
+
+        //颜色设置
+        UndoButton.setForeground(Color.red);
+        LightOnButton.setForeground(Color.green);
+        LightOffButton.setForeground(new Color(50, 200, 0));
+        TVOnButton.setForeground(Color.green);
+        TVOffButton.setForeground(new Color(50, 200, 0));
+        AirConditionerOnButton.setForeground(Color.green);
+        AirConditionerOffButton.setForeground(new Color(50, 200, 0));
+
+        //设置背景
+        UndoButton.setBackground(new Color(20, 40, 100));
+        LightOnButton.setBackground(new Color(20, 50, 130));
+        LightOffButton.setBackground(new Color(20, 50, 130));
+        TVOnButton.setBackground(new Color(20, 50, 130));
+        TVOffButton.setBackground(new Color(20, 50, 130));
+        AirConditionerOnButton.setBackground(new Color(20, 50, 130));
+        AirConditionerOffButton.setBackground(new Color(20, 50, 130));
+    }
+
+    /**
+     * 设置布局
+     *
+     * @param jFrame JFrame
+     */
+    private void setLayout(JFrame jFrame)
+    {
+        JPanel jPanel = new JPanel();
+        jPanel.setLayout(new GridLayout(4, 1));
+        jPanel.add(UndoButton);
+        {
+            JPanel jPanel1 = new JPanel();
+            jPanel1.setLayout(new GridLayout(1, 2));
+            jPanel1.add(LightOnButton);
+            jPanel1.add(LightOffButton);
+            jPanel.add(jPanel1);
+        }
+
+        {
+            JPanel jPanel1 = new JPanel();
+            jPanel1.setLayout(new GridLayout(1, 2));
+            jPanel1.add(TVOnButton);
+            jPanel1.add(TVOffButton);
+            jPanel.add(jPanel1);
+        }
+
+        {
+            JPanel jPanel1 = new JPanel();
+            jPanel1.setLayout(new GridLayout(1, 2));
+            jPanel1.add(AirConditionerOnButton);
+            jPanel1.add(AirConditionerOffButton);
+            jPanel.add(jPanel1);
+        }
+
+        jFrame.add(jPanel);
+    }
+
+    /**
+     * 初始化按钮
+     */
+    private void initButton()
+    {
+        LightOnButton = new JButton("打开电灯");
+        LightOffButton = new JButton("关闭电灯");
+        TVOnButton = new JButton("打开电视机");
+        TVOffButton = new JButton("关闭电视机");
+        AirConditionerOnButton = new JButton("打开空调");
+        AirConditionerOffButton = new JButton("关闭空调");
+        UndoButton = new JButton("撤销操作");
+    }
+
+    /**
+     * 设置关闭的监听器
+     *
+     * @param jFrame JFrame
+     */
+    private void setCloseListener(JFrame jFrame)
+    {
+        jFrame.addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                Toolkit.getDefaultToolkit().beep();
+                int result = JOptionPane.showConfirmDialog(null, "是否退出？", "退出提示", JOptionPane.OK_CANCEL_OPTION);
+                if (result == 0)
+                {
+                    System.exit(0);
+                }
+            }
+        });
+    }
+
+    /**
+     * 注册虚拟机关闭挂钩
+     */
+    private void addShutdownHook()
+    {
+        Runtime runtime = Runtime.getRuntime();
+        runtime.addShutdownHook(new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                System.out.println("程序退出");
+            }
+        }));
+    }
+
+
+    public static void main(String[] args)
+    {
+        new SwingRemoteController();
+    }
+}
+```
+
+
+
+运行测试
+
+
+
+![image-20220818233050709](img/java设计模式学习笔记/image-20220818233050709.png)
+
+
+
+![image-20220818233105301](img/java设计模式学习笔记/image-20220818233105301.png)
+
+
+
+![image-20220818233140174](img/java设计模式学习笔记/image-20220818233140174.png)
+
+
+
+
+
+![image-20220818233226732](img/java设计模式学习笔记/image-20220818233226732.png)
+
+
+
+
 
