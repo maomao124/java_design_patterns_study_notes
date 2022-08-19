@@ -15518,3 +15518,493 @@ public class SwingRemoteController
 
 
 
+
+
+
+
+**示例2：餐厅点菜**
+
+
+
+![image-20220818234320548](img/java设计模式学习笔记/image-20220818234320548.png)
+
+
+
+服务员： 就是调用者角色，由她来发起命令。
+
+资深大厨： 就是接收者角色，真正命令执行的对象。
+
+订单： 命令中包含订单。
+
+
+
+![image-20220818234349936](img/java设计模式学习笔记/image-20220818234349936.png)
+
+
+
+
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.t2
+ * Interface(接口名): Command
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/18
+ * Time(创建时间)： 23:46
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+public interface Command
+{
+    /**
+     * Execute.
+     */
+    void execute();
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.t2
+ * Class(类名): Order
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/19
+ * Time(创建时间)： 13:52
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Order
+{
+    // 餐桌号码
+    private int diningTable;
+
+    // 用来存储餐名并记录份数
+    private Map<String, Integer> foodDic = new HashMap<>();
+
+    public int getDiningTable()
+    {
+        return diningTable;
+    }
+
+    public void setDiningTable(int diningTable)
+    {
+        this.diningTable = diningTable;
+    }
+
+    public Map<String, Integer> getFoodDic()
+    {
+        return foodDic;
+    }
+
+    public void setFoodDic(Map<String, Integer> foodDic)
+    {
+        this.foodDic = foodDic;
+    }
+
+    public void addFoodDic(String name, int num)
+    {
+        foodDic.put(name, num);
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.t2
+ * Class(类名): SeniorChef
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/19
+ * Time(创建时间)： 13:55
+ * Version(版本): 1.0
+ * Description(描述)： 命令的Receiver
+ */
+
+public class SeniorChef
+{
+    /**
+     * Make food.
+     *
+     * @param num      the num
+     * @param foodName the food name
+     */
+    public void makeFood(int num, String foodName)
+    {
+        System.out.println(num + "份" + foodName);
+        try
+        {
+            Thread.sleep(500);
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+import java.util.Set;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.t2
+ * Class(类名): OrderCommand
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/19
+ * Time(创建时间)： 13:52
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class OrderCommand implements Command
+{
+    private final SeniorChef receiver;
+    private final Order order;
+
+    public OrderCommand(SeniorChef receiver, Order order)
+    {
+        this.receiver = receiver;
+        this.order = order;
+    }
+
+    public OrderCommand(Order order)
+    {
+        this.receiver = new SeniorChef();
+        this.order = order;
+
+    }
+
+    @Override
+    public void execute()
+    {
+        System.out.println(order.getDiningTable() + "桌的订单：");
+        Set<String> keys = order.getFoodDic().keySet();
+        for (String key : keys)
+        {
+            System.out.print("-->");
+            receiver.makeFood(order.getFoodDic().get(key), key);
+        }
+        System.out.println(order.getDiningTable() + "桌的饭制作完毕");
+    }
+
+
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.t2
+ * Class(类名): Waitor
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/19
+ * Time(创建时间)： 13:59
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Waitor
+{
+    private final List<Command> commands;
+
+    /**
+     * Instantiates a new Waitor.
+     */
+    public Waitor()
+    {
+        commands = new ArrayList<>();
+    }
+
+    /**
+     * Sets command.
+     *
+     * @param cmd the cmd
+     */
+    public void setCommand(Command cmd)
+    {
+        commands.add(cmd);
+    }
+
+    /**
+     * Order up.
+     */
+    public void orderUp()
+    {
+        for (Command command : commands)
+        {
+            if (command != null)
+            {
+                System.out.println();
+                command.execute();
+            }
+        }
+        commands.clear();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.t2
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/19
+ * Time(创建时间)： 14:05
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        Order order1 = new Order();
+        order1.setDiningTable(1);
+        order1.getFoodDic().put("西红柿鸡蛋面", 1);
+        order1.getFoodDic().put("小杯可乐", 2);
+
+        Order order2 = new Order();
+        order2.setDiningTable(3);
+        order2.getFoodDic().put("尖椒肉丝盖饭", 1);
+        order2.addFoodDic("小杯雪碧", 1);
+
+        OrderCommand orderCommand1 = new OrderCommand(order1);
+        OrderCommand orderCommand2 = new OrderCommand(order2);
+
+        Waitor waitor = new Waitor();
+        waitor.setCommand(orderCommand1);
+        waitor.setCommand(orderCommand2);
+        waitor.orderUp();
+        waitor.orderUp();
+
+        Order order3 = new Order();
+        order3.setDiningTable(4);
+        order3.addFoodDic("马铃薯炒土豆", 2);
+        OrderCommand orderCommand3 = new OrderCommand(order3);
+
+        waitor.setCommand(orderCommand3);
+
+        waitor.orderUp();
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+1桌的订单：
+-->1份西红柿鸡蛋面
+-->2份小杯可乐
+1桌的饭制作完毕
+
+3桌的订单：
+-->1份尖椒肉丝盖饭
+-->1份小杯雪碧
+3桌的饭制作完毕
+
+4桌的订单：
+-->2份马铃薯炒土豆
+4桌的饭制作完毕
+```
+
+
+
+
+
+
+
+### 优缺点
+
+**优点：**
+
+* 降低系统的耦合度。命令模式能将调用操作的对象与实现该操作的对象解耦。
+* 增加或删除命令非常方便。采用命令模式增加与删除命令不会影响其他类，它满足“开闭原则”，对扩展比较灵活。
+* 可以实现宏命令。命令模式可以与组合模式结合，将多个命令装配成一个组合命令，即宏命令。
+* 方便实现 Undo 和 Redo 操作。命令模式可以与备忘录模式结合，实现命令的撤销与恢复。
+
+**缺点：**
+
+* 使用命令模式可能会导致某些系统有过多的具体命令类。
+* 系统结构更加复杂。
+
+
+
+
+
+### 使用场景
+
+* 系统需要将请求调用者和请求接收者解耦，使得调用者和接收者不直接交互。
+* 系统需要在不同的时间指定请求、将请求排队和执行请求。
+* 系统需要支持命令的撤销(Undo)操作和恢复(Redo)操作。
+
+
+
+
+
+### JDK源码解析
+
+Runable是一个典型命令模式，Runnable担当命令的角色，Thread充当的是调用者，start方法就是其执行方法
+
+
+
+```java
+@FunctionalInterface
+public interface Runnable {
+    /**
+     * When an object implementing interface {@code Runnable} is used
+     * to create a thread, starting the thread causes the object's
+     * {@code run} method to be called in that separately executing
+     * thread.
+     * <p>
+     * The general contract of the method {@code run} is that it may
+     * take any action whatsoever.
+     *
+     * @see     java.lang.Thread#run()
+     */
+    public abstract void run();
+}
+```
+
+
+
+```java
+public class Thread implements Runnable {
+    private Runnable target;
+    
+    public synchronized void start() {
+        if (threadStatus != 0)
+            throw new IllegalThreadStateException();
+
+        group.add(this);
+
+        boolean started = false;
+        try {
+            start0();
+            started = true;
+        } finally {
+            try {
+                if (!started) {
+                    group.threadStartFailed(this);
+                }
+            } catch (Throwable ignore) {
+            }
+        }
+    }
+    
+    private native void start0();
+}
+```
+
+
+
+会调用一个native方法start0(),调用系统方法，开启一个线程。而接收者是对程序员开放的，可以自己定义接收者
+
+
+
+```java
+package mao.jdk;
+
+/**
+ * Project name(项目名称)：java设计模式_命令模式
+ * Package(包名): mao.jdk
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/19
+ * Time(创建时间)： 14:21
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                System.out.println("hello");
+            }
+        }).start();
+    }
+}
+```
+
+
+
+![image-20220819142920625](img/java设计模式学习笔记/image-20220819142920625.png)
+
+
+
+
+
+
+
+
+
+## 责任链模式
+
