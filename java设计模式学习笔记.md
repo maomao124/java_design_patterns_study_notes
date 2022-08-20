@@ -16755,3 +16755,623 @@ public class Test
 
 ## 状态模式
 
+### 概念
+
+对有状态的对象，把复杂的“判断逻辑”提取到不同的状态对象中，允许状态对象在其内部状态发生改变时改变其行为。
+
+
+
+### 结构
+
+状态模式包含以下主要角色。
+
+* 环境（Context）角色：也称为上下文，它定义了客户程序需要的接口，维护一个当前状态，并将与状态相关的操作委托给当前状态对象来处理。
+* 抽象状态（State）角色：定义一个接口，用以封装环境对象中的特定状态所对应的行为。
+* 具体状态（Concrete  State）角色：实现抽象状态所对应的行为。
+
+
+
+
+
+### 示例
+
+**电梯控制**
+
+通过按钮来控制一个电梯的状态，一个电梯有开门状态，关门状态，停止状态，运行状态。每一种状态改变，都有可能要根据其他状态来更新处理。例如，如果电梯门现在处于运行时状态，就不能进行开门操作，而如果电梯门是停止状态，就可以执行开门操作
+
+
+
+![image-20220820192212678](img/java设计模式学习笔记/image-20220820192212678.png)
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_状态模式
+ * Package(包名): mao.before
+ * Interface(接口名): ILift
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/20
+ * Time(创建时间)： 19:22
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface ILift
+{
+    //开门状态
+    public final static int OPENING_STATE = 1;
+    //关门状态
+    public final static int CLOSING_STATE = 2;
+    //运行状态
+    public final static int RUNNING_STATE = 3;
+    //停止状态
+    public final static int STOPPING_STATE = 4;
+
+    /**
+     * 设置电梯的状态
+     *
+     * @param state 状态数字
+     */
+    void setState(int state);
+
+    /**
+     * 获取状态
+     *
+     * @return 状态数字
+     */
+    int getState();
+
+    /**
+     * 获得对应的状态字符串
+     *
+     * @param state 状态数字
+     * @return 字符串
+     */
+    String getStateString(int state);
+
+    /**
+     * 开门
+     */
+    void open();
+
+    /**
+     * 关门
+     */
+    void close();
+
+    /**
+     * 电梯运行
+     */
+    void run();
+
+    /**
+     * 电梯停止
+     */
+    void stop();
+}
+```
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_状态模式
+ * Package(包名): mao.before
+ * Class(类名): Lift
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/20
+ * Time(创建时间)： 19:24
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Lift implements ILift
+{
+
+    private int state;
+
+    @Override
+    public void setState(int state)
+    {
+        String beforeState = getStateString(this.state);
+        String afterState = getStateString(state);
+        this.state = state;
+        System.out.println("电梯由" + beforeState + "更改为" + afterState);
+    }
+
+    @Override
+    public int getState()
+    {
+        return state;
+    }
+
+    /**
+     * 获得对应的状态字符串
+     *
+     * @param state 状态数字
+     * @return 字符串
+     */
+    @Override
+    public String getStateString(int state)
+    {
+        if (state == OPENING_STATE)
+        {
+            return "打开状态";
+        }
+        else if (state == CLOSING_STATE)
+        {
+            return "关闭状态";
+        }
+        else if (state == RUNNING_STATE)
+        {
+            return "运行状态";
+        }
+        else if (state == STOPPING_STATE)
+        {
+            return "停止状态";
+        }
+        else
+        {
+            return "未知状态";
+        }
+    }
+
+    @Override
+    public void open()
+    {
+        if (this.state == OPENING_STATE)
+        {
+            //当前为打开电梯状态
+        }
+        else if (this.state == CLOSING_STATE)
+        {
+            //当前为关闭电梯状态
+            this.setState(OPENING_STATE);
+        }
+        else if (this.state == RUNNING_STATE)
+        {
+            //当前为运行电梯状态
+            //运行状态禁止开门
+        }
+        else if (this.state == STOPPING_STATE)
+        {
+            //当前为电梯停止状态
+            this.setState(OPENING_STATE);
+        }
+        else
+        {
+            throw new RuntimeException("电梯程序运行异常");
+        }
+    }
+
+    @Override
+    public void close()
+    {
+        if (this.state == OPENING_STATE)
+        {
+            //当前为打开电梯状态
+            this.setState(CLOSING_STATE);
+        }
+        else if (this.state == CLOSING_STATE)
+        {
+            //当前为关闭电梯状态
+        }
+        else if (this.state == RUNNING_STATE)
+        {
+            //当前为运行电梯状态
+        }
+        else if (this.state == STOPPING_STATE)
+        {
+            //当前为电梯停止状态
+            this.setState(CLOSING_STATE);
+        }
+        else
+        {
+            throw new RuntimeException("电梯程序运行异常");
+        }
+    }
+
+    @Override
+    public void run()
+    {
+        if (this.state == OPENING_STATE)
+        {
+            //当前为打开电梯状态
+        }
+        else if (this.state == CLOSING_STATE)
+        {
+            //当前为关闭电梯状态
+            this.setState(RUNNING_STATE);
+        }
+        else if (this.state == RUNNING_STATE)
+        {
+            //当前为运行电梯状态
+        }
+        else if (this.state == STOPPING_STATE)
+        {
+            //当前为电梯停止状态
+            this.setState(RUNNING_STATE);
+        }
+        else
+        {
+            throw new RuntimeException("电梯程序运行异常");
+        }
+    }
+
+    @Override
+    public void stop()
+    {
+        if (this.state == OPENING_STATE)
+        {
+            //当前为打开电梯状态
+        }
+        else if (this.state == CLOSING_STATE)
+        {
+            //当前为关闭电梯状态
+        }
+        else if (this.state == RUNNING_STATE)
+        {
+            //当前为运行电梯状态
+            this.setState(STOPPING_STATE);
+        }
+        else if (this.state == STOPPING_STATE)
+        {
+            //当前为电梯停止状态
+        }
+        else
+        {
+            throw new RuntimeException("电梯程序运行异常");
+        }
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.before;
+
+/**
+ * Project name(项目名称)：java设计模式_状态模式
+ * Package(包名): mao.before
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/20
+ * Time(创建时间)： 19:52
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        ILift lift = new Lift();
+
+        lift.setState(ILift.RUNNING_STATE);
+
+        lift.run();
+        lift.close();
+        lift.open();
+        lift.stop();
+        lift.open();
+        lift.run();
+        lift.stop();
+        lift.close();
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+电梯由未知状态更改为运行状态
+电梯由运行状态更改为停止状态
+电梯由停止状态更改为打开状态
+电梯由打开状态更改为关闭状态
+```
+
+
+
+
+
+swing界面：
+
+```java
+package mao.before;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+/**
+ * Project name(项目名称)：java设计模式_状态模式
+ * Package(包名): mao.before
+ * Class(类名): SwingTest
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/20
+ * Time(创建时间)： 19:56
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class SwingTest
+{
+    private JButton openButton;
+    private JButton closeButton;
+
+    private JButton runButton;
+    private JButton stopButton;
+
+    private JTextField state;
+
+    private ILift lift;
+
+    public SwingTest()
+    {
+        //初始化顶层面板
+        JFrame jFrame = new JFrame("电梯系统");
+        jFrame.setSize(540, 720);
+        //获取屏幕宽度
+        int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
+        //获取屏幕高度
+        int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
+        //位于屏幕中央
+        jFrame.setLocation(screenWidth / 2 - jFrame.getWidth() / 2, screenHeight / 2 - jFrame.getHeight() / 2);
+        jFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
+        //注册虚拟机关闭挂钩
+        addShutdownHook();
+
+        //初始化按钮
+        initButton();
+
+        //个性化
+        setPersonalise();
+
+        //初始化电梯对象
+        initILeft();
+
+        //设置布局
+        setLayout(jFrame);
+
+        //设置关闭的监听器
+        setCloseListener(jFrame);
+
+        //给按钮添加监听器
+        setButtonListener();
+
+
+        jFrame.setVisible(true);
+
+    }
+
+    /**
+     * 给按钮添加监听器
+     */
+    private void setButtonListener()
+    {
+        openButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                lift.open();
+                state.setText(lift.getStateString(lift.getState()));
+            }
+        });
+
+        closeButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                lift.close();
+                state.setText(lift.getStateString(lift.getState()));
+            }
+        });
+
+        runButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                lift.run();
+                state.setText(lift.getStateString(lift.getState()));
+            }
+        });
+
+        stopButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                lift.stop();
+                state.setText(lift.getStateString(lift.getState()));
+            }
+        });
+    }
+
+    /**
+     * 初始化遥控器对象
+     */
+    private void initILeft()
+    {
+        this.lift = new Lift();
+        lift.setState(ILift.STOPPING_STATE);
+    }
+
+    /**
+     * 设个性化
+     */
+    private void setPersonalise()
+    {
+        Font font = new Font("宋体", Font.BOLD, 32);
+        //字体设置
+        openButton.setFont(font);
+        closeButton.setFont(font);
+        runButton.setFont(font);
+        stopButton.setFont(font);
+
+        //颜色设置
+        openButton.setForeground(Color.green);
+        closeButton.setForeground(new Color(50, 200, 0));
+        runButton.setForeground(Color.green);
+        stopButton.setForeground(new Color(50, 200, 0));
+
+        //设置背景
+        openButton.setBackground(new Color(20, 50, 130));
+        closeButton.setBackground(new Color(20, 50, 130));
+        runButton.setBackground(new Color(20, 50, 130));
+        stopButton.setBackground(new Color(20, 50, 130));
+
+        state.setFont(font);
+        state.setForeground(Color.cyan);
+        state.setBackground(new Color(20, 30, 100));
+        state.setHorizontalAlignment(JTextField.CENTER);
+        state.setEditable(false);
+    }
+
+    /**
+     * 设置布局
+     *
+     * @param jFrame JFrame
+     */
+    private void setLayout(JFrame jFrame)
+    {
+        JPanel jPanel = new JPanel();
+        jPanel.setLayout(new GridLayout(3, 1));
+        jPanel.add(state);
+        {
+            JPanel jPanel1 = new JPanel();
+            jPanel1.setLayout(new GridLayout(1, 2));
+            jPanel1.add(openButton);
+            jPanel1.add(closeButton);
+            jPanel.add(jPanel1);
+        }
+
+        {
+            JPanel jPanel1 = new JPanel();
+            jPanel1.setLayout(new GridLayout(1, 2));
+            jPanel1.add(runButton);
+            jPanel1.add(stopButton);
+            jPanel.add(jPanel1);
+        }
+
+
+        jFrame.add(jPanel);
+    }
+
+    /**
+     * 初始化按钮
+     */
+    private void initButton()
+    {
+        openButton = new JButton("打开电梯门");
+        closeButton = new JButton("关闭电梯门");
+        runButton = new JButton("运行");
+        stopButton = new JButton("停止");
+        state = new JTextField("停止状态");
+    }
+
+    /**
+     * 设置关闭的监听器
+     *
+     * @param jFrame JFrame
+     */
+    private void setCloseListener(JFrame jFrame)
+    {
+        jFrame.addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                Toolkit.getDefaultToolkit().beep();
+                int result = JOptionPane.showConfirmDialog(null, "是否退出？", "退出提示", JOptionPane.OK_CANCEL_OPTION);
+                if (result == 0)
+                {
+                    System.exit(0);
+                }
+            }
+        });
+    }
+
+    /**
+     * 注册虚拟机关闭挂钩
+     */
+    private void addShutdownHook()
+    {
+        Runtime runtime = Runtime.getRuntime();
+        runtime.addShutdownHook(new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                System.out.println("程序退出");
+            }
+        }));
+    }
+
+
+    public static void main(String[] args)
+    {
+        new SwingTest();
+    }
+}
+```
+
+
+
+
+
+![image-20220820202431634](img/java设计模式学习笔记/image-20220820202431634.png)
+
+
+
+![image-20220820202506117](img/java设计模式学习笔记/image-20220820202506117.png)
+
+
+
+![image-20220820202521274](img/java设计模式学习笔记/image-20220820202521274.png)
+
+
+
+
+
+问题分析：
+
+* 使用了大量的条件的判断，使程序的可阅读性变差。
+* 扩展性很差。如果新加了断电的状态，我们需要修改上面判断逻辑
+
+
+
+
+
+**改进：**
+
+
+
