@@ -17375,3 +17375,707 @@ public class SwingTest
 
 
 
+![image-20220820203011367](img/java设计模式学习笔记/image-20220820203011367.png)
+
+
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_状态模式
+ * Package(包名): mao.after
+ * Class(类名): LiftState
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/20
+ * Time(创建时间)： 20:32
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public abstract class LiftState
+{
+    protected Context context;
+
+    public void setContext(Context context)
+    {
+        this.context = context;
+    }
+
+
+    /**
+     * 电梯开门动作
+     */
+    public abstract void open();
+
+
+    /**
+     * 电梯关门动作
+     */
+    public abstract void close();
+
+
+    /**
+     * 电梯运行动作
+     */
+    public abstract void run();
+
+
+    /**
+     * 电梯停止动作
+     */
+    public abstract void stop();
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_状态模式
+ * Package(包名): mao.after
+ * Class(类名): OpenningState
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/20
+ * Time(创建时间)： 20:34
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class OpenningState extends LiftState
+{
+
+    @Override
+    public void open()
+    {
+
+    }
+
+    @Override
+    public void close()
+    {
+        context.setLiftState(Context.closingState);
+        System.out.println("电梯门关闭");
+        context.stateString = "关闭状态";
+    }
+
+    @Override
+    public void run()
+    {
+
+    }
+
+    @Override
+    public void stop()
+    {
+
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_状态模式
+ * Package(包名): mao.after
+ * Class(类名): ClosingState
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/20
+ * Time(创建时间)： 20:34
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class ClosingState extends LiftState
+{
+
+    @Override
+    public void open()
+    {
+        context.setLiftState(Context.openningState);
+        System.out.println("电梯门打开");
+        context.stateString = "打开状态";
+    }
+
+    @Override
+    public void close()
+    {
+
+    }
+
+    @Override
+    public void run()
+    {
+        context.setLiftState(Context.runningState);
+        System.out.println("电梯运行");
+        context.stateString = "运行状态";
+    }
+
+    @Override
+    public void stop()
+    {
+
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_状态模式
+ * Package(包名): mao.after
+ * Class(类名): RunningState
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/20
+ * Time(创建时间)： 20:35
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class RunningState extends LiftState
+{
+
+    @Override
+    public void open()
+    {
+
+    }
+
+    @Override
+    public void close()
+    {
+
+    }
+
+    @Override
+    public void run()
+    {
+
+    }
+
+    @Override
+    public void stop()
+    {
+        context.setLiftState(Context.stoppingState);
+        System.out.println("电梯停止");
+        context.stateString = "停止状态";
+    }
+}
+```
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_状态模式
+ * Package(包名): mao.after
+ * Class(类名): StoppingState
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/20
+ * Time(创建时间)： 20:35
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class StoppingState extends LiftState
+{
+
+    @Override
+    public void open()
+    {
+        context.setLiftState(Context.openningState);
+        System.out.println("电梯门打开");
+        context.stateString = "打开状态";
+    }
+
+    @Override
+    public void close()
+    {
+        context.setLiftState(Context.closingState);
+        System.out.println("电梯门关闭");
+        context.stateString = "关闭状态";
+    }
+
+    @Override
+    public void run()
+    {
+        context.setLiftState(Context.runningState);
+        System.out.println("电梯运行");
+        context.stateString = "运行状态";
+    }
+
+    @Override
+    public void stop()
+    {
+
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_状态模式
+ * Package(包名): mao.after
+ * Class(类名): Context
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/20
+ * Time(创建时间)： 20:35
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Context
+{
+    //定义出所有的电梯状态
+    public final static OpenningState openningState;
+    public final static ClosingState closingState;
+    public final static RunningState runningState;
+    public final static StoppingState stoppingState;
+
+    public String stateString = "未知状态";
+
+    static
+    {
+        openningState = new OpenningState();//开门状态，这时候电梯只能关闭
+        closingState = new ClosingState();//关闭状态，这时候电梯可以运行和开门
+        runningState = new RunningState();//运行状态，这时候电梯只能停止
+        stoppingState = new StoppingState();//停止状态，这时候电梯可以开门、运行
+    }
+
+    //定义一个当前电梯状态
+    private LiftState liftState;
+
+    public LiftState getLiftState()
+    {
+        return this.liftState;
+    }
+
+    public void setLiftState(LiftState liftState)
+    {
+        //当前环境改变
+        this.liftState = liftState;
+        //把当前的环境通知到各个实现类中
+        this.liftState.setContext(this);
+    }
+
+    public void open()
+    {
+        this.liftState.open();
+    }
+
+    public void close()
+    {
+        this.liftState.close();
+    }
+
+    public void run()
+    {
+        this.liftState.run();
+    }
+
+    public void stop()
+    {
+        this.liftState.stop();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.after;
+
+/**
+ * Project name(项目名称)：java设计模式_状态模式
+ * Package(包名): mao.after
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/20
+ * Time(创建时间)： 21:01
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        Context context = new Context();
+        context.setLiftState(Context.stoppingState);
+
+        context.open();
+        context.close();
+        context.run();
+        context.stop();
+        context.close();
+        context.run();
+        context.open();
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+电梯门打开
+电梯门关闭
+电梯运行
+电梯停止
+电梯门关闭
+电梯运行
+```
+
+
+
+
+
+swing界面：
+
+
+
+```java
+package mao.after;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+/**
+ * Project name(项目名称)：java设计模式_状态模式
+ * Package(包名): mao.after
+ * Class(类名): SwingTest
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/20
+ * Time(创建时间)： 21:08
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class SwingTest
+{
+    private JButton openButton;
+    private JButton closeButton;
+
+    private JButton runButton;
+    private JButton stopButton;
+
+    private JTextField state;
+
+    private Context context;
+
+    public SwingTest()
+    {
+        //初始化顶层面板
+        JFrame jFrame = new JFrame("电梯系统");
+        jFrame.setSize(540, 720);
+        //获取屏幕宽度
+        int screenWidth = Toolkit.getDefaultToolkit().getScreenSize().width;
+        //获取屏幕高度
+        int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
+        //位于屏幕中央
+        jFrame.setLocation(screenWidth / 2 - jFrame.getWidth() / 2, screenHeight / 2 - jFrame.getHeight() / 2);
+        jFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
+        //注册虚拟机关闭挂钩
+        addShutdownHook();
+
+        //初始化按钮
+        initButton();
+
+        //个性化
+        setPersonalise();
+
+        //初始化电梯对象
+        initContext();
+
+        //设置布局
+        setLayout(jFrame);
+
+        //设置关闭的监听器
+        setCloseListener(jFrame);
+
+        //给按钮添加监听器
+        setButtonListener();
+
+
+        jFrame.setVisible(true);
+
+    }
+
+    /**
+     * 给按钮添加监听器
+     */
+    private void setButtonListener()
+    {
+        openButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                context.open();
+                state.setText(context.stateString);
+            }
+        });
+
+        closeButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                context.close();
+                state.setText(context.stateString);
+            }
+        });
+
+        runButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                context.run();
+                state.setText(context.stateString);
+            }
+        });
+
+        stopButton.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                context.stop();
+                state.setText(context.stateString);
+            }
+        });
+    }
+
+    /**
+     * 初始化对象
+     */
+    private void initContext()
+    {
+        this.context = new Context();
+        context.setLiftState(Context.stoppingState);
+    }
+
+    /**
+     * 设个性化
+     */
+    private void setPersonalise()
+    {
+        Font font = new Font("宋体", Font.BOLD, 32);
+        //字体设置
+        openButton.setFont(font);
+        closeButton.setFont(font);
+        runButton.setFont(font);
+        stopButton.setFont(font);
+
+        //颜色设置
+        openButton.setForeground(Color.green);
+        closeButton.setForeground(new Color(50, 200, 0));
+        runButton.setForeground(Color.green);
+        stopButton.setForeground(new Color(50, 200, 0));
+
+        //设置背景
+        openButton.setBackground(new Color(20, 50, 130));
+        closeButton.setBackground(new Color(20, 50, 130));
+        runButton.setBackground(new Color(20, 50, 130));
+        stopButton.setBackground(new Color(20, 50, 130));
+
+        state.setFont(new Font("宋体", Font.BOLD, 48));
+        state.setForeground(Color.cyan);
+        state.setBackground(new Color(20, 30, 100));
+        state.setHorizontalAlignment(JTextField.CENTER);
+        state.setEditable(false);
+    }
+
+    /**
+     * 设置布局
+     *
+     * @param jFrame JFrame
+     */
+    private void setLayout(JFrame jFrame)
+    {
+        JPanel jPanel = new JPanel();
+        jPanel.setLayout(new GridLayout(3, 1));
+        jPanel.add(state);
+        {
+            JPanel jPanel1 = new JPanel();
+            jPanel1.setLayout(new GridLayout(1, 2));
+            jPanel1.add(openButton);
+            jPanel1.add(closeButton);
+            jPanel.add(jPanel1);
+        }
+
+        {
+            JPanel jPanel1 = new JPanel();
+            jPanel1.setLayout(new GridLayout(1, 2));
+            jPanel1.add(runButton);
+            jPanel1.add(stopButton);
+            jPanel.add(jPanel1);
+        }
+
+
+        jFrame.add(jPanel);
+    }
+
+    /**
+     * 初始化按钮
+     */
+    private void initButton()
+    {
+        openButton = new JButton("打开电梯门");
+        closeButton = new JButton("关闭电梯门");
+        runButton = new JButton("运行");
+        stopButton = new JButton("停止");
+        state = new JTextField("停止状态");
+    }
+
+    /**
+     * 设置关闭的监听器
+     *
+     * @param jFrame JFrame
+     */
+    private void setCloseListener(JFrame jFrame)
+    {
+        jFrame.addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                Toolkit.getDefaultToolkit().beep();
+                int result = JOptionPane.showConfirmDialog(null, "是否退出？", "退出提示", JOptionPane.OK_CANCEL_OPTION);
+                if (result == 0)
+                {
+                    System.exit(0);
+                }
+            }
+        });
+    }
+
+    /**
+     * 注册虚拟机关闭挂钩
+     */
+    private void addShutdownHook()
+    {
+        Runtime runtime = Runtime.getRuntime();
+        runtime.addShutdownHook(new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                System.out.println("程序退出");
+            }
+        }));
+    }
+
+
+    public static void main(String[] args)
+    {
+        new SwingTest();
+    }
+}
+```
+
+
+
+
+
+![image-20220820212510207](img/java设计模式学习笔记/image-20220820212510207.png)
+
+
+
+![image-20220820212539085](img/java设计模式学习笔记/image-20220820212539085.png)
+
+
+
+
+
+
+
+![image-20220820212654182](img/java设计模式学习笔记/image-20220820212654182.png)
+
+
+
+
+
+
+
+### 优缺点
+
+**优点：**
+
+* 将所有与某个状态有关的行为放到一个类中，并且可以方便地增加新的状态，只需要改变对象状态即可改变对象的行为。
+* 允许状态转换逻辑与状态对象合成一体，而不是某一个巨大的条件语句块。
+
+**缺点：**
+
+* 状态模式的使用必然会增加系统类和对象的个数。 
+* 状态模式的结构与实现都较为复杂，如果使用不当将导致程序结构和代码的混乱。
+* 状态模式对"开闭原则"的支持并不太好。
+
+
+
+
+
+### 使用场景
+
+- 当一个对象的行为取决于它的状态，并且它必须在运行时根据状态改变它的行为时，就可以考虑使用状态模式。
+- 一个操作中含有庞大的分支结构，并且这些分支决定于对象的状态时。
+
+
+
+
+
+
+
+## 观察者模式
+
