@@ -19379,3 +19379,418 @@ public class Test
 
 ## 中介者模式
 
+### 概念
+
+一般来说，同事类之间的关系是比较复杂的，多个同事类之间互相关联时，他们之间的关系会呈现为复杂的网状结构，这是一种过度耦合的架构，即不利于类的复用，也不稳定。例如在下左图中，有六个同事类对象，假如对象1发生变化，那么将会有4个对象受到影响。如果对象2发生变化，那么将会有5个对象受到影响。也就是说，同事类之间直接关联的设计是不好的。
+
+如果引入中介者模式，那么同事类之间的关系将变为星型结构，从下右图中可以看到，任何一个类的变动，只会影响的类本身，以及中介者，这样就减小了系统的耦合。一个好的设计，必定不会把所有的对象关系处理逻辑封装在本类中，而是使用一个专门的类来管理那些不属于自己的行为。
+
+
+
+![image-20220821145305776](img/java设计模式学习笔记/image-20220821145305776.png)
+
+
+
+
+
+**定义：**
+
+中介者模式又叫调停模式，定义一个中介角色来封装一系列对象之间的交互，使原有对象之间的耦合松散，且可以独立地改变它们之间的交互。
+
+
+
+
+
+### 结构
+
+* 抽象中介者（Mediator）角色：它是中介者的接口，提供了同事对象注册与转发同事对象信息的抽象方法。
+* 具体中介者（ConcreteMediator）角色：实现中介者接口，定义一个 List 来管理同事对象，协调各个同事角色之间的交互关系，因此它依赖于同事角色。
+* 抽象同事类（Colleague）角色：定义同事类的接口，保存中介者对象，提供同事对象交互的抽象方法，实现所有相互影响的同事类的公共功能。
+* 具体同事类（Concrete Colleague）角色：是抽象同事类的实现者，当需要与其他同事对象交互时，由中介者对象负责后续的交互。
+
+
+
+
+
+### 示例
+
+**租房**
+
+现在租房基本都是通过房屋中介，房主将房屋托管给房屋中介，而租房者从房屋中介获取房屋信息。房屋中介充当租房者与房屋所有者之间的中介者
+
+
+
+![image-20220821145536410](img/java设计模式学习笔记/image-20220821145536410.png)
+
+
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_中介者模式
+ * Package(包名): mao.t1
+ * Class(类名): Person
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 14:58
+ * Version(版本): 1.0
+ * Description(描述)： 抽象同事类
+ */
+
+public abstract class Person
+{
+    //名字
+    protected String name;
+    //中介者
+    protected Mediator mediator;
+
+    public Person(String name, Mediator mediator)
+    {
+        this.name = name;
+        this.mediator = mediator;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
+     * 联系中介
+     *
+     * @param message 消息
+     */
+    public abstract void constact(String message);
+
+    /**
+     * 接收中介的消息
+     *
+     * @param message 消息
+     */
+    public abstract void getMessage(String message);
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_中介者模式
+ * Package(包名): mao.t1
+ * Class(类名): Mediator
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 14:56
+ * Version(版本): 1.0
+ * Description(描述)： 抽象中介者
+ */
+
+public abstract class Mediator
+{
+    /**
+     * 中介者联络的方法
+     *
+     * @param message 消息
+     * @param person  要联络的人(抽象同事类)
+     */
+    public abstract void constact(String message, Person person);
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_中介者模式
+ * Package(包名): mao.t1
+ * Class(类名): HouseOwner
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 14:59
+ * Version(版本): 1.0
+ * Description(描述)： 具体同事类 房屋拥有者
+ */
+
+public class HouseOwner extends Person
+{
+    public HouseOwner(String name, Mediator mediator)
+    {
+        super(name, mediator);
+    }
+
+    @Override
+    public void constact(String message)
+    {
+        mediator.constact(message, this);
+    }
+
+    @Override
+    public void getMessage(String message)
+    {
+        System.out.println("房主" + name + "获取到中介的消息：" + message);
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_中介者模式
+ * Package(包名): mao.t1
+ * Class(类名): Tenant
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 15:05
+ * Version(版本): 1.0
+ * Description(描述)： 具体同事类 承租人
+ */
+
+public class Tenant extends Person
+{
+
+    public Tenant(String name, Mediator mediator)
+    {
+        super(name, mediator);
+    }
+
+    @Override
+    public void constact(String message)
+    {
+        mediator.constact(message, this);
+    }
+
+    @Override
+    public void getMessage(String message)
+    {
+        System.out.println("租房者" + name + "获取到中介的消息：" + message);
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Project name(项目名称)：java设计模式_中介者模式
+ * Package(包名): mao.t1
+ * Class(类名): MediatorStructure
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 15:07
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+public class MediatorStructure extends Mediator
+{
+    private final List<Tenant> tenants;
+    private final List<HouseOwner> houseOwners;
+
+    /**
+     * Instantiates a new Mediator structure.
+     */
+    public MediatorStructure()
+    {
+        tenants = new ArrayList<>();
+        houseOwners = new ArrayList<>();
+    }
+
+    /**
+     * Add tenants mediator structure.
+     *
+     * @param tenant the tenant
+     * @return the mediator structure
+     */
+    public MediatorStructure addTenants(Tenant tenant)
+    {
+        this.tenants.add(tenant);
+        return this;
+    }
+
+    /**
+     * Add house owners mediator structure.
+     *
+     * @param houseOwner the house owner
+     * @return the mediator structure
+     */
+    public MediatorStructure addHouseOwners(HouseOwner houseOwner)
+    {
+        this.houseOwners.add(houseOwner);
+        return this;
+    }
+
+    /**
+     * Gets tenants.
+     *
+     * @return the tenants
+     */
+    public List<Tenant> getTenants()
+    {
+        return tenants;
+    }
+
+    /**
+     * Gets house owners.
+     *
+     * @return the house owners
+     */
+    public List<HouseOwner> getHouseOwners()
+    {
+        return houseOwners;
+    }
+
+    @Override
+    public void constact(String message, Person person)
+    {
+        if (person instanceof Tenant)
+        {
+            //租房者发出的消息，应该发给所有的房屋拥有者
+            for (HouseOwner houseOwner : houseOwners)
+            {
+                houseOwner.getMessage(message);
+            }
+        }
+        else if (person instanceof HouseOwner)
+        {
+            //房屋拥有者发出的消息，应该发给所有的租房者
+            for (Tenant tenant : tenants)
+            {
+                tenant.getMessage(message);
+            }
+        }
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_中介者模式
+ * Package(包名): mao.t1
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 15:11
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        MediatorStructure mediator = new MediatorStructure();
+
+        HouseOwner houseOwner1 = new HouseOwner("张三", mediator);
+        HouseOwner houseOwner2 = new HouseOwner("李四", mediator);
+        HouseOwner houseOwner3 = new HouseOwner("王五", mediator);
+
+        Tenant tenant1 = new Tenant("赵六", mediator);
+        Tenant tenant2 = new Tenant("张九", mediator);
+        Tenant tenant3 = new Tenant("王四", mediator);
+        Tenant tenant4 = new Tenant("钱七", mediator);
+
+        //添加
+        mediator.addHouseOwners(houseOwner1);
+        mediator.addHouseOwners(houseOwner2);
+        mediator.addHouseOwners(houseOwner3);
+
+        mediator.addTenants(tenant1);
+        mediator.addTenants(tenant2);
+        mediator.addTenants(tenant3);
+        mediator.addTenants(tenant4);
+
+        tenant2.constact("我需要一套30平的房子,联系人：" + tenant2.getName());
+        System.out.println("----");
+        tenant4.constact("我需要一套70平的房子,联系人：" + tenant4.getName());
+        System.out.println("----");
+        tenant1.constact("我需要一套100平的房子,价格3000一个月以上的,联系人：" + tenant1.getName());
+
+        System.out.println("----");
+        System.out.println("----");
+
+        houseOwner1.constact("现有一套120平的房子出租，价格为4000元一个月,出租人：" + houseOwner1.getName());
+        System.out.println("----");
+        houseOwner3.constact("现有一套40平的房子出租，价格为1300元一个月,出租人：" + houseOwner3.getName());
+
+
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+房主张三获取到中介的消息：我需要一套30平的房子,联系人：张九
+房主李四获取到中介的消息：我需要一套30平的房子,联系人：张九
+房主王五获取到中介的消息：我需要一套30平的房子,联系人：张九
+----
+房主张三获取到中介的消息：我需要一套70平的房子,联系人：钱七
+房主李四获取到中介的消息：我需要一套70平的房子,联系人：钱七
+房主王五获取到中介的消息：我需要一套70平的房子,联系人：钱七
+----
+房主张三获取到中介的消息：我需要一套100平的房子,价格3000一个月以上的,联系人：赵六
+房主李四获取到中介的消息：我需要一套100平的房子,价格3000一个月以上的,联系人：赵六
+房主王五获取到中介的消息：我需要一套100平的房子,价格3000一个月以上的,联系人：赵六
+----
+----
+租房者赵六获取到中介的消息：现有一套120平的房子出租，价格为4000元一个月,出租人：张三
+租房者张九获取到中介的消息：现有一套120平的房子出租，价格为4000元一个月,出租人：张三
+租房者王四获取到中介的消息：现有一套120平的房子出租，价格为4000元一个月,出租人：张三
+租房者钱七获取到中介的消息：现有一套120平的房子出租，价格为4000元一个月,出租人：张三
+----
+租房者赵六获取到中介的消息：现有一套40平的房子出租，价格为1300元一个月,出租人：王五
+租房者张九获取到中介的消息：现有一套40平的房子出租，价格为1300元一个月,出租人：王五
+租房者王四获取到中介的消息：现有一套40平的房子出租，价格为1300元一个月,出租人：王五
+租房者钱七获取到中介的消息：现有一套40平的房子出租，价格为1300元一个月,出租人：王五
+```
+
+
+
+
+
