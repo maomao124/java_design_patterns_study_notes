@@ -18380,3 +18380,800 @@ public class Test
 
 
 
+
+
+**示例2：石油涨跌**
+
+当原油价格上涨时，空方伤心，多方局兴；当油价下跌时，空方局兴，多方伤心
+
+
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_观察者模式
+ * Package(包名): mao.t2
+ * Interface(接口名): Observer
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 13:42
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface Observer
+{
+    /**
+     * 通知
+     *
+     * @param price 价格的涨跌
+     */
+    void update(float price);
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_观察者模式
+ * Package(包名): mao.t2
+ * Interface(接口名): Observable
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 13:48
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface Observable
+{
+    /**
+     * 设置价格
+     *
+     * @param price 价格
+     */
+    void setPrice(float price);
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_观察者模式
+ * Package(包名): mao.t2
+ * Class(类名): Bear
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 13:46
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Bear implements Observer
+{
+    @Override
+    public void update(float price)
+    {
+        if (price > 0)
+        {
+            System.out.println("油价上涨" + price + "元，空方伤心了！");
+        }
+        else
+        {
+            System.out.println("油价下跌" + (-price) + "元，空方高兴了！");
+        }
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_观察者模式
+ * Package(包名): mao.t2
+ * Class(类名): Bull
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 13:45
+ * Version(版本): 1.0
+ * Description(描述)： 具体观察者类：多方
+ */
+
+public class Bull implements Observer
+{
+    @Override
+    public void update(float price)
+    {
+        if (price > 0)
+        {
+            System.out.println("油价上涨" + price + "元，多方高兴了！");
+        }
+        else
+        {
+            System.out.println("油价下跌" + (-price) + "元，多方伤心了！");
+        }
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Project name(项目名称)：java设计模式_观察者模式
+ * Package(包名): mao.t2
+ * Class(类名): OilFutures
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 13:49
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class OilFutures implements Observable
+{
+    private float price;
+
+    List<Observer> list;
+
+    public OilFutures(float price)
+    {
+        this.price = price;
+        list = new ArrayList<>(2);
+        list.add(new Bear());
+        list.add(new Bull());
+    }
+
+    @Override
+    public void setPrice(float price)
+    {
+        float beforePrice = this.price;
+        this.price = price;
+        for (Observer observer : list)
+        {
+            observer.update(price - beforePrice);
+        }
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_观察者模式
+ * Package(包名): mao.t2
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 13:55
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        Observable observable = new OilFutures(29);
+        observable.setPrice(28);
+        observable.setPrice(25);
+        observable.setPrice(26);
+        observable.setPrice(30);
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+油价下跌1.0元，空方高兴了！
+油价下跌1.0元，多方伤心了！
+油价下跌3.0元，空方高兴了！
+油价下跌3.0元，多方伤心了！
+油价上涨1.0元，空方伤心了！
+油价上涨1.0元，多方高兴了！
+油价上涨4.0元，空方伤心了！
+油价上涨4.0元，多方高兴了！
+```
+
+
+
+
+
+### 优缺点
+
+**优点：**
+
+* 降低了目标与观察者之间的耦合关系，两者之间是抽象耦合关系。
+* 被观察者发送通知，所有注册的观察者都会收到信息【可以实现广播机制】
+
+**缺点：**
+
+* 如果观察者非常多的话，那么所有的观察者收到被观察者发送的通知会耗时
+* 如果被观察者有循环依赖的话，那么被观察者发送通知会使观察者循环调用，会导致系统崩溃
+
+
+
+
+
+### 使用场景
+
+* 对象间存在一对多关系，一个对象的状态发生改变会影响其他对象。
+* 当一个抽象模型有两个方面，其中一个方面依赖于另一方面时。
+
+
+
+
+
+
+
+### 基于jdk实现
+
+在 Java 中，通过 java.util.Observable 类和 java.util.Observer 接口定义了观察者模式，只要实现它们的子类就可以编写观察者模式实例
+
+
+
+**Observable类**
+
+Observable 类是抽象目标类（被观察者），它有一个 Vector 集合成员变量，用于保存所有要通知的观察者对象
+
+* void addObserver(Observer o) 方法：用于将新的观察者对象添加到集合中。
+* void notifyObservers(Object arg) 方法：调用集合中的所有观察者对象的 update方法，通知它们数据发生改变。通常越晚加入集合的观察者越先得到通知。
+* void setChange() 方法：用来设置一个 boolean 类型的内部标志，注明目标对象发生了变化。当它为true时，notifyObservers() 才会通知观察者。
+
+
+
+```java
+package java.util;
+
+/**
+ * This class represents an observable object, or "data"
+ * in the model-view paradigm. It can be subclassed to represent an
+ * object that the application wants to have observed.
+ * <p>
+ * An observable object can have one or more observers. An observer
+ * may be any object that implements interface {@code Observer}. After an
+ * observable instance changes, an application calling the
+ * {@code Observable}'s {@code notifyObservers} method
+ * causes all of its observers to be notified of the change by a call
+ * to their {@code update} method.
+ * <p>
+ * The order in which notifications will be delivered is unspecified.
+ * The default implementation provided in the Observable class will
+ * notify Observers in the order in which they registered interest, but
+ * subclasses may change this order, use no guaranteed order, deliver
+ * notifications on separate threads, or may guarantee that their
+ * subclass follows this order, as they choose.
+ * <p>
+ * Note that this notification mechanism has nothing to do with threads
+ * and is completely separate from the {@code wait} and {@code notify}
+ * mechanism of class {@code Object}.
+ * <p>
+ * When an observable object is newly created, its set of observers is
+ * empty. Two observers are considered the same if and only if the
+ * {@code equals} method returns true for them.
+ *
+ * @author  Chris Warth
+ * @see     java.util.Observable#notifyObservers()
+ * @see     java.util.Observable#notifyObservers(java.lang.Object)
+ * @see     java.util.Observer
+ * @see     java.util.Observer#update(java.util.Observable, java.lang.Object)
+ * @since   1.0
+ *
+ * @deprecated
+ * This class and the {@link Observer} interface have been deprecated.
+ * The event model supported by {@code Observer} and {@code Observable}
+ * is quite limited, the order of notifications delivered by
+ * {@code Observable} is unspecified, and state changes are not in
+ * one-for-one correspondence with notifications.
+ * For a richer event model, consider using the
+ * {@link java.beans} package.  For reliable and ordered
+ * messaging among threads, consider using one of the concurrent data
+ * structures in the {@link java.util.concurrent} package.
+ * For reactive streams style programming, see the
+ * {@link java.util.concurrent.Flow} API.
+ */
+@Deprecated(since="9")
+public class Observable {
+    private boolean changed = false;
+    private Vector<Observer> obs;
+
+    /** Construct an Observable with zero Observers. */
+
+    public Observable() {
+        obs = new Vector<>();
+    }
+
+    /**
+     * Adds an observer to the set of observers for this object, provided
+     * that it is not the same as some observer already in the set.
+     * The order in which notifications will be delivered to multiple
+     * observers is not specified. See the class comment.
+     *
+     * @param   o   an observer to be added.
+     * @throws NullPointerException   if the parameter o is null.
+     */
+    public synchronized void addObserver(Observer o) {
+        if (o == null)
+            throw new NullPointerException();
+        if (!obs.contains(o)) {
+            obs.addElement(o);
+        }
+    }
+
+    /**
+     * Deletes an observer from the set of observers of this object.
+     * Passing {@code null} to this method will have no effect.
+     * @param   o   the observer to be deleted.
+     */
+    public synchronized void deleteObserver(Observer o) {
+        obs.removeElement(o);
+    }
+
+    /**
+     * If this object has changed, as indicated by the
+     * {@code hasChanged} method, then notify all of its observers
+     * and then call the {@code clearChanged} method to
+     * indicate that this object has no longer changed.
+     * <p>
+     * Each observer has its {@code update} method called with two
+     * arguments: this observable object and {@code null}. In other
+     * words, this method is equivalent to:
+     * <blockquote>{@code
+     * notifyObservers(null)}</blockquote>
+     *
+     * @see     java.util.Observable#clearChanged()
+     * @see     java.util.Observable#hasChanged()
+     * @see     java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
+    public void notifyObservers() {
+        notifyObservers(null);
+    }
+
+    /**
+     * If this object has changed, as indicated by the
+     * {@code hasChanged} method, then notify all of its observers
+     * and then call the {@code clearChanged} method to indicate
+     * that this object has no longer changed.
+     * <p>
+     * Each observer has its {@code update} method called with two
+     * arguments: this observable object and the {@code arg} argument.
+     *
+     * @param   arg   any object.
+     * @see     java.util.Observable#clearChanged()
+     * @see     java.util.Observable#hasChanged()
+     * @see     java.util.Observer#update(java.util.Observable, java.lang.Object)
+     */
+    public void notifyObservers(Object arg) {
+        /*
+         * a temporary array buffer, used as a snapshot of the state of
+         * current Observers.
+         */
+        Object[] arrLocal;
+
+        synchronized (this) {
+            /* We don't want the Observer doing callbacks into
+             * arbitrary code while holding its own Monitor.
+             * The code where we extract each Observable from
+             * the Vector and store the state of the Observer
+             * needs synchronization, but notifying observers
+             * does not (should not).  The worst result of any
+             * potential race-condition here is that:
+             * 1) a newly-added Observer will miss a
+             *   notification in progress
+             * 2) a recently unregistered Observer will be
+             *   wrongly notified when it doesn't care
+             */
+            if (!changed)
+                return;
+            arrLocal = obs.toArray();
+            clearChanged();
+        }
+
+        for (int i = arrLocal.length-1; i>=0; i--)
+            ((Observer)arrLocal[i]).update(this, arg);
+    }
+
+    /**
+     * Clears the observer list so that this object no longer has any observers.
+     */
+    public synchronized void deleteObservers() {
+        obs.removeAllElements();
+    }
+
+    /**
+     * Marks this {@code Observable} object as having been changed; the
+     * {@code hasChanged} method will now return {@code true}.
+     */
+    protected synchronized void setChanged() {
+        changed = true;
+    }
+
+    /**
+     * Indicates that this object has no longer changed, or that it has
+     * already notified all of its observers of its most recent change,
+     * so that the {@code hasChanged} method will now return {@code false}.
+     * This method is called automatically by the
+     * {@code notifyObservers} methods.
+     *
+     * @see     java.util.Observable#notifyObservers()
+     * @see     java.util.Observable#notifyObservers(java.lang.Object)
+     */
+    protected synchronized void clearChanged() {
+        changed = false;
+    }
+
+    /**
+     * Tests if this object has changed.
+     *
+     * @return  {@code true} if and only if the {@code setChanged}
+     *          method has been called more recently than the
+     *          {@code clearChanged} method on this object;
+     *          {@code false} otherwise.
+     * @see     java.util.Observable#clearChanged()
+     * @see     java.util.Observable#setChanged()
+     */
+    public synchronized boolean hasChanged() {
+        return changed;
+    }
+
+    /**
+     * Returns the number of observers of this {@code Observable} object.
+     *
+     * @return  the number of observers of this object.
+     */
+    public synchronized int countObservers() {
+        return obs.size();
+    }
+}
+```
+
+
+
+**Observer 接口**
+
+Observer 接口是抽象观察者，它监视目标对象的变化，当目标对象发生变化时，观察者得到通知，并调用 update 方法，进行相应的工作
+
+
+
+```java
+package java.util;
+
+/**
+ * A class can implement the {@code Observer} interface when it
+ * wants to be informed of changes in observable objects.
+ *
+ * @author  Chris Warth
+ * @see     java.util.Observable
+ * @since   1.0
+ *
+ * @deprecated
+ * This interface has been deprecated. See the {@link Observable}
+ * class for further information.
+ */
+@Deprecated(since="9")
+public interface Observer {
+    /**
+     * This method is called whenever the observed object is changed. An
+     * application calls an {@code Observable} object's
+     * {@code notifyObservers} method to have all the object's
+     * observers notified of the change.
+     *
+     * @param   o     the observable object.
+     * @param   arg   an argument passed to the {@code notifyObservers}
+     *                 method.
+     */
+    void update(Observable o, Object arg);
+}
+```
+
+
+
+
+
+**具体实现**
+
+微信公众号示例
+
+
+
+```java
+package mao.t3;
+
+/**
+ * Project name(项目名称)：java设计模式_观察者模式
+ * Package(包名): mao.t3
+ * Class(类名): Message
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 14:08
+ * Version(版本): 1.0
+ * Description(描述)： 消息对象
+ */
+
+
+public class Message
+{
+    private String message;
+    private String subjectName;
+
+
+    /**
+     * Instantiates a new Message.
+     */
+    public Message()
+    {
+    }
+
+    /**
+     * Instantiates a new Message.
+     *
+     * @param message     the message
+     * @param subjectName the subject name
+     */
+    public Message(String message, String subjectName)
+    {
+        this.message = message;
+        this.subjectName = subjectName;
+    }
+
+    /**
+     * Gets message.
+     *
+     * @return the message
+     */
+    public String getMessage()
+    {
+        return message;
+    }
+
+    /**
+     * Sets message.
+     *
+     * @param message the message
+     * @return the message
+     */
+    public Message setMessage(String message)
+    {
+        this.message = message;
+        return this;
+    }
+
+    /**
+     * Gets subject name.
+     *
+     * @return the subject name
+     */
+    public String getSubjectName()
+    {
+        return subjectName;
+    }
+
+    /**
+     * Sets subject name.
+     *
+     * @param subjectName the subject name
+     * @return the subject name
+     */
+    public Message setSubjectName(String subjectName)
+    {
+        this.subjectName = subjectName;
+        return this;
+    }
+
+    @Override
+    @SuppressWarnings("all")
+    public String toString()
+    {
+        final StringBuilder stringbuilder = new StringBuilder();
+        stringbuilder.append("message：").append(message).append('\n');
+        stringbuilder.append("subjectName：").append(subjectName).append('\n');
+        return stringbuilder.toString();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t3;
+
+import java.util.Observable;
+import java.util.Observer;
+
+/**
+ * Project name(项目名称)：java设计模式_观察者模式
+ * Package(包名): mao.t3
+ * Class(类名): WechatUser
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 14:03
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class WechatUser implements Observer
+{
+    //微信用户名
+    private final String name;
+
+    public WechatUser(String name)
+    {
+        this.name = name;
+    }
+
+    @Override
+    public void update(Observable o, Object arg)
+    {
+        Message message = (Message) arg;
+        System.out.println("微信用户" + name + "接收到" + message.getSubjectName() + "公众号的消息：" + message.getMessage());
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t3;
+
+import java.util.Observable;
+
+/**
+ * Project name(项目名称)：java设计模式_观察者模式
+ * Package(包名): mao.t3
+ * Class(类名): SubscriptionSubject
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 14:05
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class SubscriptionSubject extends Observable
+{
+    //公众号名称
+    private final String name;
+
+    public SubscriptionSubject(String name)
+    {
+        this.name = name;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
+     * 通知消息
+     *
+     * @param message 消息
+     */
+    public void sendNotify(String message)
+    {
+        Message msg = new Message()
+                .setMessage(message)
+                .setSubjectName(this.getName());
+        this.setChanged();
+        this.notifyObservers(msg);
+        this.clearChanged();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t3;
+
+import java.util.Observer;
+
+/**
+ * Project name(项目名称)：java设计模式_观察者模式
+ * Package(包名): mao.t3
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 14:13
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        Observer observer1 = new WechatUser("张三");
+        Observer observer2 = new WechatUser("李四");
+        Observer observer3 = new WechatUser("王五");
+        Observer observer4 = new WechatUser("赵六");
+        Observer observer5 = new WechatUser("王八");
+
+        SubscriptionSubject observable1 = new SubscriptionSubject("腾讯新闻官方公众号");
+
+        observable1.addObserver(observer1);
+        observable1.addObserver(observer2);
+        observable1.addObserver(observer3);
+        observable1.addObserver(observer4);
+        observable1.addObserver(observer5);
+
+        Observer observer6 = new WechatUser("张里");
+        Observer observer7 = new WechatUser("李五");
+        Observer observer8 = new WechatUser("王久");
+
+        SubscriptionSubject observable2 = new SubscriptionSubject("百度地图");
+        observable2.addObserver(observer6);
+        observable2.addObserver(observer7);
+        observable2.addObserver(observer8);
+        observable2.addObserver(observer3);
+
+        observable1.sendNotify("你好，欢迎关注");
+
+        System.out.println("-------");
+
+        observable2.sendNotify("欢迎关注━(*｀∀´*)ノ亻!");
+
+        System.out.println("-------");
+
+        observable1.sendNotify("震惊！鸡蛋和石头竟然不能一起吃！原因竟然是......");
+    }
+}
+```
