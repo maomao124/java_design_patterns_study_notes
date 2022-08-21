@@ -19794,3 +19794,326 @@ public class Test
 
 
 
+**示例2：班级同学之间谈话**
+
+模拟一个班级上同学之间的谈话。班上有三个女生A、B和C，有三个男生D、E和F。女生A想说一些话，只想让女生知道。男生D则想说一些话，让所有的人都可以听到。
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_中介者模式
+ * Package(包名): mao.t2
+ * Class(类名): Student
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 15:44
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+public class Student
+{
+    //名字
+    private final String name;
+    //性别。性别应该要定义一个枚举
+    private final String sex;
+
+    /**
+     * Instantiates a new Student.
+     *
+     * @param name the name
+     * @param sex  the sex
+     */
+    public Student(String name, String sex)
+    {
+        this.name = name;
+        this.sex = sex;
+        Mediator.add(this);
+    }
+
+    /**
+     * Gets sex.
+     *
+     * @return the sex
+     */
+    public String getSex()
+    {
+        return sex;
+    }
+
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
+     * Send message to all.
+     *
+     * @param message the message
+     */
+    public void sendMessageToAll(String message)
+    {
+        Mediator.sendMessageToAll(this, message);
+    }
+
+    /**
+     * Send message to same sex.
+     *
+     * @param message the message
+     */
+    public void sendMessageToSameSex(String message)
+    {
+        Mediator.sendMessageToSameSex(this, message);
+    }
+
+    /**
+     * Receive message.
+     *
+     * @param message the message
+     */
+    public void receiveMessage(String message)
+    {
+        System.out.println(name + "收到了消息。" + message);
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Project name(项目名称)：java设计模式_中介者模式
+ * Package(包名): mao.t2
+ * Class(类名): Mediator
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 15:46
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Mediator
+{
+    private static final List<Student> maleStudents = new ArrayList<>();
+    private static final List<Student> femaleStudents = new ArrayList<>();
+
+    /**
+     * 添加学生
+     *
+     * @param student Student对象
+     */
+    public static void add(Student student)
+    {
+        if ("male".equals(student.getSex()))
+        {
+            maleStudents.add(student);
+        }
+        else
+        {
+            femaleStudents.add(student);
+        }
+    }
+
+    /**
+     * 发送消息给所有学生
+     *
+     * @param student Student对象
+     * @param message 消息
+     */
+    public static void sendMessageToAll(Student student, String message)
+    {
+        for (Student stu : maleStudents)
+        {
+            if (student.getName().equals(stu.getName()))
+            {
+                continue;
+            }
+            stu.receiveMessage(student.getName() + ":" + message);
+        }
+        for (Student stu : femaleStudents)
+        {
+            if (student.getName().equals(stu.getName()))
+            {
+                continue;
+            }
+            stu.receiveMessage(student.getName() + ":" + message);
+        }
+    }
+
+    /**
+     * 发送消息给同性别的学生
+     *
+     * @param student Student对象
+     * @param message 消息
+     */
+    public static void sendMessageToSameSex(Student student, String message)
+    {
+        List<Student> tempList = "male".equals(student.getSex()) ? maleStudents : femaleStudents;
+        for (Student stu : tempList)
+        {
+            if (student.getName().equals(stu.getName()))
+            {
+                continue;
+            }
+            stu.receiveMessage(student.getName() + ":" + message);
+        }
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_中介者模式
+ * Package(包名): mao.t2
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 15:52
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        Student femaleStudentA = new Student("小红", "female");
+        Student femaleStudentB = new Student("小美", "female");
+        Student femaleStudentC = new Student("小花", "female");
+
+        Student maleStudentA = new Student("小明", "male");
+        Student maleStudentB = new Student("小亮", "male");
+        Student maleStudentC = new Student("小绿", "male");
+
+        maleStudentB.sendMessageToAll("干饭");
+        System.out.println("-------");
+        maleStudentA.sendMessageToAll("睡觉");
+        System.out.println("-------");
+        maleStudentC.sendMessageToAll("明天放假！！！");
+
+        System.out.println("-------");
+        System.out.println("-------");
+
+        femaleStudentA.sendMessageToSameSex("一起去厕所吗？");
+        System.out.println("-------");
+        femaleStudentB.sendMessageToSameSex("大家好！");
+        System.out.println("-------");
+        femaleStudentC.sendMessageToSameSex("明天一起去玩吧");
+
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+小明收到了消息。小亮:干饭
+小绿收到了消息。小亮:干饭
+小红收到了消息。小亮:干饭
+小美收到了消息。小亮:干饭
+小花收到了消息。小亮:干饭
+-------
+小亮收到了消息。小明:睡觉
+小绿收到了消息。小明:睡觉
+小红收到了消息。小明:睡觉
+小美收到了消息。小明:睡觉
+小花收到了消息。小明:睡觉
+-------
+小明收到了消息。小绿:明天放假！！！
+小亮收到了消息。小绿:明天放假！！！
+小红收到了消息。小绿:明天放假！！！
+小美收到了消息。小绿:明天放假！！！
+小花收到了消息。小绿:明天放假！！！
+-------
+-------
+小美收到了消息。小红:一起去厕所吗？
+小花收到了消息。小红:一起去厕所吗？
+-------
+小红收到了消息。小美:大家好！
+小花收到了消息。小美:大家好！
+-------
+小红收到了消息。小花:明天一起去玩吧
+小美收到了消息。小花:明天一起去玩吧
+```
+
+
+
+
+
+![image-20220821160337536](img/java设计模式学习笔记/image-20220821160337536.png)
+
+
+
+
+
+
+
+### 优缺点
+
+**优点：**
+
+* 松散耦合
+
+  中介者模式通过把多个同事对象之间的交互封装到中介者对象里面，从而使得同事对象之间松散耦合，基本上可以做到互补依赖。这样一来，同事对象就可以独立地变化和复用，而不再像以前那样“牵一处而动全身”了。
+
+* 集中控制交互
+
+  多个同事对象的交互，被封装在中介者对象里面集中管理，使得这些交互行为发生变化的时候，只需要修改中介者对象就可以了，当然如果是已经做好的系统，那么就扩展中介者对象，而各个同事类不需要做修改。
+
+* 一对多关联转变为一对一的关联
+
+  没有使用中介者模式的时候，同事对象之间的关系通常是一对多的，引入中介者对象以后，中介者对象和同事对象的关系通常变成双向的一对一，这会让对象的关系更容易理解和实现。
+
+**缺点：**
+
+当同事类太多时，中介者的职责将很大，它会变得复杂而庞大，以至于系统难以维护。
+
+
+
+
+
+### 使用场景
+
+* 系统中对象之间存在复杂的引用关系，系统结构混乱且难以理解。
+* 当想创建一个运行于多个类之间的对象，又不想生成新的子类时。
+
+
+
+
+
+
+
+
+
+## 迭代器模式
+
