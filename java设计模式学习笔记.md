@@ -19177,3 +19177,205 @@ public class Test
     }
 }
 ```
+
+
+
+运行结果：
+
+```sh
+微信用户王八接收到腾讯新闻官方公众号公众号的消息：你好，欢迎关注
+微信用户赵六接收到腾讯新闻官方公众号公众号的消息：你好，欢迎关注
+微信用户王五接收到腾讯新闻官方公众号公众号的消息：你好，欢迎关注
+微信用户李四接收到腾讯新闻官方公众号公众号的消息：你好，欢迎关注
+微信用户张三接收到腾讯新闻官方公众号公众号的消息：你好，欢迎关注
+-------
+微信用户王五接收到百度地图公众号的消息：欢迎关注━(*｀∀´*)ノ亻!
+微信用户王久接收到百度地图公众号的消息：欢迎关注━(*｀∀´*)ノ亻!
+微信用户李五接收到百度地图公众号的消息：欢迎关注━(*｀∀´*)ノ亻!
+微信用户张里接收到百度地图公众号的消息：欢迎关注━(*｀∀´*)ノ亻!
+-------
+微信用户王八接收到腾讯新闻官方公众号公众号的消息：震惊！鸡蛋和石头竟然不能一起吃！原因竟然是......
+微信用户赵六接收到腾讯新闻官方公众号公众号的消息：震惊！鸡蛋和石头竟然不能一起吃！原因竟然是......
+微信用户王五接收到腾讯新闻官方公众号公众号的消息：震惊！鸡蛋和石头竟然不能一起吃！原因竟然是......
+微信用户李四接收到腾讯新闻官方公众号公众号的消息：震惊！鸡蛋和石头竟然不能一起吃！原因竟然是......
+微信用户张三接收到腾讯新闻官方公众号公众号的消息：震惊！鸡蛋和石头竟然不能一起吃！原因竟然是......
+```
+
+
+
+
+
+**示例2：警察抓小偷**
+
+警察抓小偷也可以使用观察者模式来实现，警察是观察者，小偷是被观察者。
+
+
+
+```java
+package mao.t4;
+
+import java.util.Observable;
+import java.util.Observer;
+
+/**
+ * Project name(项目名称)：java设计模式_观察者模式
+ * Package(包名): mao.t4
+ * Class(类名): Policemen
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 14:32
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Policemen implements Observer
+{
+    private String name;
+
+    public Policemen(String name)
+    {
+        this.name = name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    @Override
+    public void update(Observable o, Object arg)
+    {
+        System.out.println("警察：" + ((Thief) o).getName() + "，我在" + arg.toString() + "已经盯你很久了，你可以保持沉默，但你所说的将成为呈堂证供");
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t4;
+
+import java.util.Observable;
+
+/**
+ * Project name(项目名称)：java设计模式_观察者模式
+ * Package(包名): mao.t4
+ * Class(类名): Thief
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 14:33
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Thief extends Observable
+{
+    private String name;
+
+    public Thief(String name)
+    {
+        this.name = name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void sendMessage(String message)
+    {
+        System.out.println("小偷：本人在" + message + "偷东西，有本事来抓我");
+        this.setChanged();
+        this.notifyObservers(message);
+        this.clearChanged();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t4;
+
+/**
+ * Project name(项目名称)：java设计模式_观察者模式
+ * Package(包名): mao.t4
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 14:37
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        Thief thief = new Thief("法外狂徒张三");
+
+        Policemen policemen1 = new Policemen("警察1");
+        Policemen policemen2 = new Policemen("警察2");
+        Policemen policemen3 = new Policemen("警察3");
+        Policemen policemen4 = new Policemen("警察4");
+
+        thief.addObserver(policemen1);
+        thief.addObserver(policemen2);
+        thief.addObserver(policemen3);
+        thief.addObserver(policemen4);
+
+        thief.sendMessage("北京故宫旁边");
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+小偷：本人在北京故宫旁边偷东西，有本事来抓我
+警察：法外狂徒张三，我在北京故宫旁边已经盯你很久了，你可以保持沉默，但你所说的将成为呈堂证供
+警察：法外狂徒张三，我在北京故宫旁边已经盯你很久了，你可以保持沉默，但你所说的将成为呈堂证供
+警察：法外狂徒张三，我在北京故宫旁边已经盯你很久了，你可以保持沉默，但你所说的将成为呈堂证供
+警察：法外狂徒张三，我在北京故宫旁边已经盯你很久了，你可以保持沉默，但你所说的将成为呈堂证供
+```
+
+
+
+
+
+![image-20220821144321381](img/java设计模式学习笔记/image-20220821144321381.png)
+
+
+
+
+
+
+
+
+
+
+
+## 中介者模式
+
