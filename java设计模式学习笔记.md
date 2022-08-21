@@ -18079,3 +18079,304 @@ public class SwingTest
 
 ## 观察者模式
 
+### 概念
+
+观察者模式又被称为发布-订阅（Publish/Subscribe）模式，它定义了一种一对多的依赖关系，让多个观察者对象同时监听某一个主题对象。这个主题对象在状态变化时，会通知所有的观察者对象，使他们能够自动更新自己。
+
+
+
+### 结构
+
+在观察者模式中有如下角色：
+
+* Subject：抽象主题（抽象被观察者），抽象主题角色把所有观察者对象保存在一个集合里，每个主题都可以有任意数量的观察者，抽象主题提供一个接口，可以增加和删除观察者对象。
+* ConcreteSubject：具体主题（具体被观察者），该角色将有关状态存入具体观察者对象，在具体主题的内部状态发生改变时，给所有注册过的观察者发送通知。
+* Observer：抽象观察者，是观察者的抽象类，它定义了一个更新接口，使得在得到主题更改通知时更新自己。
+* ConcrereObserver：具体观察者，实现抽象观察者定义的更新接口，以便在得到主题更改通知时更新自身的状态。
+
+
+
+
+
+
+
+### 示例
+
+**微信公众号**
+
+在使用微信公众号时，大家都会有这样的体验，当你关注的公众号中有新内容更新的话，它就会推送给关注公众号的微信用户端。我们使用观察者模式来模拟这样的场景，微信用户就是观察者，微信公众号是被观察者，有多个的微信用户关注了程序猿这个公众号
+
+
+
+![image-20220821130956083](img/java设计模式学习笔记/image-20220821130956083.png)
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_观察者模式
+ * Package(包名): mao.t1
+ * Interface(接口名): Observer
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 13:10
+ * Version(版本): 1.0
+ * Description(描述)： 观察者类
+ */
+
+public interface Observer
+{
+    /**
+     * 更新方法
+     *
+     * @param message     消息
+     * @param subjectName 主题名称，这里主要指公众号的名称
+     */
+    void update(String message, String subjectName);
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_观察者模式
+ * Package(包名): mao.t1
+ * Class(类名): WechatUser
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 13:12
+ * Version(版本): 1.0
+ * Description(描述)： 微信用户，具体观察者类
+ */
+
+public class WechatUser implements Observer
+{
+    //微信用户名
+    private final String name;
+
+    public WechatUser(String name)
+    {
+        this.name = name;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    @Override
+    public void update(String message, String subjectName)
+    {
+        System.out.println("微信用户" + name + "接收到" + subjectName + "公众号的消息：" + message);
+    }
+
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_观察者模式
+ * Package(包名): mao.t1
+ * Interface(接口名): Subject
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 13:15
+ * Version(版本): 1.0
+ * Description(描述)： 抽象主题类
+ */
+
+public interface Subject
+{
+
+    /**
+     * 添加订阅者
+     *
+     * @param observer Observer
+     */
+    void attach(Observer observer);
+
+    /**
+     * 删除订阅者
+     *
+     * @param observer Observer
+     */
+    void detach(Observer observer);
+
+    /**
+     * 通知或者发送消息给订阅者
+     *
+     * @param message String
+     */
+    void notify(String message);
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Project name(项目名称)：java设计模式_观察者模式
+ * Package(包名): mao.t1
+ * Class(类名): SubscriptionSubject
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 13:17
+ * Version(版本): 1.0
+ * Description(描述)： 具体主题（具体被观察者）
+ */
+
+public class SubscriptionSubject implements Subject
+{
+    //公众号的名称
+    private final String name;
+
+    private final List<Observer> userList;
+
+    public SubscriptionSubject(String name)
+    {
+        this.name = name;
+        userList = new ArrayList<>();
+    }
+
+    @Override
+    public void attach(Observer observer)
+    {
+        userList.add(observer);
+    }
+
+    @Override
+    public void detach(Observer observer)
+    {
+        userList.remove(observer);
+    }
+
+    @Override
+    public void notify(String message)
+    {
+        for (Observer observer : userList)
+        {
+            observer.update(message, name);
+        }
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_观察者模式
+ * Package(包名): mao.t1
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/21
+ * Time(创建时间)： 13:19
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        Observer observer1 = new WechatUser("张三");
+        Observer observer2 = new WechatUser("李四");
+        Observer observer3 = new WechatUser("王五");
+        Observer observer4 = new WechatUser("赵六");
+        Observer observer5 = new WechatUser("王八");
+
+        Subject subject1 = new SubscriptionSubject("腾讯新闻官方公众号");
+
+        subject1.attach(observer1);
+        subject1.attach(observer2);
+        subject1.attach(observer3);
+        subject1.attach(observer4);
+        subject1.attach(observer5);
+
+        Observer observer6 = new WechatUser("张里");
+        Observer observer7 = new WechatUser("李五");
+        Observer observer8 = new WechatUser("王久");
+
+        Subject subject2 = new SubscriptionSubject("百度地图");
+        subject2.attach(observer6);
+        subject2.attach(observer7);
+        subject2.attach(observer8);
+        subject2.attach(observer3);
+
+        //通知
+        subject1.notify("你好，欢迎关注");
+
+        System.out.println("-------");
+
+        subject2.notify("欢迎关注━(*｀∀´*)ノ亻!");
+
+        System.out.println("-------");
+
+        subject1.notify("震惊！鸡蛋和石头竟然不能一起吃！原因竟然是......");
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+微信用户张三接收到腾讯新闻官方公众号公众号的消息：你好，欢迎关注
+微信用户李四接收到腾讯新闻官方公众号公众号的消息：你好，欢迎关注
+微信用户王五接收到腾讯新闻官方公众号公众号的消息：你好，欢迎关注
+微信用户赵六接收到腾讯新闻官方公众号公众号的消息：你好，欢迎关注
+微信用户王八接收到腾讯新闻官方公众号公众号的消息：你好，欢迎关注
+-------
+微信用户张里接收到百度地图公众号的消息：欢迎关注━(*｀∀´*)ノ亻!
+微信用户李五接收到百度地图公众号的消息：欢迎关注━(*｀∀´*)ノ亻!
+微信用户王久接收到百度地图公众号的消息：欢迎关注━(*｀∀´*)ノ亻!
+微信用户王五接收到百度地图公众号的消息：欢迎关注━(*｀∀´*)ノ亻!
+-------
+微信用户张三接收到腾讯新闻官方公众号公众号的消息：震惊！鸡蛋和石头竟然不能一起吃！原因竟然是......
+微信用户李四接收到腾讯新闻官方公众号公众号的消息：震惊！鸡蛋和石头竟然不能一起吃！原因竟然是......
+微信用户王五接收到腾讯新闻官方公众号公众号的消息：震惊！鸡蛋和石头竟然不能一起吃！原因竟然是......
+微信用户赵六接收到腾讯新闻官方公众号公众号的消息：震惊！鸡蛋和石头竟然不能一起吃！原因竟然是......
+微信用户王八接收到腾讯新闻官方公众号公众号的消息：震惊！鸡蛋和石头竟然不能一起吃！原因竟然是......
+```
+
+
+
+
+
