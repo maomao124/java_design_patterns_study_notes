@@ -21674,3 +21674,582 @@ public class Test
 
 ### 使用场景
 
+* 对象结构相对稳定，但其操作算法经常变化的程序。
+* 对象结构中的对象需要提供多种不同且不相关的操作，而且要避免让这些操作的变化影响对象的结构。
+
+
+
+
+
+### 分派
+
+访问者模式用到了一种双分派的技术
+
+
+
+变量被声明时的类型叫做变量的静态类型，有些人又把静态类型叫做明显类型；而变量所引用的对象的真实类型又叫做变量的实际类型。比如 `Map map = new HashMap()` ，map变量的静态类型是 `Map` ，实际类型是 `HashMap` 。根据对象的类型而对方法进行的选择，就是分派(Dispatch)，分派(Dispatch)又分为两种，即静态分派和动态分派。
+
+**静态分派(Static Dispatch)** 发生在编译时期，分派根据静态类型信息发生。静态分派对于我们来说并不陌生，方法重载就是静态分派。
+
+**动态分派(Dynamic Dispatch)** 发生在运行时期，动态分派动态地置换掉某个方法。Java通过方法的重写支持动态分派。
+
+
+
+
+
+### 静态分派
+
+通过方法的重写支持动态分派
+
+
+
+```java
+package mao.dynamic_dispatch;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.dynamic_dispatch
+ * Class(类名): Animal
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 21:36
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Animal
+{
+    public void execute()
+    {
+        System.out.println("Animal");
+    }
+}
+```
+
+
+
+```java
+package mao.dynamic_dispatch;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.dynamic_dispatch
+ * Class(类名): Cat
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 21:36
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Cat extends Animal
+{
+    @Override
+    public void execute()
+    {
+        System.out.println("cat");
+    }
+}
+```
+
+
+
+```java
+package mao.dynamic_dispatch;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.dynamic_dispatch
+ * Class(类名): Dog
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 21:36
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Dog extends Animal
+{
+    @Override
+    public void execute()
+    {
+        System.out.println("dog");
+    }
+}
+```
+
+
+
+```java
+package mao.dynamic_dispatch;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.dynamic_dispatch
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 21:37
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        Animal animal1 = new Dog();
+        Animal animal2 = new Cat();
+        Animal animal3 = new Animal();
+
+        animal1.execute();
+        animal2.execute();
+        animal3.execute();
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+dog
+cat
+Animal
+```
+
+
+
+Java编译器在编译时期并不总是知道哪些代码会被执行，因为编译器仅仅知道对象的静态类型，而不知道对象的真实类型；而方法的调用则是根据对象的真实类型，而不是静态类型。
+
+
+
+
+
+### 静态分派
+
+通过方法重载支持静态分派
+
+
+
+```java
+package mao.static_dispatch;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.static_dispatch
+ * Class(类名): Animal
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 22:20
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Animal
+{
+
+}
+```
+
+
+
+```java
+package mao.static_dispatch;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.static_dispatch
+ * Class(类名): Cat
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 22:20
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Cat extends Animal
+{
+
+}
+```
+
+
+
+```java
+package mao.static_dispatch;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.static_dispatch
+ * Class(类名): Dog
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 22:20
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Dog extends Animal
+{
+
+}
+```
+
+
+
+```java
+package mao.static_dispatch;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.static_dispatch
+ * Class(类名): Execute
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 22:20
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Execute
+{
+    /**
+     * Execute.
+     *
+     * @param animal the animal
+     */
+    public void execute(Animal animal)
+    {
+        System.out.println("Animal");
+    }
+
+    /**
+     * Execute.
+     *
+     * @param dog the dog
+     */
+    public void execute(Dog dog)
+    {
+        System.out.println("dog");
+    }
+
+    /**
+     * Execute.
+     *
+     * @param cat the cat
+     */
+    public void execute(Cat cat)
+    {
+        System.out.println("cat");
+    }
+}
+```
+
+
+
+```java
+package mao.static_dispatch;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.static_dispatch
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 22:21
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        Animal animal1 = new Dog();
+        Animal animal2 = new Cat();
+        Animal animal3 = new Animal();
+
+        Execute execute = new Execute();
+        execute.execute(animal1);
+        execute.execute(animal2);
+        execute.execute(animal3);
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+Animal
+Animal
+Animal
+```
+
+
+
+重载方法的分派是根据静态类型进行的，这个分派过程在编译时期就完成了，所以输出的全部都是Animal
+
+
+
+
+
+### 双分派
+
+所谓双分派技术就是在选择一个方法的时候，不仅仅要根据消息接收者（receiver）的运行时区别，还要根据参数的运行时区别
+
+
+
+```java
+package mao.double_dispatch;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.double_dispatch
+ * Class(类名): Animal
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 22:25
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Animal
+{
+    public void accept(IExecute exe)
+    {
+        exe.execute(this);
+    }
+}
+```
+
+
+
+```java
+package mao.double_dispatch;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.double_dispatch
+ * Class(类名): Cat
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 22:26
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Cat extends Animal
+{
+    public void accept(IExecute exe)
+    {
+        exe.execute(this);
+    }
+}
+```
+
+
+
+```java
+package mao.double_dispatch;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.double_dispatch
+ * Class(类名): Dog
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 22:25
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Dog extends Animal
+{
+    public void accept(IExecute exe)
+    {
+        exe.execute(this);
+    }
+}
+```
+
+
+
+```java
+package mao.double_dispatch;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.double_dispatch
+ * Interface(接口名): IExecute
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 22:27
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface IExecute
+{
+    /**
+     * Execute.
+     *
+     * @param animal the animal
+     */
+    void execute(Animal animal);
+
+    /**
+     * Execute.
+     *
+     * @param dog the dog
+     */
+    void execute(Dog dog);
+
+    /**
+     * Execute.
+     *
+     * @param cat the cat
+     */
+    void execute(Cat cat);
+}
+```
+
+
+
+
+
+```java
+package mao.double_dispatch;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.double_dispatch
+ * Class(类名): Execute
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 22:27
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Execute implements IExecute
+{
+    @Override
+    public void execute(Animal animal)
+    {
+        System.out.println("animal");
+    }
+
+    @Override
+    public void execute(Dog dog)
+    {
+        System.out.println("dog");
+    }
+
+    @Override
+    public void execute(Cat cat)
+    {
+        System.out.println("cat");
+    }
+}
+```
+
+
+
+```java
+package mao.double_dispatch;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.double_dispatch
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 22:30
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        IExecute execute = new Execute();
+        Animal animal = new Animal();
+        Animal animal1 = new Cat();
+        Animal animal2 = new Dog();
+
+        animal.accept(execute);
+        animal1.accept(execute);
+        animal2.accept(execute);
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+animal
+cat
+dog
+```
+
+
+
+客户端将Execute对象做为参数传递给Animal类型的变量调用的方法，这里完成第一次分派，这里是方法重写，所以是动态分派，也就是执行实际类型中的方法，同时也`将自己this作为参数传递进去，这里就完成了第二次分派`，这里的Execute类中有多个重载的方法，而传递进行的是this，就是具体的实际类型的对象。
+
+
+
+**双分派实现动态绑定的本质，就是在重载方法委派的前面加上了继承体系中覆盖的环节，由于覆盖是动态的，所以重载就是动态的了**
+
+
+
+![image-20220822224053117](img/java设计模式学习笔记/image-20220822224053117.png)
+
+
+
+
+
+
+
+
+
+
+
+## 备忘录模式
+
