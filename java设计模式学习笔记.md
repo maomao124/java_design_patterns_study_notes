@@ -21268,3 +21268,409 @@ public class Test
 
 
 
+
+
+**示例2**
+
+年底，CEO和CTO开始评定员工一年的工作绩效，员工分为工程师和经理，CTO关注工程师的代码量、经理的新产品数量；CEO关注的是工程师的KPI和经理的KPI以及新产品数量。
+
+
+
+由于CEO和CTO对于不同员工的关注点是不一样的，这就需要对不同员工类型进行不同的处理。访问者模式此时可以派上用场了。
+
+
+
+
+
+```java
+package mao.t2;
+
+import java.util.Random;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.t2
+ * Class(类名): Staff
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 21:09
+ * Version(版本): 1.0
+ * Description(描述)： 员工基类
+ */
+
+public abstract class Staff
+{
+    //员工姓名
+    public String name;
+    //员工KPI
+    public int kpi;
+
+    public Staff(String name)
+    {
+        this.name = name;
+        //随机
+        kpi = new Random().nextInt(10);
+    }
+
+    //核心方法，接受Visitor的访问
+    public abstract void accept(Visitor visitor);
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+import java.util.Random;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.t2
+ * Class(类名): Engineer
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 21:10
+ * Version(版本): 1.0
+ * Description(描述)： 工程师类
+ */
+
+public class Engineer extends Staff
+{
+
+    public Engineer(String name)
+    {
+        super(name);
+    }
+
+    @Override
+    public void accept(Visitor visitor)
+    {
+        visitor.visit(this);
+    }
+
+    /**
+     * 获得工程师的代码行数
+     *
+     * @return 代码行数
+     */
+    public int getCodeLines()
+    {
+        //这里随机
+        return new Random().nextInt(10 * 10000);
+    }
+}
+```
+
+
+
+```java
+package mao.t2;
+
+import java.util.Random;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.t2
+ * Class(类名): Manager
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 21:12
+ * Version(版本): 1.0
+ * Description(描述)： 经理
+ */
+
+public class Manager extends Staff
+{
+
+    public Manager(String name)
+    {
+        super(name);
+    }
+
+    @Override
+    public void accept(Visitor visitor)
+    {
+        visitor.visit(this);
+    }
+
+    /**
+     * 获得经理一年的产品数量
+     *
+     * @return 产品数量
+     */
+    public int getProducts()
+    {
+        //这里也是随机
+        return new Random().nextInt(10);
+    }
+
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.t2
+ * Interface(接口名): Visitor
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 21:13
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface Visitor
+{
+    /**
+     * 访问工程师
+     *
+     * @param engineer Engineer
+     */
+    void visit(Engineer engineer);
+
+    /**
+     * 访问经理
+     *
+     * @param manager Engineer
+     */
+    void visit(Manager manager);
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.t2
+ * Class(类名): CEOVisitor
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 21:14
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class CEOVisitor implements Visitor
+{
+
+    @Override
+    public void visit(Engineer engineer)
+    {
+        System.out.println("工程师: " + engineer.name + ", KPI: " + engineer.kpi);
+    }
+
+    @Override
+    public void visit(Manager manager)
+    {
+        System.out.println("经理: " + manager.name + ", KPI: " + manager.kpi +
+                ", 新产品数量: " + manager.getProducts());
+    }
+}
+```
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.t2
+ * Class(类名): CTOVisitor
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 21:20
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class CTOVisitor implements Visitor
+{
+
+    @Override
+    public void visit(Engineer engineer)
+    {
+        System.out.println("工程师: " + engineer.name + ", 代码行数: " + engineer.getCodeLines());
+    }
+
+    @Override
+    public void visit(Manager manager)
+    {
+        System.out.println("经理: " + manager.name + ", 产品数量: " + manager.getProducts());
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.t2
+ * Class(类名): BusinessReport
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 21:15
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class BusinessReport
+{
+    private final List<Staff> mStaffs = new LinkedList<>();
+
+    /**
+     * Instantiates a new Business report.
+     */
+    public BusinessReport()
+    {
+        mStaffs.add(new Manager("经理-A"));
+        mStaffs.add(new Engineer("工程师-A"));
+        mStaffs.add(new Engineer("工程师-B"));
+        mStaffs.add(new Engineer("工程师-C"));
+        mStaffs.add(new Manager("经理-B"));
+        mStaffs.add(new Engineer("工程师-D"));
+    }
+
+    /**
+     * 展示报表
+     *
+     * @param visitor Visitor 实现类
+     */
+    public void showReport(Visitor visitor)
+    {
+        for (Staff staff : mStaffs)
+        {
+            staff.accept(visitor);
+        }
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t2;
+
+/**
+ * Project name(项目名称)：java设计模式_访问者模式
+ * Package(包名): mao.t2
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 21:21
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        BusinessReport businessReport = new BusinessReport();
+        System.out.println("=========== CEO报表 ===========");
+        businessReport.showReport(new CEOVisitor());
+        System.out.println("=========== CTO报表 ===========");
+        businessReport.showReport(new CTOVisitor());
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+=========== CEO报表 ===========
+经理: 经理-A, KPI: 6, 新产品数量: 4
+工程师: 工程师-A, KPI: 0
+工程师: 工程师-B, KPI: 8
+工程师: 工程师-C, KPI: 3
+经理: 经理-B, KPI: 5, 新产品数量: 4
+工程师: 工程师-D, KPI: 4
+=========== CTO报表 ===========
+经理: 经理-A, 产品数量: 5
+工程师: 工程师-A, 代码行数: 66077
+工程师: 工程师-B, 代码行数: 18528
+工程师: 工程师-C, 代码行数: 40260
+经理: 经理-B, 产品数量: 2
+工程师: 工程师-D, 代码行数: 79623
+```
+
+结果不唯一
+
+
+
+
+
+### 优缺点
+
+**优点：**
+
+* 扩展性好
+
+  在不修改对象结构中的元素的情况下，为对象结构中的元素添加新的功能。
+
+* 复用性好
+
+  通过访问者来定义整个对象结构通用的功能，从而提高复用程度。
+
+* 分离无关行为
+
+  通过访问者来分离无关的行为，把相关的行为封装在一起，构成一个访问者，这样每一个访问者的功能都比较单一。
+
+**缺点：**
+
+* 对象结构变化很困难
+
+  在访问者模式中，每增加一个新的元素类，都要在每一个具体访问者类中增加相应的具体操作，这违背了“开闭原则”。
+
+* 违反了依赖倒置原则
+
+  访问者模式依赖了具体类，而没有依赖抽象类。
+
+
+
+
+
+### 使用场景
+
