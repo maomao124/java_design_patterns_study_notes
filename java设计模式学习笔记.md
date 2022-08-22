@@ -20117,3 +20117,835 @@ public class Test
 
 ## 迭代器模式
 
+### 概念
+
+提供一个对象来顺序访问聚合对象中的一系列数据，而不暴露聚合对象的内部表示。 
+
+
+
+### 结构
+
+迭代器模式主要包含以下角色：
+
+* 抽象聚合（Aggregate）角色：定义存储、添加、删除聚合元素以及创建迭代器对象的接口。
+* 具体聚合（ConcreteAggregate）角色：实现抽象聚合类，返回一个具体迭代器的实例。
+* 抽象迭代器（Iterator）角色：定义访问和遍历聚合元素的接口，通常包含 hasNext()、next() 等方法。
+* 具体迭代器（Concretelterator）角色：实现抽象迭代器接口中所定义的方法，完成对聚合对象的遍历，记录遍历的当前位置。
+
+
+
+
+
+### 示例
+
+定义一个可以存储学生对象的容器对象，将遍历该容器的功能交由迭代器实现
+
+
+
+![image-20220822195223298](img/java设计模式学习笔记/image-20220822195223298.png)
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_迭代器模式
+ * Package(包名): mao.t1
+ * Class(类名): Student
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 19:53
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+public class Student
+{
+    private Long id;
+    private String name;
+    private String sex;
+    private Integer age;
+
+    /**
+     * Instantiates a new Student.
+     */
+    public Student()
+    {
+
+    }
+
+    /**
+     * Instantiates a new Student.
+     *
+     * @param id   the id
+     * @param name the name
+     * @param sex  the sex
+     * @param age  the age
+     */
+    public Student(Long id, String name, String sex, Integer age)
+    {
+        this.id = id;
+        this.name = name;
+        this.sex = sex;
+        this.age = age;
+    }
+
+    /**
+     * Gets id.
+     *
+     * @return the id
+     */
+    public Long getId()
+    {
+        return id;
+    }
+
+    /**
+     * Sets id.
+     *
+     * @param id the id
+     */
+    public void setId(Long id)
+    {
+        this.id = id;
+    }
+
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
+     * Sets name.
+     *
+     * @param name the name
+     */
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    /**
+     * Gets sex.
+     *
+     * @return the sex
+     */
+    public String getSex()
+    {
+        return sex;
+    }
+
+    /**
+     * Sets sex.
+     *
+     * @param sex the sex
+     */
+    public void setSex(String sex)
+    {
+        this.sex = sex;
+    }
+
+    /**
+     * Gets age.
+     *
+     * @return the age
+     */
+    public Integer getAge()
+    {
+        return age;
+    }
+
+    /**
+     * Sets age.
+     *
+     * @param age the age
+     */
+    public void setAge(Integer age)
+    {
+        this.age = age;
+    }
+
+    @Override
+    @SuppressWarnings("all")
+    public String toString()
+    {
+        final StringBuilder stringbuilder = new StringBuilder();
+        stringbuilder.append("id：").append(id).append('\n');
+        stringbuilder.append("name：").append(name).append('\n');
+        stringbuilder.append("sex：").append(sex).append('\n');
+        stringbuilder.append("age：").append(age).append('\n');
+        return stringbuilder.toString();
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_迭代器模式
+ * Package(包名): mao.t1
+ * Class(类名): StudentBuilder
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 19:56
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class StudentBuilder
+{
+    private Long id;
+    private String name;
+    private String sex;
+    private Integer age;
+
+    /**
+     * Sets id.
+     *
+     * @param id the id
+     * @return the id
+     */
+    public StudentBuilder setId(Long id)
+    {
+        this.id = id;
+        return this;
+    }
+
+    /**
+     * Sets name.
+     *
+     * @param name the name
+     * @return the name
+     */
+    public StudentBuilder setName(String name)
+    {
+        this.name = name;
+        return this;
+    }
+
+    /**
+     * Sets sex.
+     *
+     * @param sex the sex
+     * @return the sex
+     */
+    public StudentBuilder setSex(String sex)
+    {
+        this.sex = sex;
+        return this;
+    }
+
+    /**
+     * Sets age.
+     *
+     * @param age the age
+     * @return the age
+     */
+    public StudentBuilder setAge(Integer age)
+    {
+        this.age = age;
+        return this;
+    }
+
+    /**
+     * Build student.
+     *
+     * @return the student
+     */
+    public Student build()
+    {
+        return new Student(id, name, sex, age);
+    }
+}
+```
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_迭代器模式
+ * Package(包名): mao.t1
+ * Interface(接口名): StudentIterator
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 19:52
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface StudentIterator
+{
+    /**
+     * Has next boolean.
+     *
+     * @return the boolean
+     */
+    boolean hasNext();
+
+    /**
+     * Next student.
+     *
+     * @return the student
+     */
+    Student next();
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+import java.util.List;
+
+/**
+ * Project name(项目名称)：java设计模式_迭代器模式
+ * Package(包名): mao.t1
+ * Class(类名): StudentIteratorImpl1
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 19:58
+ * Version(版本): 1.0
+ * Description(描述)： 升序
+ */
+
+public class StudentIteratorImpl1 implements StudentIterator
+{
+    private final List<Student> list;
+    private int position = 0;
+
+    /**
+     * Instantiates a new Student iterator impl 1.
+     *
+     * @param list the list
+     */
+    public StudentIteratorImpl1(List<Student> list)
+    {
+        this.list = list;
+    }
+
+    @Override
+    public boolean hasNext()
+    {
+        return position < list.size();
+    }
+
+    @Override
+    public Student next()
+    {
+        Student student = list.get(position);
+        position++;
+        return student;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+import java.util.List;
+
+/**
+ * Project name(项目名称)：java设计模式_迭代器模式
+ * Package(包名): mao.t1
+ * Class(类名): StudentIteratorImpl2
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 20:00
+ * Version(版本): 1.0
+ * Description(描述)： 降序
+ */
+
+public class StudentIteratorImpl2 implements StudentIterator
+{
+    private final List<Student> list;
+    private int position;
+
+    /**
+     * Instantiates a new Student iterator impl 2.
+     *
+     * @param list the list
+     */
+    public StudentIteratorImpl2(List<Student> list)
+    {
+        this.list = list;
+        position = list.size() - 1;
+    }
+
+
+    @Override
+    public boolean hasNext()
+    {
+        return position >= 0;
+    }
+
+    @Override
+    public Student next()
+    {
+        Student student = list.get(position);
+        position--;
+        return student;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_迭代器模式
+ * Package(包名): mao.t1
+ * Interface(接口名): StudentAggregate
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 20:04
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface StudentAggregate
+{
+    /**
+     * 添加学生
+     *
+     * @param student Student
+     */
+    void addStudent(Student student);
+
+    /**
+     * 移除学生
+     *
+     * @param student Student
+     */
+    void removeStudent(Student student);
+
+    /**
+     * 获取迭代器对象
+     *
+     * @param asc_or_desc 升序或者将序，输入0为升序，输入1为降序
+     * @return StudentIterator实现类
+     */
+    StudentIterator getStudentIterator(int asc_or_desc);
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Project name(项目名称)：java设计模式_迭代器模式
+ * Package(包名): mao.t1
+ * Class(类名): StudentAggregateImpl
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 20:07
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class StudentAggregateImpl implements StudentAggregate
+{
+    private final List<Student> studentList;
+
+    public StudentAggregateImpl()
+    {
+        this.studentList = new ArrayList<>();
+    }
+
+    @Override
+    public void addStudent(Student student)
+    {
+        studentList.add(student);
+    }
+
+    @Override
+    public void removeStudent(Student student)
+    {
+        studentList.remove(student);
+    }
+
+    @Override
+    public StudentIterator getStudentIterator(int asc_or_desc)
+    {
+        if (asc_or_desc == 0)
+        {
+            return new StudentIteratorImpl1(studentList);
+        }
+        else if (asc_or_desc == 1)
+        {
+            return new StudentIteratorImpl2(studentList);
+        }
+        else
+        {
+            throw new RuntimeException("输入的数字不合法！ 当前参数asc_or_desc的值为" + asc_or_desc + "，此产参数值只能为0或者1");
+        }
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.t1;
+
+/**
+ * Project name(项目名称)：java设计模式_迭代器模式
+ * Package(包名): mao.t1
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 20:11
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        StudentAggregate studentAggregate = new StudentAggregateImpl();
+
+        Student student = new StudentBuilder().setId(1L).build();
+        Student student1 = new StudentBuilder().setId(2L)
+                .setName("张珊珊")
+                .setAge(18)
+                .setSex("女").
+                build();
+
+        Student student2 = new StudentBuilder()
+                .setId(3L)
+                .setName("王五")
+                .build();
+
+        Student student3 = new StudentBuilder()
+                .setId(4L)
+                .setName("张八")
+                .setSex("男")
+                .setAge(19)
+                .build();
+
+        studentAggregate.addStudent(student);
+        studentAggregate.addStudent(student1);
+        studentAggregate.addStudent(student2);
+        studentAggregate.addStudent(student3);
+
+        StudentIterator studentIterator = studentAggregate.getStudentIterator(0);
+        while (studentIterator.hasNext())
+        {
+            Student next = studentIterator.next();
+            System.out.println(next);
+        }
+
+        System.out.println("----------");
+
+        studentIterator = studentAggregate.getStudentIterator(1);
+        while (studentIterator.hasNext())
+        {
+            Student next = studentIterator.next();
+            System.out.println(next);
+        }
+
+        System.out.println("----------");
+
+        //测试异常
+        studentAggregate.getStudentIterator(3);
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+id：1
+name：null
+sex：null
+age：null
+
+id：2
+name：张珊珊
+sex：女
+age：18
+
+id：3
+name：王五
+sex：null
+age：null
+
+id：4
+name：张八
+sex：男
+age：19
+
+----------
+id：4
+name：张八
+sex：男
+age：19
+
+id：3
+name：王五
+sex：null
+age：null
+
+id：2
+name：张珊珊
+sex：女
+age：18
+
+id：1
+name：null
+sex：null
+age：null
+
+----------
+Exception in thread "main" java.lang.RuntimeException: 输入的数字不合法！ 当前参数asc_or_desc的值为3，此产参数值只能为0或者1
+	at mao.t1.StudentAggregateImpl.getStudentIterator(StudentAggregateImpl.java:53)
+	at mao.t1.Test.main(Test.java:65)
+```
+
+
+
+
+
+### 优缺点
+
+**优点：**
+
+* 它支持以不同的方式遍历一个聚合对象，在同一个聚合对象上可以定义多种遍历方式。在迭代器模式中只需要用一个不同的迭代器来替换原有迭代器即可改变遍历算法，我们也可以自己定义迭代器的子类以支持新的遍历方式。
+* 迭代器简化了聚合类。由于引入了迭代器，在原有的聚合对象中不需要再自行提供数据遍历等方法，这样可以简化聚合类的设计。
+* 在迭代器模式中，由于引入了抽象层，增加新的聚合类和迭代器类都很方便，无须修改原有代码，满足 “开闭原则” 的要求。
+
+
+
+**缺点：**
+
+增加了类的个数，这在一定程度上增加了系统的复杂性。
+
+
+
+
+
+### 使用场景
+
+* 当需要为聚合对象提供多种遍历方式时。
+* 当需要为遍历不同的聚合结构提供一个统一的接口时。
+* 当访问一个聚合对象的内容而无须暴露其内部细节的表示时。
+
+
+
+
+
+### JDK源码解析
+
+迭代器模式在JAVA的很多集合类中被广泛应用
+
+
+
+```java
+package mao.jdk;
+
+import mao.t1.Student;
+import mao.t1.StudentBuilder;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+/**
+ * Project name(项目名称)：java设计模式_迭代器模式
+ * Package(包名): mao.jdk
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/22
+ * Time(创建时间)： 20:25
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        List<Student> list = new ArrayList<>();
+
+        Student student = new StudentBuilder().setId(1L).build();
+        Student student1 = new StudentBuilder().setId(2L)
+                .setName("张珊珊")
+                .setAge(18)
+                .setSex("女").
+                build();
+
+        Student student2 = new StudentBuilder()
+                .setId(3L)
+                .setName("王五")
+                .build();
+
+        Student student3 = new StudentBuilder()
+                .setId(4L)
+                .setName("张八")
+                .setSex("男")
+                .setAge(19)
+                .build();
+
+        list.add(student);
+        list.add(student1);
+        list.add(student2);
+        list.add(student3);
+
+        Iterator<Student> iterator = list.iterator();
+        while (iterator.hasNext())
+        {
+            Student next = iterator.next();
+            System.out.println(next);
+        }
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+id：1
+name：null
+sex：null
+age：null
+
+id：2
+name：张珊珊
+sex：女
+age：18
+
+id：3
+name：王五
+sex：null
+age：null
+
+id：4
+name：张八
+sex：男
+age：19
+```
+
+
+
+- List：抽象聚合类
+- ArrayList：具体的聚合类
+- Iterator：抽象迭代器
+- list.iterator()：返回的是实现了 `Iterator` 接口的具体迭代器对象
+
+
+
+
+
+```java
+public class ArrayList<E> extends AbstractList<E>
+        implements List<E>, RandomAccess, Cloneable, java.io.Serializable {
+    
+     /**
+     * Returns an iterator over the elements in this list in proper sequence.
+     *
+     * <p>The returned iterator is <a href="#fail-fast"><i>fail-fast</i></a>.
+     *
+     * @return an iterator over the elements in this list in proper sequence
+     */
+    public Iterator<E> iterator() {
+        return new Itr();
+    }
+    
+    private class Itr implements Iterator<E> {
+        int cursor;       // 下一个要返回元素的索引
+        int lastRet = -1; // 上一个返回元素的索引
+        int expectedModCount = modCount;
+
+        Itr() {}
+		
+        //判断是否还有元素
+        public boolean hasNext() {
+            return cursor != size;
+        }
+
+        //获取下一个元素
+        public E next() {
+            checkForComodification();
+            int i = cursor;
+            if (i >= size)
+                throw new NoSuchElementException();
+            Object[] elementData = ArrayList.this.elementData;
+            if (i >= elementData.length)
+                throw new ConcurrentModificationException();
+            cursor = i + 1;
+            return (E) elementData[lastRet = i];
+        }
+        ...
+}
+```
+
+
+
+
+
+![image-20220822203333170](img/java设计模式学习笔记/image-20220822203333170.png)
+
+
+
+
+
+
+
+## 访问者模式
+
