@@ -22253,3 +22253,849 @@ dog
 
 ## 备忘录模式
 
+### 概念
+
+备忘录模式提供了一种状态恢复的实现机制，使得用户可以方便地回到一个特定的历史步骤，当新的状态无效或者存在问题时，可以使用暂时存储起来的备忘录将状态复原，很多软件都提供了撤销（Undo）操作，如 Word、记事本、Photoshop、IDEA等软件在编辑时按 Ctrl+Z 组合键时能撤销当前操作，使文档恢复到之前的状态；还有在 浏览器 中的后退键、数据库事务管理中的回滚操作、玩游戏时的中间结果存档功能、数据库与操作系统的备份操作、棋类游戏中的悔棋功能等都属于这类。
+
+**定义：**
+
+备忘录模式又叫快照模式，在不破坏封装性的前提下，捕获一个对象的内部状态，并在该对象之外保存这个状态，以便以后当需要时能将该对象恢复到原先保存的状态。
+
+
+
+
+
+### 结构
+
+备忘录模式的主要角色如下：
+
+* 发起人（Originator）角色：记录当前时刻的内部状态信息，提供创建备忘录和恢复备忘录数据的功能，实现其他业务功能，它可以访问备忘录里的所有信息。
+* 备忘录（Memento）角色：负责存储发起人的内部状态，在需要的时候提供这些内部状态给发起人。
+* 管理者（Caretaker）角色：对备忘录进行管理，提供保存与获取备忘录的功能，但其不能对备忘录的内容进行访问与修改。
+
+
+
+备忘录有两个等效的接口：
+
+* **窄接口**：管理者(Caretaker)对象（和其他发起人对象之外的任何对象）看到的是备忘录的窄接口(narror Interface)，这个窄接口只允许他把备忘录对象传给其他的对象。
+* **宽接口**：与管理者看到的窄接口相反，发起人对象可以看到一个宽接口(wide Interface)，这个宽接口允许它读取所有的数据，以便根据这些数据恢复这个发起人对象的内部状态。
+
+
+
+
+
+
+
+### 示例
+
+**游戏挑战BOSS**
+
+游戏中的某个场景，一游戏角色有生命力、攻击力、防御力等数据，在打Boss前和后一定会不一样的，我们允许玩家如果感觉与Boss决斗的效果不理想可以让游戏恢复到决斗之前的状态。
+
+
+
+要实现上述案例，有两种方式：
+
+* “白箱”备忘录模式
+* “黑箱”备忘录模式
+
+
+
+
+
+#### “白箱”备忘录模式
+
+备忘录角色对任何对象都提供一个接口，即宽接口，备忘录角色的内部所存储的状态就对所有对象公开。
+
+
+
+![image-20220823193536078](img/java设计模式学习笔记/image-20220823193536078.png)
+
+
+
+
+
+```java
+package mao.white_box;
+
+
+/**
+ * Project name(项目名称)：java设计模式_备忘录模式
+ * Package(包名): mao.white_box
+ * Class(类名): GameRole
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/23
+ * Time(创建时间)： 19:36
+ * Version(版本): 1.0
+ * Description(描述)： 游戏角色类
+ */
+
+public class GameRole
+{
+    //生命力
+    private int vit;
+    //攻击力
+    private int atk;
+    //防御力
+    private int def;
+
+    /**
+     * 初始化游戏角色的状态
+     */
+    public void initState()
+    {
+        this.vit = 100;
+        this.atk = 100;
+        this.def = 100;
+    }
+
+    /**
+     * Instantiates a new Game role.
+     */
+    public GameRole()
+    {
+        this.initState();
+    }
+
+    /**
+     * 获取随机数
+     *
+     * @param min 最小值
+     * @param max 最大值
+     * @return 一个随机数 int random
+     */
+    private int getIntRandom(int min, int max)
+    {
+        if (min > max)
+        {
+            min = max;
+        }
+        return min + (int) (Math.random() * (max - min + 1));
+    }
+
+    /**
+     * 战斗方法，随机
+     */
+    public void fight()
+    {
+        this.vit = this.vit - getIntRandom(2, 15);
+        if (Math.random() > 0.5)
+        {
+            this.atk = this.atk + getIntRandom(3, 10);
+        }
+        else
+        {
+            this.atk = this.atk - getIntRandom(5, 15);
+        }
+        if (Math.random() > 0.5)
+        {
+            this.def = this.def + getIntRandom(3, 10);
+        }
+        else
+        {
+            this.def = this.def - getIntRandom(5, 15);
+        }
+    }
+
+    /**
+     * 保存游戏的状态
+     *
+     * @return RoleStateMemento对象 role state memento
+     */
+    public RoleStateMemento saveState()
+    {
+        return new RoleStateMemento(vit, atk, def);
+    }
+
+    /**
+     * 恢复状态
+     *
+     * @param roleStateMemento RoleStateMemento对象
+     */
+    public void recoverState(RoleStateMemento roleStateMemento)
+    {
+        this.vit = roleStateMemento.getVit();
+        this.atk = roleStateMemento.getAtk();
+        this.def = roleStateMemento.getDef();
+    }
+
+    /**
+     * 显示当前状态
+     */
+    public void stateDisplay()
+    {
+        System.out.println("当前角色生命力：" + vit);
+        System.out.println("当前角色攻击力：" + atk);
+        System.out.println("当前角色防御力：" + def);
+    }
+
+    /**
+     * Gets vit.
+     *
+     * @return the vit
+     */
+    public int getVit()
+    {
+        return vit;
+    }
+
+    /**
+     * Gets atk.
+     *
+     * @return the atk
+     */
+    public int getAtk()
+    {
+        return atk;
+    }
+
+    /**
+     * Gets def.
+     *
+     * @return the def
+     */
+    public int getDef()
+    {
+        return def;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.white_box;
+
+/**
+ * Project name(项目名称)：java设计模式_备忘录模式
+ * Package(包名): mao.white_box
+ * Class(类名): RoleStateMemento
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/23
+ * Time(创建时间)： 19:43
+ * Version(版本): 1.0
+ * Description(描述)： 游戏状态存储类(备忘录类)
+ */
+
+public class RoleStateMemento
+{
+    private int vit;
+    private int atk;
+    private int def;
+
+    /**
+     * Instantiates a new Role state memento.
+     *
+     * @param vit the vit
+     * @param atk the atk
+     * @param def the def
+     */
+    public RoleStateMemento(int vit, int atk, int def)
+    {
+        this.vit = vit;
+        this.atk = atk;
+        this.def = def;
+    }
+
+    /**
+     * Gets vit.
+     *
+     * @return the vit
+     */
+    public int getVit()
+    {
+        return vit;
+    }
+
+    /**
+     * Sets vit.
+     *
+     * @param vit the vit
+     * @return the vit
+     */
+    public RoleStateMemento setVit(int vit)
+    {
+        this.vit = vit;
+        return this;
+    }
+
+    /**
+     * Gets atk.
+     *
+     * @return the atk
+     */
+    public int getAtk()
+    {
+        return atk;
+    }
+
+    /**
+     * Sets atk.
+     *
+     * @param atk the atk
+     * @return the atk
+     */
+    public RoleStateMemento setAtk(int atk)
+    {
+        this.atk = atk;
+        return this;
+    }
+
+    /**
+     * Gets def.
+     *
+     * @return the def
+     */
+    public int getDef()
+    {
+        return def;
+    }
+
+    /**
+     * Sets def.
+     *
+     * @param def the def
+     * @return the def
+     */
+    public RoleStateMemento setDef(int def)
+    {
+        this.def = def;
+        return this;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.white_box;
+
+/**
+ * Project name(项目名称)：java设计模式_备忘录模式
+ * Package(包名): mao.white_box
+ * Class(类名): RoleStateCaretaker
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/23
+ * Time(创建时间)： 19:48
+ * Version(版本): 1.0
+ * Description(描述)： 角色状态管理者类
+ */
+
+public class RoleStateCaretaker
+{
+    private RoleStateMemento roleStateMemento;
+
+    public RoleStateMemento getRoleStateMemento()
+    {
+        return roleStateMemento;
+    }
+
+    public void setRoleStateMemento(RoleStateMemento roleStateMemento)
+    {
+        this.roleStateMemento = roleStateMemento;
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.white_box;
+
+/**
+ * Project name(项目名称)：java设计模式_备忘录模式
+ * Package(包名): mao.white_box
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/23
+ * Time(创建时间)： 19:50
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        GameRole gameRole = new GameRole();
+        gameRole.stateDisplay();
+        RoleStateMemento roleStateMemento = gameRole.saveState();
+        RoleStateCaretaker roleStateCaretaker = new RoleStateCaretaker();
+        roleStateCaretaker.setRoleStateMemento(roleStateMemento);
+        System.out.println("------------");
+        gameRole.fight();
+        gameRole.stateDisplay();
+        System.out.println("------------");
+        gameRole.fight();
+        gameRole.stateDisplay();
+        System.out.println("------------");
+        gameRole.fight();
+        gameRole.stateDisplay();
+        System.out.println("------------");
+        //恢复
+        gameRole.recoverState(roleStateCaretaker.getRoleStateMemento());
+        gameRole.stateDisplay();
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+当前角色生命力：100
+当前角色攻击力：100
+当前角色防御力：100
+------------
+当前角色生命力：94
+当前角色攻击力：109
+当前角色防御力：95
+------------
+当前角色生命力：82
+当前角色攻击力：94
+当前角色防御力：84
+------------
+当前角色生命力：68
+当前角色攻击力：82
+当前角色防御力：76
+------------
+当前角色生命力：100
+当前角色攻击力：100
+当前角色防御力：100
+```
+
+结果不唯一
+
+
+
+**白箱备忘录模式是破坏封装性的**
+
+
+
+
+
+#### “黑箱”备忘录模式
+
+
+
+备忘录角色对发起人对象提供一个宽接口，而为其他对象提供一个窄接口。在Java语言中，实现双重接口的办法就是将**备忘录类**设计成**发起人类**的内部成员类。
+
+将 `RoleStateMemento` 设为 `GameRole` 的内部类，从而将 `RoleStateMemento` 对象封装在 `GameRole` 里面；在外面提供一个标识接口 `Memento` 给 `RoleStateCaretaker` 及其他对象使用。这样 `GameRole` 类看到的是 `RoleStateMemento` 所有的接口，而`RoleStateCaretaker`  及其他对象看到的仅仅是标识接口 `Memento` 所暴露出来的接口，从而维护了封装型。
+
+
+
+![image-20220823202315804](img/java设计模式学习笔记/image-20220823202315804.png)
+
+
+
+
+
+```java
+package mao.black_box;
+
+/**
+ * Project name(项目名称)：java设计模式_备忘录模式
+ * Package(包名): mao.black_box
+ * Interface(接口名): Memento
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/23
+ * Time(创建时间)： 20:24
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface Memento
+{
+
+}
+```
+
+
+
+```java
+package mao.black_box;
+
+/**
+ * Project name(项目名称)：java设计模式_备忘录模式
+ * Package(包名): mao.black_box
+ * Class(类名): GameRole
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/23
+ * Time(创建时间)： 20:24
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+public class GameRole
+{
+    //生命力
+    private int vit;
+    //攻击力
+    private int atk;
+    //防御力
+    private int def;
+
+    /**
+     * 初始化游戏角色的状态
+     */
+    public void initState()
+    {
+        this.vit = 100;
+        this.atk = 100;
+        this.def = 100;
+    }
+
+    /**
+     * Instantiates a new Game role.
+     */
+    public GameRole()
+    {
+        this.initState();
+    }
+
+    /**
+     * 获取随机数
+     *
+     * @param min 最小值
+     * @param max 最大值
+     * @return 一个随机数 int random
+     */
+    private int getIntRandom(int min, int max)
+    {
+        if (min > max)
+        {
+            min = max;
+        }
+        return min + (int) (Math.random() * (max - min + 1));
+    }
+
+    /**
+     * 战斗方法，随机
+     */
+    public void fight()
+    {
+        this.vit = this.vit - getIntRandom(2, 15);
+        if (Math.random() > 0.5)
+        {
+            this.atk = this.atk + getIntRandom(3, 10);
+        }
+        else
+        {
+            this.atk = this.atk - getIntRandom(5, 15);
+        }
+        if (Math.random() > 0.5)
+        {
+            this.def = this.def + getIntRandom(3, 10);
+        }
+        else
+        {
+            this.def = this.def - getIntRandom(5, 15);
+        }
+    }
+
+    /**
+     * 保存游戏的状态
+     *
+     * @return RoleStateMemento对象 role state memento
+     */
+    public RoleStateMemento saveState()
+    {
+        return new RoleStateMemento(vit, atk, def);
+    }
+
+    /**
+     * 恢复状态
+     *
+     * @param memento Memento对象
+     */
+    public void recoverState(Memento memento)
+    {
+        RoleStateMemento roleStateMemento = (RoleStateMemento) memento;
+        this.vit = roleStateMemento.getVit();
+        this.atk = roleStateMemento.getAtk();
+        this.def = roleStateMemento.getDef();
+    }
+
+    /**
+     * 显示当前状态
+     */
+    public void stateDisplay()
+    {
+        System.out.println("当前角色生命力：" + vit);
+        System.out.println("当前角色攻击力：" + atk);
+        System.out.println("当前角色防御力：" + def);
+    }
+
+    /**
+     * Gets vit.
+     *
+     * @return the vit
+     */
+    public int getVit()
+    {
+        return vit;
+    }
+
+    /**
+     * Gets atk.
+     *
+     * @return the atk
+     */
+    public int getAtk()
+    {
+        return atk;
+    }
+
+    /**
+     * Gets def.
+     *
+     * @return the def
+     */
+    public int getDef()
+    {
+        return def;
+    }
+
+    private class RoleStateMemento implements Memento
+    {
+        private int vit;
+        private int atk;
+        private int def;
+
+        /**
+         * Instantiates a new Role state memento.
+         *
+         * @param vit the vit
+         * @param atk the atk
+         * @param def the def
+         */
+        public RoleStateMemento(int vit, int atk, int def)
+        {
+            this.vit = vit;
+            this.atk = atk;
+            this.def = def;
+        }
+
+        /**
+         * Gets vit.
+         *
+         * @return the vit
+         */
+        public int getVit()
+        {
+            return vit;
+        }
+
+        /**
+         * Sets vit.
+         *
+         * @param vit the vit
+         */
+        public void setVit(int vit)
+        {
+            this.vit = vit;
+        }
+
+        /**
+         * Gets atk.
+         *
+         * @return the atk
+         */
+        public int getAtk()
+        {
+            return atk;
+        }
+
+        /**
+         * Sets atk.
+         *
+         * @param atk the atk
+         */
+        public void setAtk(int atk)
+        {
+            this.atk = atk;
+        }
+
+        /**
+         * Gets def.
+         *
+         * @return the def
+         */
+        public int getDef()
+        {
+            return def;
+        }
+
+        /**
+         * Sets def.
+         *
+         * @param def the def
+         */
+        public void setDef(int def)
+        {
+            this.def = def;
+        }
+    }
+}
+```
+
+
+
+
+
+```java
+package mao.black_box;
+
+/**
+ * Project name(项目名称)：java设计模式_备忘录模式
+ * Package(包名): mao.black_box
+ * Class(类名): RoleStateCaretaker
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/23
+ * Time(创建时间)： 20:26
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class RoleStateCaretaker
+{
+    private Memento memento;
+
+    public Memento getMemento()
+    {
+        return memento;
+    }
+
+    public void setMemento(Memento memento)
+    {
+        this.memento = memento;
+    }
+}
+```
+
+
+
+```java
+package mao.black_box;
+
+/**
+ * Project name(项目名称)：java设计模式_备忘录模式
+ * Package(包名): mao.black_box
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/23
+ * Time(创建时间)： 20:26
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        GameRole gameRole = new GameRole();
+        gameRole.stateDisplay();
+        RoleStateCaretaker roleStateCaretaker = new RoleStateCaretaker();
+        roleStateCaretaker.setMemento(gameRole.saveState());
+        System.out.println("------------");
+        gameRole.fight();
+        gameRole.stateDisplay();
+        System.out.println("------------");
+        gameRole.fight();
+        gameRole.stateDisplay();
+        System.out.println("------------");
+        gameRole.fight();
+        gameRole.stateDisplay();
+        System.out.println("------------");
+        //恢复
+        gameRole.recoverState(roleStateCaretaker.getMemento());
+        gameRole.stateDisplay();
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+当前角色生命力：100
+当前角色攻击力：100
+当前角色防御力：100
+------------
+当前角色生命力：94
+当前角色攻击力：103
+当前角色防御力：89
+------------
+当前角色生命力：91
+当前角色攻击力：111
+当前角色防御力：95
+------------
+当前角色生命力：88
+当前角色攻击力：105
+当前角色防御力：89
+------------
+当前角色生命力：100
+当前角色攻击力：100
+当前角色防御力：100
+```
+
+
+
+
+
+![image-20220823203348963](img/java设计模式学习笔记/image-20220823203348963.png)
+
+
+
+
+
+
+
+### 优缺点
+
+**优点：**
+
+- 提供了一种可以恢复状态的机制。当用户需要时能够比较方便地将数据恢复到某个历史的状态。
+- 实现了内部状态的封装。除了创建它的发起人之外，其他对象都不能够访问这些状态信息。
+- 简化了发起人类。发起人不需要管理和保存其内部状态的各个备份，所有状态信息都保存在备忘录中，并由管理者进行管理，这符合单一职责原则。
+
+**缺点：**
+
+* 资源消耗大。如果要保存的内部状态信息过多或者特别频繁，将会占用比较大的内存资源。
+
+
+
+
+
+### 使用场景
+
+* 需要保存与恢复数据的场景，如玩游戏时的中间结果的存档功能。
+* 需要提供一个可回滚操作的场景，如 Word、记事本、Photoshop，idea等软件在编辑时按 Ctrl+Z 组合键，还有数据库中事务操作。
+
+
+
