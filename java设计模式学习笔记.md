@@ -23205,3 +23205,385 @@ value ::= integer
 
 ### 示例
 
+设计实现加减法的软件
+
+
+
+![image-20220824121621449](img/java设计模式学习笔记/image-20220824121621449.png)
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_解释器模式
+ * Package(包名): mao
+ * Class(类名): AbstractExpression
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/24
+ * Time(创建时间)： 12:18
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public abstract class AbstractExpression
+{
+    public abstract int interpret(Context context);
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_解释器模式
+ * Package(包名): mao
+ * Class(类名): Plus
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/24
+ * Time(创建时间)： 12:20
+ * Version(版本): 1.0
+ * Description(描述)： 非终结符表达式角色  加法表达式
+ */
+
+public class Plus extends AbstractExpression
+{
+    private final AbstractExpression left;
+    private final AbstractExpression right;
+
+    public Plus(AbstractExpression left, AbstractExpression right)
+    {
+        this.left = left;
+        this.right = right;
+    }
+
+    @Override
+    public int interpret(Context context)
+    {
+        return left.interpret(context) + right.interpret(context);
+    }
+
+    @Override
+    public String toString()
+    {
+        return "(" + left.toString() + " + " + right.toString() + ")";
+    }
+}
+```
+
+
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_解释器模式
+ * Package(包名): mao
+ * Class(类名): Minus
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/24
+ * Time(创建时间)： 12:21
+ * Version(版本): 1.0
+ * Description(描述)： 非终结符表达式角色 减法表达式
+ */
+
+public class Minus extends AbstractExpression
+{
+    private final AbstractExpression left;
+    private final AbstractExpression right;
+
+    public Minus(AbstractExpression left, AbstractExpression right)
+    {
+        this.left = left;
+        this.right = right;
+    }
+
+    @Override
+    public int interpret(Context context)
+    {
+        return left.interpret(context) - right.interpret(context);
+    }
+
+    @Override
+    public String toString()
+    {
+        return "(" + left.toString() + " - " + right.toString() + ")";
+    }
+}
+```
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_解释器模式
+ * Package(包名): mao
+ * Class(类名): Value
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/24
+ * Time(创建时间)： 12:18
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Value extends AbstractExpression
+{
+    private final int value;
+
+    public Value(int value)
+    {
+        this.value = value;
+    }
+
+    @Override
+    public int interpret(Context context)
+    {
+        return value;
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.valueOf(value);
+    }
+}
+```
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_解释器模式
+ * Package(包名): mao
+ * Class(类名): Variable
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/24
+ * Time(创建时间)： 12:22
+ * Version(版本): 1.0
+ * Description(描述)： 终结符表达式角色 变量表达式
+ */
+
+public class Variable extends AbstractExpression
+{
+    private final String name;
+
+    public Variable(String name)
+    {
+        this.name = name;
+    }
+
+    @Override
+    public int interpret(Context context)
+    {
+        return context.getValue(this);
+    }
+
+    @Override
+    public String toString()
+    {
+        return name;
+    }
+}
+```
+
+
+
+```java
+package mao;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Project name(项目名称)：java设计模式_解释器模式
+ * Package(包名): mao
+ * Class(类名): Context
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/24
+ * Time(创建时间)： 12:23
+ * Version(版本): 1.0
+ * Description(描述)： 环境类
+ */
+
+public class Context
+{
+    private final Map<Variable, Integer> map;
+
+    public Context()
+    {
+        this.map = new HashMap<>();
+    }
+
+    public void assign(Variable var, Integer value)
+    {
+        map.put(var, value);
+    }
+
+    public int getValue(Variable var)
+    {
+        return map.get(var);
+    }
+}
+```
+
+
+
+```java
+package mao;
+
+/**
+ * Project name(项目名称)：java设计模式_解释器模式
+ * Package(包名): mao
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/24
+ * Time(创建时间)： 12:26
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args)
+    {
+        Context context = new Context();
+        //变量
+        Variable a = new Variable("a");
+        Variable b = new Variable("b");
+        Variable c = new Variable("c");
+        Variable d = new Variable("d");
+        Variable e = new Variable("e");
+
+        context.assign(a, 1);
+        context.assign(b, 2);
+        context.assign(c, 3);
+        context.assign(d, 4);
+        context.assign(e, 5);
+
+        //(a + ((b + (c - d)) - e))
+        //(1 + ((2 + (3 - 4)) - 5))
+        AbstractExpression abstractExpression = new Plus(a, new Minus(new Plus(b, new Minus(c, d)), e));
+        int result = abstractExpression.interpret(context);
+        System.out.println(abstractExpression);
+        System.out.println(result);
+
+        //(4 + (6 - 3))
+        AbstractExpression abstractExpression1 = new Plus(new Value(4), new Minus(new Value(6), new Value(3)));
+        System.out.println(abstractExpression1);
+        int interpret = abstractExpression1.interpret(new Context());
+        System.out.println(interpret);
+
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+(a + ((b + (c - d)) - e))
+-3
+(4 + (6 - 3))
+7
+```
+
+
+
+![image-20220824124818139](img/java设计模式学习笔记/image-20220824124818139.png)
+
+
+
+
+
+
+
+### 优缺点
+
+**优点：**
+
+* 易于改变和扩展文法。
+
+  由于在解释器模式中使用类来表示语言的文法规则，因此可以通过继承等机制来改变或扩展文法。每一条文法规则都可以表示为一个类，因此可以方便地实现一个简单的语言。
+
+* 实现文法较为容易。
+
+  在抽象语法树中每一个表达式节点类的实现方式都是相似的，这些类的代码编写都不会特别复杂。
+
+* 增加新的解释表达式较为方便。
+
+  如果用户需要增加新的解释表达式只需要对应增加一个新的终结符表达式或非终结符表达式类，原有表达式类代码无须修改，符合 "开闭原则"。
+
+**缺点：**
+
+- 对于复杂文法难以维护。
+
+  在解释器模式中，每一条规则至少需要定义一个类，因此如果一个语言包含太多文法规则，类的个数将会急剧增加，导致系统难以管理和维护。
+
+* 执行效率较低。
+
+  由于在解释器模式中使用了大量的循环和递归调用，因此在解释较为复杂的句子时其速度很慢，而且代码的调试过程也比较麻烦。
+
+
+
+
+
+### 使用场景
+
+* 当语言的文法较为简单，且执行效率不是关键问题时。
+* 当问题重复出现，且可以用一种简单的语言来进行表达时。
+* 当一个语言需要解释执行，并且语言中的句子可以表示为一个抽象语法树的时候。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 自定义Spring框架
+
+
+
