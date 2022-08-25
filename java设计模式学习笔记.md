@@ -26377,3 +26377,442 @@ address：中国北京...
 
 
 
+## 循环依赖测试
+
+
+
+```java
+package mao.test3;
+
+/**
+ * Project name(项目名称)：java设计模式_自定义Spring框架
+ * Package(包名): mao.test3
+ * Class(类名): A
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/25
+ * Time(创建时间)： 18:13
+ * Version(版本): 1.0
+ * Description(描述)： A依赖于A
+ */
+
+public class A
+{
+    private String name;
+    private A a;
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public A getA()
+    {
+        return a;
+    }
+
+    public void setA(A a)
+    {
+        this.a = a;
+    }
+}
+```
+
+
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="a" class="mao.test3.A">
+        <property name="name" value="A依赖于A"/>
+        <property name="a" ref="a"/>
+    </bean>
+
+</beans>
+```
+
+
+
+```java
+package mao.test3;
+
+import mao.customize.context.ApplicationContext;
+import mao.customize.context.ClassPathXmlApplicationContext;
+
+/**
+ * Project name(项目名称)：java设计模式_自定义Spring框架
+ * Package(包名): mao.test3
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/25
+ * Time(创建时间)： 18:17
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args) throws Exception
+    {
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("beans3.xml");
+        A a = applicationContext.getBean("a", A.class);
+        System.out.println(a.getName());
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+Exception in thread "main" java.lang.StackOverflowError
+	at java.base/jdk.internal.reflect.Reflection.verifyMemberAccess(Reflection.java:134)
+	at java.base/java.lang.reflect.AccessibleObject.slowVerifyAccess(AccessibleObject.java:728)
+	at java.base/java.lang.reflect.AccessibleObject.verifyAccess(AccessibleObject.java:714)
+	at java.base/java.lang.reflect.AccessibleObject.checkAccess(AccessibleObject.java:686)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:489)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:480)
+	at mao.customize.context.ClassPathXmlApplicationContext.getBean(ClassPathXmlApplicationContext.java:75)
+	at mao.customize.context.ClassPathXmlApplicationContext.getBean(ClassPathXmlApplicationContext.java:92)
+	at mao.customize.context.ClassPathXmlApplicationContext.getBean(ClassPathXmlApplicationContext.java:92)
+	at mao.customize.context.ClassPathXmlApplicationContext.getBean(ClassPathXmlApplicationContext.java:92)
+	...
+	...
+	...
+```
+
+
+
+![image-20220825182356512](img/java设计模式学习笔记/image-20220825182356512.png)
+
+
+
+
+
+因为自定义的spring框架中并没有解决此依赖问题
+
+
+
+而spring使用了三级缓存来解决循环依赖问题
+
+
+
+```java
+package mao.test3;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+/**
+ * Project name(项目名称)：java设计模式_自定义Spring框架
+ * Package(包名): mao.test3
+ * Class(类名): TestBySpring
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/25
+ * Time(创建时间)： 18:19
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class TestBySpring
+{
+    public static void main(String[] args)
+    {
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("beans3.xml");
+        A a = applicationContext.getBean("a", A.class);
+        System.out.println(a.getName());
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+A依赖于A
+```
+
+
+
+
+
+
+
+A依赖于B，B依赖于A的示例
+
+
+
+```java
+package mao.test4;
+
+/**
+ * Project name(项目名称)：java设计模式_自定义Spring框架
+ * Package(包名): mao.test4
+ * Class(类名): A
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/25
+ * Time(创建时间)： 18:26
+ * Version(版本): 1.0
+ * Description(描述)： A依赖于B
+ */
+
+public class A
+{
+    private String name;
+    private B b;
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public B getB()
+    {
+        return b;
+    }
+
+    public void setB(B b)
+    {
+        this.b = b;
+    }
+}
+```
+
+
+
+```java
+package mao.test4;
+
+/**
+ * Project name(项目名称)：java设计模式_自定义Spring框架
+ * Package(包名): mao.test4
+ * Class(类名): B
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/25
+ * Time(创建时间)： 18:26
+ * Version(版本): 1.0
+ * Description(描述)： B依赖于A
+ */
+
+public class B
+{
+    private String name;
+    private A a;
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public A getA()
+    {
+        return a;
+    }
+
+    public void setA(A a)
+    {
+        this.a = a;
+    }
+}
+```
+
+
+
+
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="a" class="mao.test4.A">
+        <property name="name" value="A依赖于B"/>
+        <property name="b" ref="b"/>
+    </bean>
+
+    <bean id="b" class="mao.test4.B">
+        <property name="name" value="B依赖于A"/>
+        <property name="a" ref="a"/>
+    </bean>
+
+</beans>
+```
+
+
+
+```java
+package mao.test4;
+
+import mao.customize.context.ApplicationContext;
+import mao.customize.context.ClassPathXmlApplicationContext;
+
+/**
+ * Project name(项目名称)：java设计模式_自定义Spring框架
+ * Package(包名): mao.test4
+ * Class(类名): Test
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/25
+ * Time(创建时间)： 18:29
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class Test
+{
+    public static void main(String[] args) throws Exception
+    {
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("beans4.xml");
+        B b = applicationContext.getBean("b", B.class);
+        System.out.println(b.getA().getName());
+        System.out.println(b.getName());
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+Exception in thread "main" java.lang.StackOverflowError
+	at java.base/java.lang.Class.getConstructor0(Class.java:3510)
+	at java.base/java.lang.Class.getDeclaredConstructor(Class.java:2691)
+	at mao.customize.context.ClassPathXmlApplicationContext.getBean(ClassPathXmlApplicationContext.java:75)
+	at mao.customize.context.ClassPathXmlApplicationContext.getBean(ClassPathXmlApplicationContext.java:92)
+	at mao.customize.context.ClassPathXmlApplicationContext.getBean(ClassPathXmlApplicationContext.java:92)
+	at mao.customize.context.ClassPathXmlApplicationContext.getBean(ClassPathXmlApplicationContext.java:92)
+	...
+	...
+	...
+```
+
+
+
+![image-20220825184353744](img/java设计模式学习笔记/image-20220825184353744.png)
+
+
+
+
+
+A依赖于B，B依赖于A也会出现死递归
+
+
+
+
+
+```java
+package mao.test4;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+/**
+ * Project name(项目名称)：java设计模式_自定义Spring框架
+ * Package(包名): mao.test4
+ * Class(类名): TestBySpring
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/25
+ * Time(创建时间)： 18:33
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class TestBySpring
+{
+    public static void main(String[] args)
+    {
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("beans4.xml");
+
+        B b = applicationContext.getBean("b", B.class);
+        System.out.println(b.getA().getName());
+        System.out.println(b.getName());
+    }
+}
+```
+
+
+
+运行结果：
+
+```sh
+A依赖于B
+B依赖于A
+```
+
+
+
+
+
+想要解决循环依赖问题，则需要使用三级缓存
+
+* 第一级缓存〈也叫单例池）singletonObjects:存放已经经历了完整生命周期的Bean对象
+* 第二级缓存: earlySingletonObjects，存放早期暴露出来的Bean对象，Bean的生命周期未结束（属性还未填充完整）
+* 第三级缓存: Map<String, ObiectFactory<?>> singletonFactories，存放可以生成Bean的工厂
+
+
+
+![image-20220825185206004](img/java设计模式学习笔记/image-20220825185206004.png)
+
+
+
+
+
+
+
+
+
+## 使用到的设计模式
+
+* 工厂模式。这个使用工厂模式 + 配置文件的方式。
+* 单例模式。Spring IOC管理的bean对象都是单例的，此处的单例不是通过构造器进行单例的控制的，而是spring框架对每一个bean只创建了一个对象。
+* 模板方法模式。AbstractApplicationContext类中的finishBeanInitialization()方法调用了子类的getBean()方法，因为getBean()的实现和环境息息相关。
+* 迭代器模式。对于MutablePropertyValues类定义使用到了迭代器模式，因为此类存储并管理PropertyValue对象，也属于一个容器，所以给该容器提供一个遍历方式。
+
+spring框架其实使用到了很多设计模式，如AOP使用到了代理模式，选择JDK代理或者CGLIB代理使用到了策略模式，还有适配器模式，装饰者模式，观察者模式等。
+
+
+
+
+
+
+
+
+
+
+
+
+
