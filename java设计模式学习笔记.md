@@ -24392,3 +24392,195 @@ public interface BeanDefinitionRegistry extends AliasRegistry {
 
 }
 ```
+
+
+
+
+
+BeanDefinitionRegistry接口的子实现类主要有以下几个：
+
+* DefaultListableBeanFactory
+
+  在该类中定义了如下代码，就是用来注册bean
+
+  ```java
+  private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(256);
+  ```
+
+
+
+![image-20220825143310590](img/java设计模式学习笔记/image-20220825143310590.png)
+
+
+
+
+
+
+* SimpleBeanDefinitionRegistry
+
+  在该类中定义了如下代码，就是用来注册bean
+
+  ```java
+  private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(64);
+  ```
+
+
+
+![image-20220825143430646](img/java设计模式学习笔记/image-20220825143430646.png)
+
+
+
+```java
+public class SimpleBeanDefinitionRegistry extends SimpleAliasRegistry implements BeanDefinitionRegistry {
+
+   /** Map of bean definition objects, keyed by bean name. */
+   private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(64);
+
+
+   @Override
+   public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
+         throws BeanDefinitionStoreException {
+
+      Assert.hasText(beanName, "'beanName' must not be empty");
+      Assert.notNull(beanDefinition, "BeanDefinition must not be null");
+      this.beanDefinitionMap.put(beanName, beanDefinition);
+   }
+
+   @Override
+   public void removeBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
+      if (this.beanDefinitionMap.remove(beanName) == null) {
+         throw new NoSuchBeanDefinitionException(beanName);
+      }
+   }
+
+   @Override
+   public BeanDefinition getBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
+      BeanDefinition bd = this.beanDefinitionMap.get(beanName);
+      if (bd == null) {
+         throw new NoSuchBeanDefinitionException(beanName);
+      }
+      return bd;
+   }
+
+   @Override
+   public boolean containsBeanDefinition(String beanName) {
+      return this.beanDefinitionMap.containsKey(beanName);
+   }
+
+   @Override
+   public String[] getBeanDefinitionNames() {
+      return StringUtils.toStringArray(this.beanDefinitionMap.keySet());
+   }
+
+   @Override
+   public int getBeanDefinitionCount() {
+      return this.beanDefinitionMap.size();
+   }
+
+   @Override
+   public boolean isBeanNameInUse(String beanName) {
+      return isAlias(beanName) || containsBeanDefinition(beanName);
+   }
+
+}
+```
+
+
+
+
+
+### 创建容器
+
+ClassPathXmlApplicationContext对Bean配置资源的载入是从refresh（）方法开始的。refresh（）方法是一个模板方法，规定了 IoC 容器的启动流程，有些逻辑要交给其子类实现。它对 Bean 配置资源进行载入，ClassPathXmlApplicationContext通过调用其父类AbstractApplicationContext的refresh（）方法启动整个IoC容器对Bean定义的载入过程。
+
+
+
+```java
+public abstract class AbstractApplicationContext extends DefaultResourceLoader
+		implements ConfigurableApplicationContext {
+...
+
+@Override
+public void refresh() throws BeansException, IllegalStateException {
+   synchronized (this.startupShutdownMonitor) {
+      StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
+
+      // Prepare this context for refreshing.
+      prepareRefresh();
+
+      // Tell the subclass to refresh the internal bean factory.
+      ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+
+      // Prepare the bean factory for use in this context.
+      prepareBeanFactory(beanFactory);
+
+      try {
+         // Allows post-processing of the bean factory in context subclasses.
+         postProcessBeanFactory(beanFactory);
+
+         StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
+         // Invoke factory processors registered as beans in the context.
+         invokeBeanFactoryPostProcessors(beanFactory);
+
+         // Register bean processors that intercept bean creation.
+         registerBeanPostProcessors(beanFactory);
+         beanPostProcess.end();
+
+         // Initialize message source for this context.
+         initMessageSource();
+
+         // Initialize event multicaster for this context.
+         initApplicationEventMulticaster();
+
+         // Initialize other special beans in specific context subclasses.
+         onRefresh();
+
+         // Check for listener beans and register them.
+         registerListeners();
+
+         // Instantiate all remaining (non-lazy-init) singletons.
+         finishBeanFactoryInitialization(beanFactory);
+
+         // Last step: publish corresponding event.
+         finishRefresh();
+      }
+
+      catch (BeansException ex) {
+         if (logger.isWarnEnabled()) {
+            logger.warn("Exception encountered during context initialization - " +
+                  "cancelling refresh attempt: " + ex);
+         }
+
+         // Destroy already created singletons to avoid dangling resources.
+         destroyBeans();
+
+         // Reset 'active' flag.
+         cancelRefresh(ex);
+
+         // Propagate exception to caller.
+         throw ex;
+      }
+
+      finally {
+         // Reset common introspection caches in Spring's core, since we
+         // might not ever need metadata for singleton beans anymore...
+         resetCommonCaches();
+         contextRefresh.end();
+      }
+   }
+}
+...
+}
+
+```
+
+
+
+
+
+
+
+
+
+## 自定义SpringIOC
+
