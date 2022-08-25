@@ -25443,3 +25443,211 @@ public class SimpleBeanDefinitionRegistry implements BeanDefinitionRegistry
 }
 ```
 
+
+
+
+
+
+
+
+
+---
+
+
+
+
+
+### BeanFactory接口
+
+在该接口中定义IOC容器的统一规范即获取bean对象
+
+
+
+```java
+package mao.customize.context;
+
+/**
+ * Project name(项目名称)：java设计模式_自定义Spring框架
+ * Package(包名): mao.customize.context
+ * Interface(接口名): BeanFactory
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/25
+ * Time(创建时间)： 16:25
+ * Version(版本): 1.0
+ * Description(描述)： 在该接口中定义IOC容器的统一规范即获取bean对象
+ */
+
+public interface BeanFactory
+{
+    /**
+     * 根据bean对象的名称获取bean对象
+     *
+     * @param name bean的名称，也就是bean标签的id
+     * @return Object类型的对象
+     * @throws Exception 异常
+     */
+    Object getBean(String name) throws Exception;
+
+    /**
+     * 根据bean对象的名称获取bean对象，并进行类型转换
+     *
+     * @param name  bean的名称，也就是bean标签的id
+     * @param clazz 类的字节码
+     * @param <T>   要转换的类型
+     * @return 一个clazz类型的对象
+     * @throws Exception 异常
+     */
+    <T> T getBean(String name, Class<? extends T> clazz) throws Exception;
+}
+```
+
+
+
+
+
+### ApplicationContext接口
+
+
+
+该接口的所以的子实现类对bean对象的创建都是非延时的，所以在该接口中定义 `refresh()` 方法，该方法主要完成以下两个功能：
+
+* 加载配置文件。
+* 根据注册表中的BeanDefinition对象封装的数据进行bean对象的创建。
+
+
+
+```java
+package mao.customize.context;
+
+/**
+ * Project name(项目名称)：java设计模式_自定义Spring框架
+ * Package(包名): mao.customize.context
+ * Interface(接口名): ApplicationContext
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/25
+ * Time(创建时间)： 16:28
+ * Version(版本): 1.0
+ * Description(描述)： 该接口的所以的子实现类对bean对象的创建都是非延时的，所以在该接口中定义 refresh() 方法
+ */
+
+public interface ApplicationContext extends BeanFactory
+{
+    /**
+     * refresh方法
+     * 进行配置文件加载并进行对象创建
+     * 方法的功能：
+     * <p>
+     * 1. 加载配置文件
+     * <p>
+     * 2. 根据注册表中的BeanDefinition对象封装的数据进行bean对象的创建
+     *
+     * @throws IllegalStateException 非法状态异常
+     * @throws Exception             异常
+     */
+    void refresh() throws IllegalStateException, Exception;
+    
+}
+```
+
+
+
+
+
+
+
+### AbstractApplicationContext类
+
+* 作为ApplicationContext接口的子类，所以该类也是非延时加载，所以需要在该类中定义一个Map集合，作为bean对象存储的容器。
+
+* 声明BeanDefinitionReader类型的变量，用来进行xml配置文件的解析，符合单一职责原则。
+
+  BeanDefinitionReader类型的对象创建交由子类实现，因为只有子类明确到底创建BeanDefinitionReader哪儿个子实现类对象
+
+
+
+```java
+package mao.customize.context;
+
+import mao.customize.pojo.BeanDefinition;
+import mao.customize.reader.BeanDefinitionReader;
+import mao.customize.registry.BeanDefinitionRegistry;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Project name(项目名称)：java设计模式_自定义Spring框架
+ * Package(包名): mao.customize.context
+ * Class(类名): AbstractApplicationContext
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/25
+ * Time(创建时间)： 16:34
+ * Version(版本): 1.0
+ * Description(描述)： ApplicationContext接口的子类，该类也是非延时加载
+ */
+
+public abstract class AbstractApplicationContext implements ApplicationContext
+{
+    //BeanDefinitionReader对象，用于加载配置和获取注册表对象
+    protected BeanDefinitionReader beanDefinitionReader;
+
+    //存储bean对象的容器。key存储的是bean的id值，value存储的是bean对象
+    protected Map<String, Object> singletonObjects = new HashMap<>();
+
+    //存储配置文件的路径
+    protected String configLocation;
+
+
+    @Override
+    public void refresh() throws IllegalStateException, Exception
+    {
+        //加载BeanDefinition
+        //在此抽象类类调用会出现空指针异常？BeanDefinitionReader对象的创建要要交给子类，
+        //而且此抽象类不能直接new，还有方法未重写，refresh由子类调用
+        beanDefinitionReader.loadBeanDefinitions(configLocation);
+        //初始化bean
+        this.finishBeanInitialization();
+    }
+
+    /**
+     * 初始化bean
+     *
+     * @throws Exception 异常
+     */
+    private void finishBeanInitialization() throws Exception
+    {
+        BeanDefinitionRegistry registry = beanDefinitionReader.getRegistry();
+        String[] beanDefinitionNames = registry.getBeanDefinitionNames();
+        for (String beanDefinitionName : beanDefinitionNames)
+        {
+            //BeanDefinition beanDefinition = registry.getBeanDefinition(beanDefinitionName);
+            //此方法交给子类来实现，模板方法模式
+            this.getBean(beanDefinitionName);
+        }
+    }
+}
+
+```
+
+
+
+
+
+
+
+### ClassPathXmlApplicationContext类
+
+该类主要是加载类路径下的配置文件，并进行bean对象的创建，主要完成以下功能：
+
+* 在构造方法中，创建BeanDefinitionReader对象。
+* 在构造方法中，调用refresh()方法，用于进行配置文件加载、创建bean对象并存储到容器中。
+* 重写父接口中的getBean()方法，并实现依赖注入操作。
+
+
+
