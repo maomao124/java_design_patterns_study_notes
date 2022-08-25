@@ -24215,3 +24215,180 @@ Spring IoC容器管理我们定义的各种Bean对象及其相互关系，而Bea
 
 
 ### BeanDefinitionReader
+
+Bean的解析过程非常复杂，功能被分得很细，因为这里需要被扩展的地方很多，必须保证足够的灵活性，以应对可能的变化。Bean的解析主要就是对Spring配置文件的解析。这个解析过程主要通过BeanDefinitionReader来完成
+
+
+
+![image-20220825142510034](img/java设计模式学习笔记/image-20220825142510034.png)
+
+
+
+
+
+```java
+public interface BeanDefinitionReader {
+
+   /**
+    * Return the bean factory to register the bean definitions with.
+    * <p>The factory is exposed through the {@link BeanDefinitionRegistry} interface,
+    * encapsulating the methods that are relevant for bean definition handling.
+    */
+   BeanDefinitionRegistry getRegistry();
+
+   /**
+    * Return the {@link ResourceLoader} to use for resource locations.
+    * <p>Can be checked for the {@code ResourcePatternResolver} interface and cast
+    * accordingly, for loading multiple resources for a given resource pattern.
+    * <p>A {@code null} return value suggests that absolute resource loading
+    * is not available for this bean definition reader.
+    * <p>This is mainly meant to be used for importing further resources
+    * from within a bean definition resource, for example via the "import"
+    * tag in XML bean definitions. It is recommended, however, to apply
+    * such imports relative to the defining resource; only explicit full
+    * resource locations will trigger absolute path based resource loading.
+    * <p>There is also a {@code loadBeanDefinitions(String)} method available,
+    * for loading bean definitions from a resource location (or location pattern).
+    * This is a convenience to avoid explicit {@code ResourceLoader} handling.
+    * @see #loadBeanDefinitions(String)
+    * @see org.springframework.core.io.support.ResourcePatternResolver
+    */
+   @Nullable
+   ResourceLoader getResourceLoader();
+
+   /**
+    * Return the class loader to use for bean classes.
+    * <p>{@code null} suggests to not load bean classes eagerly
+    * but rather to just register bean definitions with class names,
+    * with the corresponding classes to be resolved later (or never).
+    */
+   @Nullable
+   ClassLoader getBeanClassLoader();
+
+   /**
+    * Return the {@link BeanNameGenerator} to use for anonymous beans
+    * (without explicit bean name specified).
+    */
+   BeanNameGenerator getBeanNameGenerator();
+
+
+   /**
+    * Load bean definitions from the specified resource.
+    * @param resource the resource descriptor
+    * @return the number of bean definitions found
+    * @throws BeanDefinitionStoreException in case of loading or parsing errors
+    */
+   int loadBeanDefinitions(Resource resource) throws BeanDefinitionStoreException;
+
+   /**
+    * Load bean definitions from the specified resources.
+    * @param resources the resource descriptors
+    * @return the number of bean definitions found
+    * @throws BeanDefinitionStoreException in case of loading or parsing errors
+    */
+   int loadBeanDefinitions(Resource... resources) throws BeanDefinitionStoreException;
+
+   /**
+    * Load bean definitions from the specified resource location.
+    * <p>The location can also be a location pattern, provided that the
+    * {@link ResourceLoader} of this bean definition reader is a
+    * {@code ResourcePatternResolver}.
+    * @param location the resource location, to be loaded with the {@code ResourceLoader}
+    * (or {@code ResourcePatternResolver}) of this bean definition reader
+    * @return the number of bean definitions found
+    * @throws BeanDefinitionStoreException in case of loading or parsing errors
+    * @see #getResourceLoader()
+    * @see #loadBeanDefinitions(org.springframework.core.io.Resource)
+    * @see #loadBeanDefinitions(org.springframework.core.io.Resource[])
+    */
+   int loadBeanDefinitions(String location) throws BeanDefinitionStoreException;
+
+   /**
+    * Load bean definitions from the specified resource locations.
+    * @param locations the resource locations, to be loaded with the {@code ResourceLoader}
+    * (or {@code ResourcePatternResolver}) of this bean definition reader
+    * @return the number of bean definitions found
+    * @throws BeanDefinitionStoreException in case of loading or parsing errors
+    */
+   int loadBeanDefinitions(String... locations) throws BeanDefinitionStoreException;
+
+}
+```
+
+
+
+
+
+### BeanDefinitionRegistry
+
+BeanDefinitionReader用来解析bean定义，并封装BeanDefinition对象，而我们定义的配置文件中定义了很多bean标签，所以就有一个问题，解析的BeanDefinition对象存储到哪儿？答案就是BeanDefinition的注册中心，而该注册中心顶层接口就是BeanDefinitionRegistry
+
+
+
+![image-20220825142846334](img/java设计模式学习笔记/image-20220825142846334.png)
+
+
+
+```java
+public interface BeanDefinitionRegistry extends AliasRegistry {
+
+   /**
+    * Register a new bean definition with this registry.
+    * Must support RootBeanDefinition and ChildBeanDefinition.
+    * @param beanName the name of the bean instance to register
+    * @param beanDefinition definition of the bean instance to register
+    * @throws BeanDefinitionStoreException if the BeanDefinition is invalid
+    * @throws BeanDefinitionOverrideException if there is already a BeanDefinition
+    * for the specified bean name and we are not allowed to override it
+    * @see GenericBeanDefinition
+    * @see RootBeanDefinition
+    * @see ChildBeanDefinition
+    */
+   void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
+         throws BeanDefinitionStoreException;
+
+   /**
+    * Remove the BeanDefinition for the given name.
+    * @param beanName the name of the bean instance to register
+    * @throws NoSuchBeanDefinitionException if there is no such bean definition
+    */
+   void removeBeanDefinition(String beanName) throws NoSuchBeanDefinitionException;
+
+   /**
+    * Return the BeanDefinition for the given bean name.
+    * @param beanName name of the bean to find a definition for
+    * @return the BeanDefinition for the given name (never {@code null})
+    * @throws NoSuchBeanDefinitionException if there is no such bean definition
+    */
+   BeanDefinition getBeanDefinition(String beanName) throws NoSuchBeanDefinitionException;
+
+   /**
+    * Check if this registry contains a bean definition with the given name.
+    * @param beanName the name of the bean to look for
+    * @return if this registry contains a bean definition with the given name
+    */
+   boolean containsBeanDefinition(String beanName);
+
+   /**
+    * Return the names of all beans defined in this registry.
+    * @return the names of all beans defined in this registry,
+    * or an empty array if none defined
+    */
+   String[] getBeanDefinitionNames();
+
+   /**
+    * Return the number of beans defined in the registry.
+    * @return the number of beans defined in the registry
+    */
+   int getBeanDefinitionCount();
+
+   /**
+    * Determine whether the given bean name is already in use within this registry,
+    * i.e. whether there is a local bean or alias registered under this name.
+    * @param beanName the name to check
+    * @return whether the given bean name is already in use
+    */
+   boolean isBeanNameInUse(String beanName);
+
+}
+```
