@@ -23587,3 +23587,292 @@ public class Test
 
 
 
+## 使用
+
+**引入依赖：**
+
+```xml
+<dependencies>
+        <!--Spring核心基础依赖-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>5.3.16</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>5.3.16</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>5.3.16</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-expression</artifactId>
+            <version>5.3.16</version>
+        </dependency>
+        <!--spring注解，初始化回调方法和销毁回调方法注解-->
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+        <!--注解实现Spring自动装配-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+            <version>5.3.16</version>
+        </dependency>
+        <!--spring-aspects-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aspects</artifactId>
+            <version>5.3.16</version>
+        </dependency>
+        <!--日志相关-->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.2</version>
+        </dependency>
+    </dependencies>
+```
+
+
+
+
+
+**编写业务代码：**
+
+
+
+```java
+package mao.use;
+
+/**
+ * Project name(项目名称)：java设计模式_自定义Spring框架
+ * Package(包名): mao.use
+ * Interface(接口名): UserDao
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/24
+ * Time(创建时间)： 20:47
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface UserDao
+{
+    void add();
+}
+```
+
+
+
+```java
+package mao.use;
+
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+/**
+ * Project name(项目名称)：java设计模式_自定义Spring框架
+ * Package(包名): mao.use
+ * Class(类名): UserDaoImpl
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/24
+ * Time(创建时间)： 20:47
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class UserDaoImpl implements UserDao
+{
+    private static final Log log = LogFactory.getLog(UserDaoImpl.class);
+
+    @Override
+    public void add()
+    {
+        log.info("UserDaoImpl");
+    }
+}
+```
+
+
+
+```java
+package mao.use;
+
+/**
+ * Project name(项目名称)：java设计模式_自定义Spring框架
+ * Package(包名): mao.use
+ * Interface(接口名): UserService
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/24
+ * Time(创建时间)： 20:49
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public interface UserService
+{
+    void add();
+}
+```
+
+
+
+```java
+package mao.use;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+/**
+ * Project name(项目名称)：java设计模式_自定义Spring框架
+ * Package(包名): mao.use
+ * Class(类名): UserServiceImpl
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/24
+ * Time(创建时间)： 20:49
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class UserServiceImpl implements UserService
+{
+    private UserDao userDao;
+
+    private static final Log log = LogFactory.getLog(UserServiceImpl.class);
+
+    public void setUserDao(UserDao userDao)
+    {
+        this.userDao = userDao;
+    }
+
+    @Override
+    public void add()
+    {
+        log.info("UserServiceImpl");
+        userDao.add();
+    }
+}
+```
+
+
+
+```java
+package mao.use;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+/**
+ * Project name(项目名称)：java设计模式_自定义Spring框架
+ * Package(包名): mao.use
+ * Class(类名): UserController
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/24
+ * Time(创建时间)： 20:51
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+public class UserController
+{
+    public static void main(String[] args)
+    {
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("beans.xml");
+        UserService userService = applicationContext.getBean(UserServiceImpl.class);
+        userService.add();
+    }
+}
+```
+
+
+
+**在类路径下编写beans.xml文件**
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="userDao" class="mao.use.UserDaoImpl"/>
+
+    <bean id="userService" class="mao.use.UserServiceImpl">
+        <property name="userDao" ref="userDao"/>
+    </bean>
+
+</beans>
+```
+
+
+
+**运行结果：**
+
+```sh
+8月 24, 2022 8:59:55 下午 mao.use.UserServiceImpl add
+信息: UserServiceImpl
+8月 24, 2022 8:59:55 下午 mao.use.UserDaoImpl add
+信息: UserDaoImpl
+```
+
+
+
+
+
+该示例体现了Spring框架的IOC（Inversion of Control）和DI（Dependency Injection, DI）
+
+
+
+
+
+
+
+## 核心功能结构
+
+Spring大约有20个模块，由1300多个不同的文件构成。这些模块可以分为:
+
+核心容器、AOP和设备支持、数据访问与集成、Web组件、通信报文和集成测试等
+
+
+
+![image-20220824210240914](img/java设计模式学习笔记/image-20220824210240914.png)
+
+
+
+
+
+核心容器由 beans、core、context 和 expression（Spring Expression Language，SpEL）4个模块组成。
+
+* spring-beans和spring-core模块是Spring框架的核心模块，包含了控制反转（Inversion of Control，IOC）和依赖注入（Dependency Injection，DI）。BeanFactory使用控制反转对应用程序的配置和依赖性规范与实际的应用程序代码进行了分离。BeanFactory属于延时加载，也就是说在实例化容器对象后并不会自动实例化Bean，只有当Bean被使用时，BeanFactory才会对该 Bean 进行实例化与依赖关系的装配。
+* spring-context模块构架于核心模块之上，扩展了BeanFactory，为它添加了Bean生命周期控制、框架事件体系及资源加载透明化等功能。此外，该模块还提供了许多企业级支持，如邮件访问、远程访问、任务调度等，ApplicationContext 是该模块的核心接口，它的超类是 BeanFactory。与BeanFactory不同，ApplicationContext实例化后会自动对所有的单实例Bean进行实例化与依赖关系的装配，使之处于待用状态。
+* spring-context-support模块是对Spring IoC容器及IoC子容器的扩展支持。
+* spring-context-indexer模块是Spring的类管理组件和Classpath扫描组件。
+* spring-expression 模块是统一表达式语言（EL）的扩展模块，可以查询、管理运行中的对象，同时也可以方便地调用对象方法，以及操作数组、集合等。它的语法类似于传统EL，但提供了额外的功能，最出色的要数函数调用和简单字符串的模板函数。EL的特性是基于Spring产品的需求而设计的，可以非常方便地同Spring IoC进行交互。
+
+
+
+
+
+
+
+## Spring IOC相关接口
+
+### BeanFactory
+
