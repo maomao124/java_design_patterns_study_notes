@@ -25035,7 +25035,7 @@ public interface BeanDefinitionRegistry
     /**
      * 注册BeanDefinition对象到注册表中
      *
-     * @param beanName       bean的名称
+     * @param beanName       bean的名称（bean的id属性）
      * @param beanDefinition BeanDefinition对象
      */
     void registerBeanDefinition(String beanName, BeanDefinition beanDefinition);
@@ -25043,7 +25043,7 @@ public interface BeanDefinitionRegistry
     /**
      * 从注册表中删除指定名称的BeanDefinition对象
      *
-     * @param beanName bean的名称
+     * @param beanName bean的名称（bean的id属性）
      * @throws Exception 异常
      */
     void removeBeanDefinition(String beanName) throws Exception;
@@ -25051,7 +25051,7 @@ public interface BeanDefinitionRegistry
     /**
      * 根据名称从注册表中获取BeanDefinition对象
      *
-     * @param beanName bean的名称
+     * @param beanName bean的名称（bean的id属性）
      * @return BeanDefinition对象
      * @throws Exception 异常
      */
@@ -25060,7 +25060,7 @@ public interface BeanDefinitionRegistry
     /**
      * 根据bean的名称判断是否包含指定的BeanDefinition对象
      *
-     * @param beanName bean的名称
+     * @param beanName bean的名称（bean的id属性）
      * @return boolean类型
      */
     boolean containsBeanDefinition(String beanName);
@@ -25079,6 +25079,7 @@ public interface BeanDefinitionRegistry
      */
     String[] getBeanDefinitionNames();
 }
+
 ```
 
 
@@ -25158,6 +25159,243 @@ public class SimpleBeanDefinitionRegistry implements BeanDefinitionRegistry
         {
             return;
         }
+        //判断id是否唯一
+        if (this.beanDefinitionMap.containsKey(beanName))
+        {
+            throw new RuntimeException("bean的id不唯一！！！ 不唯一的id为" + beanName);
+        }
+        beanDefinitionMap.put(beanName, beanDefinition);
+    }
+
+    @Override
+    public void removeBeanDefinition(String beanName) throws Exception
+    {
+        if (beanName == null)
+        {
+            return;
+        }
+        beanDefinitionMap.remove(beanName);
+    }
+
+    @Override
+    public BeanDefinition getBeanDefinition(String beanName) throws Exception
+    {
+        if (beanName == null)
+        {
+            return null;
+        }
+        return beanDefinitionMap.get(beanName);
+    }
+
+    @Override
+    public boolean containsBeanDefinition(String beanName)
+    {
+        if (beanName == null)
+        {
+            return false;
+        }
+        return beanDefinitionMap.containsKey(beanName);
+    }
+
+    @Override
+    public int getBeanDefinitionCount()
+    {
+        return beanDefinitionMap.size();
+    }
+
+    @Override
+    public String[] getBeanDefinitionNames()
+    {
+        return beanDefinitionMap.keySet().toArray(new String[0]);
+    }
+}
+
+```
+
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+### BeanDefinitionReader接口
+
+BeanDefinitionReader是用来解析配置文件并在注册表中注册bean的信息。定义了两个规范：
+
+* 获取注册表的功能，让外界可以通过该对象获取注册表对象。
+* 加载配置文件，并注册bean数据。
+
+
+
+
+
+```java
+package mao.customize.reader;
+
+import mao.customize.registry.BeanDefinitionRegistry;
+
+/**
+ * Project name(项目名称)：java设计模式_自定义Spring框架
+ * Package(包名): mao.customize.reader
+ * Interface(接口名): BeanDefinitionReader
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/25
+ * Time(创建时间)： 15:36
+ * Version(版本): 1.0
+ * Description(描述)：
+ * BeanDefinitionReader是用来解析配置文件并在注册表中注册bean的信息。定义了两个规范：
+ * <p>
+ * 获取注册表的功能，让外界可以通过该对象获取注册表对象。
+ * 加载配置文件，并注册bean数据。
+ */
+
+public interface BeanDefinitionReader
+{
+    /**
+     * 获取注册表对象
+     *
+     * @return BeanDefinitionRegistry的子实现类
+     */
+    BeanDefinitionRegistry getRegistry();
+
+    /**
+     * 加载配置文件并在注册表中进行注册
+     *
+     * @param configLocation 文件的路径，一般都为类路径，具体看实现类
+     * @throws Exception 异常
+     */
+    void loadBeanDefinitions(String configLocation) throws Exception;
+}
+```
+
+
+
+
+
+### XmlBeanDefinitionReader类
+
+XmlBeanDefinitionReader类是专门用来解析xml配置文件的。该类实现BeanDefinitionReader接口并实现接口中的两个功能
+
+
+
+加载需要dom4j
+
+需要在pom.xml导入dom4j的依赖
+
+```xml
+<!--dom4j依赖 解析xml文件-->
+<dependency>
+    <groupId>org.dom4j</groupId>
+    <artifactId>dom4j</artifactId>
+    <version>2.1.3</version>
+</dependency>
+```
+
+
+
+|       Attribute       |                     定义了 XML 的属性。                      |
+| :-------------------: | :----------------------------------------------------------: |
+|        Branch         | 指能够包含子节点的节点。如XML元素(Element)和文档(Docuemnts)定义了一个公共的行为 |
+|         CDATA         |                    定义了 XML CDATA 区域                     |
+|     CharacterData     | 是一个标识接口，标识基于字符的节点。如CDATA，Comment, Text.  |
+|        Comment        |                    定义了 XML 注释的行为                     |
+|       Document        |                        定义了XML 文档                        |
+|     DocumentType      |                    定义 XML DOCTYPE 声明                     |
+|        Element        |                         定义XML 元素                         |
+|    ElementHandler     |                  定义了Element 对象的处理器                  |
+|      ElementPath      |  被 ElementHandler 使用，用于取得当前正在处理的路径层次信息  |
+|        Entity         |                       定义 XML entity                        |
+|         Node          |             为dom4j中所有的XML节点定义了多态行为             |
+|      NodeFilter       | 定义了在dom4j 节点中产生的一个滤镜或谓词的行为（predicate）  |
+| ProcessingInstruction |                      定义 XML 处理指令                       |
+|         Text          |                      定义 XML 文本节点                       |
+|        Visitor        |                     用于实现 Visitor模式                     |
+|         XPath         |          在分析一个字符串后会提供一个 XPath 表达式           |
+
+
+
+
+
+```java
+package mao.customize.registry;
+
+import mao.customize.pojo.BeanDefinition;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Project name(项目名称)：java设计模式_自定义Spring框架
+ * Package(包名): mao.customize.registry
+ * Class(类名): SimpleBeanDefinitionRegistry
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/25
+ * Time(创建时间)： 15:22
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+public class SimpleBeanDefinitionRegistry implements BeanDefinitionRegistry
+{
+
+    private final Map<String, BeanDefinition> beanDefinitionMap;
+
+    /**
+     * Instantiates a new Simple bean definition registry.
+     */
+    public SimpleBeanDefinitionRegistry()
+    {
+        this.beanDefinitionMap = new HashMap<>();
+    }
+
+    /**
+     * Instantiates a new Simple bean definition registry.
+     *
+     * @param beanDefinitionMap the bean definition map
+     */
+    public SimpleBeanDefinitionRegistry(Map<String, BeanDefinition> beanDefinitionMap)
+    {
+        //this.beanDefinitionMap = Objects.requireNonNullElseGet(beanDefinitionMap, HashMap::new);
+        if (beanDefinitionMap != null)
+        {
+            this.beanDefinitionMap = beanDefinitionMap;
+        }
+        else
+        {
+            this.beanDefinitionMap = new HashMap<>();
+        }
+
+    }
+
+    @Override
+    public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
+    {
+        if (beanName == null)
+        {
+            return;
+        }
+        if (beanDefinition == null)
+        {
+            return;
+        }
+        //判断id是否唯一
+        if (this.beanDefinitionMap.containsKey(beanName))
+        {
+            throw new RuntimeException("bean的id不唯一！！！ 不唯一的id为" + beanName);
+        }
         beanDefinitionMap.put(beanName, beanDefinition);
     }
 
@@ -25204,27 +25442,4 @@ public class SimpleBeanDefinitionRegistry implements BeanDefinitionRegistry
     }
 }
 ```
-
-
-
-
-
-
-
----
-
-
-
-
-
-
-
-### BeanDefinitionReader接口
-
-BeanDefinitionReader是用来解析配置文件并在注册表中注册bean的信息。定义了两个规范：
-
-* 获取注册表的功能，让外界可以通过该对象获取注册表对象。
-* 加载配置文件，并注册bean数据。
-
-
 
