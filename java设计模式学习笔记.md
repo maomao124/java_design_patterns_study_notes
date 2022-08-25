@@ -24830,16 +24830,16 @@ public class MutablePropertyValues implements Iterable<PropertyValue>
         }
         for (int i = 0; i < this.propertyValueList.size(); i++)
         {
-            //从集合里获取，判断是否有名字冲突的，也就是id，id唯一
+            //从集合里获取，判断是否有名字冲突的，也就是属性的名称，名称对应一个set方法，应该唯一
             PropertyValue propertyValue1 = this.propertyValueList.get(i);
             if (propertyValue1.getName().equals(propertyValue.getName()))
             {
-                //id冲突
+                //属性名称冲突
                 //这里直接就替换
                 this.propertyValueList.set(i, new PropertyValue(propertyValue.getName(), propertyValue.getRef(), propertyValue.getValue()));
             }
         }
-        //没有id冲突，直接添加
+        //没有名称冲突，直接添加
         this.propertyValueList.add(propertyValue);
         return this;
     }
@@ -24855,4 +24855,376 @@ public class MutablePropertyValues implements Iterable<PropertyValue>
         return this.getPropertyValue(propertyName) != null;
     }
 }
+
 ```
+
+
+
+
+
+### BeanDefinition类
+
+BeanDefinition类用来封装bean信息的，主要包含id（即bean对象的名称）、class（需要交由spring管理的类的全类名）及子标签property数据
+
+
+
+```java
+package mao.customize.pojo;
+
+/**
+ * Project name(项目名称)：java设计模式_自定义Spring框架
+ * Package(包名): mao.customize.pojo
+ * Class(类名): BeanDefinition
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/25
+ * Time(创建时间)： 15:09
+ * Version(版本): 1.0
+ * Description(描述)： BeanDefinition类用来封装bean信息的，主要包含id（即bean对象的名称）、class（需要交由spring管理的类的全类名）及子标签property数据。
+ * <p>
+ * 例如：
+ * <br>
+ *
+ * <bean id="userService" class="mao.use.UserServiceImpl">
+ * <property name="userDao" ref="userDao"/>
+ * </bean>
+ */
+
+
+public class BeanDefinition
+{
+    //id，id唯一
+    private String id;
+    //类的全路径名称，String类型
+    private String className;
+    //MutablePropertyValues对象，也就是多个property数据
+    private MutablePropertyValues propertyValues;
+
+    /**
+     * Instantiates a new Bean definition.
+     */
+    public BeanDefinition()
+    {
+        this.propertyValues = new MutablePropertyValues();
+    }
+
+    /**
+     * Instantiates a new Bean definition.
+     *
+     * @param id             the id
+     * @param className      the class name
+     * @param propertyValues the property values
+     */
+    public BeanDefinition(String id, String className, MutablePropertyValues propertyValues)
+    {
+        this.id = id;
+        this.className = className;
+        this.propertyValues = propertyValues;
+    }
+
+    /**
+     * Gets id.
+     *
+     * @return the id
+     */
+    public String getId()
+    {
+        return id;
+    }
+
+    /**
+     * Sets id.
+     *
+     * @param id the id
+     */
+    public void setId(String id)
+    {
+        this.id = id;
+    }
+
+    /**
+     * Gets class name.
+     *
+     * @return the class name
+     */
+    public String getClassName()
+    {
+        return className;
+    }
+
+    /**
+     * Sets class name.
+     *
+     * @param className the class name
+     */
+    public void setClassName(String className)
+    {
+        this.className = className;
+    }
+
+    /**
+     * Gets property values.
+     *
+     * @return the property values
+     */
+    public MutablePropertyValues getPropertyValues()
+    {
+        return propertyValues;
+    }
+
+    /**
+     * Sets property values.
+     *
+     * @param propertyValues the property values
+     */
+    public void setPropertyValues(MutablePropertyValues propertyValues)
+    {
+        this.propertyValues = propertyValues;
+    }
+}
+```
+
+
+
+
+
+
+
+
+
+---
+
+
+
+
+
+### BeanDefinitionRegistry接口
+
+BeanDefinitionRegistry接口定义了注册表的相关操作，定义如下功能：
+
+* 注册BeanDefinition对象到注册表中
+* 从注册表中删除指定名称的BeanDefinition对象
+* 根据名称从注册表中获取BeanDefinition对象
+* 判断注册表中是否包含指定名称的BeanDefinition对象
+* 获取注册表中BeanDefinition对象的个数
+* 获取注册表中所有的BeanDefinition的名称
+
+
+
+```java
+package mao.customize.registry;
+
+import mao.customize.pojo.BeanDefinition;
+
+/**
+ * Project name(项目名称)：java设计模式_自定义Spring框架
+ * Package(包名): mao.customize.registry
+ * Interface(接口名): BeanDefinitionRegistry
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/25
+ * Time(创建时间)： 15:16
+ * Version(版本): 1.0
+ * Description(描述)： BeanDefinitionRegistry接口定义了注册表的相关操作
+ */
+
+public interface BeanDefinitionRegistry
+{
+    /**
+     * 注册BeanDefinition对象到注册表中
+     *
+     * @param beanName       bean的名称
+     * @param beanDefinition BeanDefinition对象
+     */
+    void registerBeanDefinition(String beanName, BeanDefinition beanDefinition);
+
+    /**
+     * 从注册表中删除指定名称的BeanDefinition对象
+     *
+     * @param beanName bean的名称
+     * @throws Exception 异常
+     */
+    void removeBeanDefinition(String beanName) throws Exception;
+
+    /**
+     * 根据名称从注册表中获取BeanDefinition对象
+     *
+     * @param beanName bean的名称
+     * @return BeanDefinition对象
+     * @throws Exception 异常
+     */
+    BeanDefinition getBeanDefinition(String beanName) throws Exception;
+
+    /**
+     * 根据bean的名称判断是否包含指定的BeanDefinition对象
+     *
+     * @param beanName bean的名称
+     * @return boolean类型
+     */
+    boolean containsBeanDefinition(String beanName);
+
+    /**
+     * 返回BeanDefinition的个数
+     *
+     * @return BeanDefinition的个数，int型
+     */
+    int getBeanDefinitionCount();
+
+    /**
+     * 获取所有的名称列表
+     *
+     * @return String数组
+     */
+    String[] getBeanDefinitionNames();
+}
+```
+
+
+
+
+
+
+
+### SimpleBeanDefinitionRegistry类
+
+该类实现了BeanDefinitionRegistry接口，定义了Map集合作为注册表容器
+
+
+
+```java
+package mao.customize.registry;
+
+import mao.customize.pojo.BeanDefinition;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Project name(项目名称)：java设计模式_自定义Spring框架
+ * Package(包名): mao.customize.registry
+ * Class(类名): SimpleBeanDefinitionRegistry
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2022/8/25
+ * Time(创建时间)： 15:22
+ * Version(版本): 1.0
+ * Description(描述)： 无
+ */
+
+
+public class SimpleBeanDefinitionRegistry implements BeanDefinitionRegistry
+{
+
+    private final Map<String, BeanDefinition> beanDefinitionMap;
+
+    /**
+     * Instantiates a new Simple bean definition registry.
+     */
+    public SimpleBeanDefinitionRegistry()
+    {
+        this.beanDefinitionMap = new HashMap<>();
+    }
+
+    /**
+     * Instantiates a new Simple bean definition registry.
+     *
+     * @param beanDefinitionMap the bean definition map
+     */
+    public SimpleBeanDefinitionRegistry(Map<String, BeanDefinition> beanDefinitionMap)
+    {
+        //this.beanDefinitionMap = Objects.requireNonNullElseGet(beanDefinitionMap, HashMap::new);
+        if (beanDefinitionMap != null)
+        {
+            this.beanDefinitionMap = beanDefinitionMap;
+        }
+        else
+        {
+            this.beanDefinitionMap = new HashMap<>();
+        }
+
+    }
+
+    @Override
+    public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
+    {
+        if (beanName == null)
+        {
+            return;
+        }
+        if (beanDefinition == null)
+        {
+            return;
+        }
+        beanDefinitionMap.put(beanName, beanDefinition);
+    }
+
+    @Override
+    public void removeBeanDefinition(String beanName) throws Exception
+    {
+        if (beanName == null)
+        {
+            return;
+        }
+        beanDefinitionMap.remove(beanName);
+    }
+
+    @Override
+    public BeanDefinition getBeanDefinition(String beanName) throws Exception
+    {
+        if (beanName == null)
+        {
+            return null;
+        }
+        return beanDefinitionMap.get(beanName);
+    }
+
+    @Override
+    public boolean containsBeanDefinition(String beanName)
+    {
+        if (beanName == null)
+        {
+            return false;
+        }
+        return beanDefinitionMap.containsKey(beanName);
+    }
+
+    @Override
+    public int getBeanDefinitionCount()
+    {
+        return beanDefinitionMap.size();
+    }
+
+    @Override
+    public String[] getBeanDefinitionNames()
+    {
+        return beanDefinitionMap.keySet().toArray(new String[0]);
+    }
+}
+```
+
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+### BeanDefinitionReader接口
+
+BeanDefinitionReader是用来解析配置文件并在注册表中注册bean的信息。定义了两个规范：
+
+* 获取注册表的功能，让外界可以通过该对象获取注册表对象。
+* 加载配置文件，并注册bean数据。
+
+
+
